@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Trang chủ - Dashboard | Quản lý Trang trại Gà</title>
+    <title>Quản lý thiết bị IoT | Quản lý Trang trại Gà</title>
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -310,96 +310,161 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Trang chủ - Tổng quan</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Tải báo cáo</a>
+                        <h1 class="h3 mb-0 text-gray-800">Quản lý thiết bị IoT</h1>
+                        <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addDeviceModal">
+                            <i class="fas fa-plus fa-sm text-white-50"></i> Thêm thiết bị mới
+                        </button>
                     </div>
 
                     <!-- Content Row -->
                     <div class="row">
 
-                        <!-- Tổng số chuồng -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-primary shadow h-100 py-2">
+                        <!-- Danh sách thiết bị -->
+                        <div class="col-12">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Danh sách thiết bị IoT</h6>
+                                </div>
                                 <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Tổng số chuồng</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">5</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-home fa-2x text-gray-300"></i>
-                                        </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Tên thiết bị</th>
+                                                    <th>Loại</th>
+                                                    <th>Chuồng</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Pin</th>
+                                                    <th>Tín hiệu</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>1</td>
+                                                    <td>Cảm biến nhiệt độ A1</td>
+                                                    <td><span class="badge badge-info">Cảm biến</span></td>
+                                                    <td>Chuồng A</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>85%</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>2</td>
+                                                    <td>Cảm biến ẩm A1</td>
+                                                    <td><span class="badge badge-info">Cảm biến</span></td>
+                                                    <td>Chuồng A</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>92%</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>3</td>
+                                                    <td>Quạt thông gió A1</td>
+                                                    <td><span class="badge badge-warning">Quạt</span></td>
+                                                    <td>Chuồng A</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>-</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>4</td>
+                                                    <td>Đèn LED A1</td>
+                                                    <td><span class="badge badge-secondary">Đèn</span></td>
+                                                    <td>Chuồng A</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>-</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>5</td>
+                                                    <td>Hệ thống cho ăn A1</td>
+                                                    <td><span class="badge badge-primary">Hệ thống</span></td>
+                                                    <td>Chuồng A</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>-</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>6</td>
+                                                    <td>Cảm biến nhiệt độ B1</td>
+                                                    <td><span class="badge badge-info">Cảm biến</span></td>
+                                                    <td>Chuồng B</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>78%</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>7</td>
+                                                    <td>Quạt thông gió B1</td>
+                                                    <td><span class="badge badge-warning">Quạt</span></td>
+                                                    <td>Chuồng B</td>
+                                                    <td><span class="badge badge-success">Online</span></td>
+                                                    <td>-</td>
+                                                    <td><i class="fas fa-signal text-success"></i> Mạnh</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>8</td>
+                                                    <td>Cảm biến nhiệt độ C1</td>
+                                                    <td><span class="badge badge-info">Cảm biến</span></td>
+                                                    <td>Chuồng C</td>
+                                                    <td><span class="badge badge-warning">Chờ</span></td>
+                                                    <td>45%</td>
+                                                    <td><i class="fas fa-signal text-warning"></i> Yếu</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>9</td>
+                                                    <td>Hệ thống cho ăn E1</td>
+                                                    <td><span class="badge badge-primary">Hệ thống</span></td>
+                                                    <td>Chuồng E</td>
+                                                    <td><span class="badge badge-danger">Offline</span></td>
+                                                    <td>-</td>
+                                                    <td><i class="fas fa-signal text-danger"></i> Không</td>
+                                                    <td>
+                                                        <button class="btn btn-sm btn-primary" title="Cấu hình"><i class="fas fa-cog"></i></button>
+                                                        <button class="btn btn-sm btn-danger" title="Xóa"><i class="fas fa-trash"></i></button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Tổng thiết bị -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-success shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Tổng thiết bị</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">20</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-wifi fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Thiết bị đang hoạt động -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-info shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Thiết bị Online
-                                            </div>
-                                            <div class="row no-gutters align-items-center">
-                                                <div class="col-auto">
-                                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">18</div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="progress progress-sm mr-2">
-                                                        <div class="progress-bar bg-info" role="progressbar"
-                                                            style="width: 90%" aria-valuenow="90" aria-valuemin="0"
-                                                            aria-valuemax="100"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Cảnh báo -->
-                        <div class="col-xl-3 col-md-6 mb-4">
-                            <div class="card border-left-warning shadow h-100 py-2">
-                                <div class="card-body">
-                                    <div class="row no-gutters align-items-center">
-                                        <div class="col mr-2">
-                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Cảnh báo</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
-                                        </div>
-                                        <div class="col-auto">
-                                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Content Row -->
