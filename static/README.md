@@ -1,65 +1,175 @@
-# [Start Bootstrap - SB Admin 2](https://startbootstrap.com/theme/sb-admin-2/)
+# Static Files - SB Admin 2 Theme
 
-[SB Admin 2](https://startbootstrap.com/theme/sb-admin-2/) is an open source admin dashboard theme for [Bootstrap](https://getbootstrap.com/) created by [Start Bootstrap](https://startbootstrap.com/).
+## Giới thiệu
 
-For the legacy Bootstrap 3 version of this theme, you can view the [last stable release](https://github.com/StartBootstrap/startbootstrap-sb-admin-2/releases/tag/v3.3.7%2B1) of SB Admin 2 for Bootstrap 3.
+Thư mục `static/` chứa SB Admin 2 - một free Bootstrap 4 admin theme từ [Start Bootstrap](https://startbootstrap.com/theme/sb-admin-2).
 
-## Preview
+## Cấu trúc thư mục
 
-[![SB Admin 2 Preview](https://assets.startbootstrap.com/img/screenshots/themes/sb-admin-2.png)](https://startbootstrap.github.io/startbootstrap-sb-admin-2/)
+```
+static/
+├── index.html              # Trang Dashboard chính
+├── forms.html           # Trang tổng hợp các loại form Bootstrap
+├── buttons.html        # Các loại button
+├── cards.html         # Cards component
+├── tables.html       # DataTables examples
+├── charts.html      # Chart.js examples
+├── login.html       # Trang đăng nhập
+├── register.html    # Trang đăng ký
+├── forgot-password.html  # Trang quên mật khẩu
+├── blank.html       # Trang trống
+├── 404.html       # Trang lỗi 404
+├── utilities-color.html      # Utilities - Colors
+├── utilities-border.html    # Utilities - Borders
+├── utilities-animation.html # Utilities - Animation
+├── utilities-other.html     # Utilities - Other
+├── css/
+│   └── sb-admin-2.min.css  # Main CSS
+├── js/
+│   ├── sb-admin-2.min.js  # Main JS
+│   └── demo/             # Demo scripts cho charts
+├── vendor/           # Third-party libraries
+│   ├── jquery/           # jQuery
+│   ├── jquery-easing/     # jQuery Easing
+│   ├── bootstrap/         # Bootstrap JS
+│   ├── chart.js/         # Chart.js
+│   ├── datatables/      # DataTables
+│   └── fontawesome-free/ # Font Awesome
+├── img/              # Images
+└── scss/             # SCSS source files
+```
 
-**[Launch Live Preview](https://startbootstrap.github.io/startbootstrap-sb-admin-2/)**
+## Các trang chính
 
-## Status
+### Dashboard (index.html)
+Trang tổng quan với các thống kê:
+- Earnings (Monthly/Annual)
+- Earning (Environment)
+- Pending Requests
+- Pending Requests
 
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/StartBootstrap/startbootstrap-sb-admin-2/master/LICENSE)
-[![npm version](https://img.shields.io/npm/v/startbootstrap-sb-admin-2.svg)](https://www.npmjs.com/package/startbootstrap-sb-admin-2)
-[![Build Status](https://travis-ci.org/StartBootstrap/startbootstrap-sb-admin-2.svg?branch=master)](https://travis-ci.org/StartBootstrap/startbootstrap-sb-admin-2)
-[![dependencies Status](https://david-dm.org/StartBootstrap/startbootstrap-sb-admin-2/status.svg)](https://david-dm.org/StartBootstrap/startbootstrap-sb-admin-2)
-[![devDependencies Status](https://david-dm.org/StartBootstrap/startbootstrap-sb-admin-2/dev-status.svg)](https://david-dm.org/StartBootstrap/startbootstrap-sb-admin-2?type=dev)
+### Forms (forms.html)
+Trang tổng hợp **tất cả các loại form** trong Bootstrap 4:
 
-## Download and Installation
+**Form Controls:**
+- Text Input (text, email, password, number, tel, url, search)
+- Textarea (default, large)
+- File Upload (single, multiple, accept types)
+- Select (default, multiple)
+- Date & Time (date, time, datetime-local, month, week, color, range)
 
-To begin using this template, choose one of the following options to get started:
+**Checkboxes & Radios:**
+- Default (stacked)
+- Inline
+- Disabled
+- Custom Checkbox
+- Custom Radio
+- Custom Select
+- Custom File Input
 
-* [Download the latest release on Start Bootstrap](https://startbootstrap.com/theme/sb-admin-2/)
-* Install via npm: `npm i startbootstrap-sb-admin-2`
-* Clone the repo: `git clone https://github.com/StartBootstrap/startbootstrap-sb-admin-2.git`
-* [Fork, Clone, or Download on GitHub](https://github.com/StartBootstrap/startbootstrap-sb-admin-2)
+**Layout:**
+- Form Groups
+- Form Grid (columns)
+- Form Row
+- Horizontal Form
+- Inline Forms
+- Input Group (prepend, append, dropdown)
 
-## Usage
+**Validation:**
+- Help Text (block, inline)
+- Disabled Forms (fieldset disabled)
+- Validation Custom Styles (JavaScript validation)
+- Validation Server Side (.is-valid, .is-invalid)
+- Validation Tooltips
 
-After installation, run `npm install` and then run `npm start` which will open up a preview of the template in your default browser, watch for changes to core template files, and live reload the browser when changes are saved. You can view the `gulpfile.js` to see which tasks are included with the dev environment.
+### Buttons (buttons.html)
+Các loại button:
+- Colors: primary, secondary, success, danger, warning, info, light, dark
+- Sizes: large, default, small
+- States: active, disabled
+- Button Group
+- Split Button Dropdowns
 
-### Gulp Tasks
+### Cards (cards.html)
+Cards component examples:
+- Basic Card
+- Card with Header
+- Card with Footer
+- Image Cards
+- Collapsible Card
 
-* `gulp` the default task that builds everything
-* `gulp watch` browserSync opens the project in your default browser and live reloads when changes are made
-* `gulp css` compiles SCSS files into CSS and minifies the compiled CSS
-* `gulp js` minifies the themes JS file
-* `gulp vendor` copies dependencies from node_modules to the vendor directory
+## Cách sử dụng
 
-You must have npm installed globally in order to use this build environment. This theme was built using node v11.6.0 and the Gulp CLI v2.0.1. If Gulp is not running properly after running `npm install`, you may need to update node and/or the Gulp CLI locally.
+### 1. Mở trực tiếp bằng trình duyệt
+```bash
+# Mở file index.html trong trình duyệt
+static/index.html
+```
 
-## Bugs and Issues
+### 2. Dùng với Python server
+```bash
+cd static
+python -m http.server 8000
+# Mở http://localhost:8000
+```
 
-Have a bug or an issue with this template? [Open a new issue](https://github.com/StartBootstrap/startbootstrap-sb-admin-2/issues) here on GitHub or leave a comment on the [template overview page at Start Bootstrap](https://startbootstrap.com/theme/sb-admin-2/).
+### 3. Dùng với Node.js (http-server)
+```bash
+npx http-server static -p 8000
+```
 
-## About
+### 4. Copy vào Django static folder
+```python
+# settings.py
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+```
 
-Start Bootstrap is an open source library of free Bootstrap templates and themes. All of the free templates and themes on Start Bootstrap are released under the MIT license, which means you can use them for any purpose, even for commercial projects.
+### 5. Copy vào Flask static folder
+```python
+app = Flask(__name__, static_folder='static')
+```
 
-* <https://startbootstrap.com>
-* <https://twitter.com/SBootstrap>
+## Các thư viện đi kèm
 
-Start Bootstrap was created by and is maintained by **[David Miller](https://davidmiller.io/)**.
+| Thư viện | Phiên bản | Mục đích |
+|---------|---------|---------|
+| jQuery | 3.6.0 | JavaScript framework |
+| Bootstrap | 4.6.0 | CSS/JS framework |
+| Chart.js | 3.x | Charts/Graphs |
+| DataTables | 1.11 | Tables with pagination |
+| Font Awesome | 6.0 | Icons |
 
-* <https://davidmiller.io>
-* <https://twitter.com/davidmillerhere>
-* <https://github.com/davidtmiller>
+## Tùy chỉnh
 
-Start Bootstrap is based on the [Bootstrap](https://getbootstrap.com/) framework created by [Mark Otto](https://twitter.com/mdo) and [Jacob Thorton](https://twitter.com/fat).
+### Đổi màu sidebar
+```css
+/* Trong sb-admin-2.css */
+.bg-gradient-primary {
+    background-color: #4e73df; /* Đổi màu chính */
+    background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+}
+```
 
-## Copyright and License
+### Đổi màu chủ đạo
+Tìm và thay thế mã màu `#4e73df` trong CSS.
 
-Copyright 2013-2021 Start Bootstrap LLC. Code released under the [MIT](https://github.com/StartBootstrap/startbootstrap-resume/blob/master/LICENSE) license.
+## Tài liệu tham khảo
+
+- [SB Admin 2 Original](https://startbootstrap.com/theme/sb-admin-2)
+- [Bootstrap 4 Forms](https://getbootstrap.com/docs/4.0/components/forms/)
+- [Bootstrap 4 Buttons](https://getbootstrap.com/docs/4.0/components/buttons/)
+- [Bootstrap 4 Cards](https://getbootstrap.com/docs/4.0/components/card/)
+- [Bootstrap 4 Utilities](https://getbootstrap.com/docs/4.0/utilities/borders/)
+
+## License
+
+SB Admin 2 được phát hành dưới [MIT License](LICENSE).
+
+## Ghi chú
+
+- Theme sử dụng Bootstrap 4 (không phải Bootstrap 5)
+- Font Awesome 6 đã được tích hợp
+- Charts sử dụng Chart.js
+- Tables sử dụng DataTables với Bootstrap 4 theme
