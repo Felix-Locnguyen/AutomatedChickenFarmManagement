@@ -319,115 +319,356 @@
                     <!-- Content Row -->
                     <div class="row">
 
-                        <!-- Danh sách chuồng -->
+                        <!-- Danh sách chuồng dạng card grid -->
                         <div class="col-12">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Tên chuồng</th>
-                                                    <th>Vị trí</th>
-                                                    <th>Sức chứa</th>
-                                                    <th>Số gà hiện tại</th>
-                                                    <th>SL Thiết bị</th>
-                                                    <th>Trạng thái</th>
-                                                    <th>Thao tác</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td><a href="coop-detail.html?id=1">Chuồng A</a></td>
-                                                    <td>Khu vực A - Hàng 1</td>
-                                                    <td>500 con</td>
-                                                    <td>450</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                    <td>
-                                                        <a href="coop-detail.html?id=1" class="btn btn-sm btn-primary" title="Xem chi tiết">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="device-detail.html?coop=1" class="btn btn-sm btn-info" title="Thiết bị">
-                                                            <i class="fas fa-wifi"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>2</td>
-                                                    <td><a href="coop-detail.html?id=2">Chuồng B</a></td>
-                                                    <td>Khu vực A - Hàng 2</td>
-                                                    <td>300 con</td>
-                                                    <td>280</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                    <td>
-                                                        <a href="coop-detail.html?id=2" class="btn btn-sm btn-primary" title="Xem chi tiết">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="device-detail.html?coop=2" class="btn btn-sm btn-info" title="Thiết bị">
-                                                            <i class="fas fa-wifi"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>3</td>
-                                                    <td><a href="coop-detail.html?id=3">Chuồng C</a></td>
-                                                    <td>Khu vực B - Hàng 1</td>
-                                                    <td>400 con</td>
-                                                    <td>380</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-warning">Cảnh báo</span></td>
-                                                    <td>
-                                                        <a href="coop-detail.html?id=3" class="btn btn-sm btn-primary" title="Xem chi tiết">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="device-detail.html?coop=3" class="btn btn-sm btn-info" title="Thiết bị">
-                                                            <i class="fas fa-wifi"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>4</td>
-                                                    <td><a href="coop-detail.html?id=4">Chuồng D</a></td>
-                                                    <td>Khu vực B - Hàng 2</td>
-                                                    <td>200 con</td>
-                                                    <td>180</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                    <td>
-                                                        <a href="coop-detail.html?id=4" class="btn btn-sm btn-primary" title="Xem chi tiết">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="device-detail.html?coop=4" class="btn btn-sm btn-info" title="Thiết bị">
-                                                            <i class="fas fa-wifi"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>5</td>
-                                                    <td><a href="coop-detail.html?id=5">Chuồng E</a></td>
-                                                    <td>Khu vực C - Hàng 1</td>
-                                                    <td>350 con</td>
-                                                    <td>320</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-danger">Lỗi</span></td>
-                                                    <td>
-                                                        <a href="coop-detail.html?id=5" class="btn btn-sm btn-primary" title="Xem chi tiết">
-                                                            <i class="fas fa-eye"></i>
-                                                        </a>
-                                                        <a href="device-detail.html?coop=5" class="btn btn-sm btn-info" title="Thiết bị">
-                                                            <i class="fas fa-wifi"></i>
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <style>
+                                        .coop-grid {
+                                            display: grid;
+                                            grid-template-columns: repeat(3, 1fr);
+                                            gap: 20px;
+                                        }
+                                        @media (max-width: 992px) {
+                                            .coop-grid {
+                                                grid-template-columns: repeat(2, 1fr);
+                                            }
+                                        }
+                                        @media (max-width: 576px) {
+                                            .coop-grid {
+                                                grid-template-columns: 1fr;
+                                            }
+                                        }
+                                        .coop-card {
+                                            background: #fff;
+                                            border: 1px solid #e3e6f0;
+                                            border-radius: 8px;
+                                            padding: 20px;
+                                            transition: box-shadow 0.3s ease;
+                                        }
+                                        .coop-card:hover {
+                                            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                                        }
+                                        .coop-card-header {
+                                            display: flex;
+                                            justify-content: space-between;
+                                            align-items: center;
+                                            margin-bottom: 15px;
+                                            padding-bottom: 10px;
+                                            border-bottom: 1px solid #e3e6f0;
+                                        }
+                                        .coop-card-title {
+                                            font-size: 18px;
+                                            font-weight: 600;
+                                            color: #2c3e50;
+                                            margin: 0;
+                                        }
+                                        .coop-status {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            padding: 4px 10px;
+                                            border-radius: 20px;
+                                            font-size: 12px;
+                                            font-weight: 600;
+                                        }
+                                        .coop-status.online {
+                                            background: #d4edda;
+                                            color: #155724;
+                                        }
+                                        .coop-status.offline {
+                                            background: #f8d7da;
+                                            color: #721c24;
+                                        }
+                                        .coop-status::before {
+                                            content: "";
+                                            width: 8px;
+                                            height: 8px;
+                                            border-radius: 50%;
+                                            margin-right: 6px;
+                                        }
+                                        .coop-status.online::before {
+                                            background: #28a745;
+                                        }
+                                        .coop-status.offline::before {
+                                            background: #dc3545;
+                                        }
+                                        .coop-info {
+                                            margin-bottom: 15px;
+                                        }
+                                        .coop-info-item {
+                                            display: flex;
+                                            justify-content: space-between;
+                                            padding: 8px 0;
+                                            border-bottom: 1px dashed #e3e6f0;
+                                        }
+                                        .coop-info-item:last-child {
+                                            border-bottom: none;
+                                        }
+                                        .coop-info-label {
+                                            color: #6c757d;
+                                            font-size: 14px;
+                                        }
+                                        .coop-info-value {
+                                            font-weight: 600;
+                                            color: #2c3e50;
+                                            font-size: 14px;
+                                        }
+                                        .coop-temp-humid {
+                                            display: flex;
+                                            gap: 15px;
+                                            margin-bottom: 15px;
+                                            padding: 12px;
+                                            background: #f8f9fa;
+                                            border-radius: 6px;
+                                        }
+                                        .coop-temp, .coop-humid {
+                                            flex: 1;
+                                            text-align: center;
+                                        }
+                                        .coop-temp-icon, .coop-humid-icon {
+                                            font-size: 20px;
+                                            margin-bottom: 4px;
+                                        }
+                                        .coop-temp-value, .coop-humid-value {
+                                            font-size: 18px;
+                                            font-weight: 700;
+                                            color: #2c3e50;
+                                        }
+                                        .coop-temp-label, .coop-humid-label {
+                                            font-size: 12px;
+                                            color: #6c757d;
+                                        }
+                                        .coop-devices {
+                                            margin-bottom: 15px;
+                                        }
+                                        .coop-devices-title {
+                                            font-size: 13px;
+                                            font-weight: 600;
+                                            color: #6c757d;
+                                            margin-bottom: 8px;
+                                        }
+                                        .coop-device-list {
+                                            display: flex;
+                                            flex-wrap: wrap;
+                                            gap: 6px;
+                                        }
+                                        .coop-device-tag {
+                                            display: inline-flex;
+                                            align-items: center;
+                                            padding: 4px 8px;
+                                            background: #e3e6f0;
+                                            border-radius: 4px;
+                                            font-size: 12px;
+                                            color: #5a6268;
+                                        }
+                                        .coop-device-tag i {
+                                            margin-right: 4px;
+                                            font-size: 10px;
+                                        }
+                                        .coop-device-tag.active {
+                                            background: #cce5ff;
+                                            color: #004085;
+                                        }
+                                        .coop-actions {
+                                            display: flex;
+                                            gap: 10px;
+                                            margin-top: 15px;
+                                            padding-top: 15px;
+                                            border-top: 1px solid #e3e6f0;
+                                        }
+                                        .coop-card .btn {
+                                            flex: 1;
+                                            padding: 8px 12px;
+                                            font-size: 13px;
+                                        }
+                                    </style>
+                                    <div class="coop-grid">
+                                        <!-- Chuồng 1 -->
+                                        <div class="coop-card">
+                                            <div class="coop-card-header">
+                                                <h3 class="coop-card-title">Chuồng A</h3>
+                                                <span class="coop-status online">Online</span>
+                                            </div>
+                                            <div class="coop-info">
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
+                                                    <span class="coop-info-value">450 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Sức chứa</span>
+                                                    <span class="coop-info-value">500 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Vị trí</span>
+                                                    <span class="coop-info-value">Khu vực A - Hàng 1</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-temp-humid">
+                                                <div class="coop-temp">
+                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                                    <div class="coop-temp-value">28°C</div>
+                                                    <div class="coop-temp-label">Nhiệt độ</div>
+                                                </div>
+                                                <div class="coop-humid">
+                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                                    <div class="coop-humid-value">65%</div>
+                                                    <div class="coop-humid-label">Độ ẩm</div>
+                                                </div>
+                                            </div>
+                                            <div class="coop-devices">
+                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                                                <div class="coop-device-list">
+                                                    <span class="coop-device-tag active"><i class="fas fa-wifi"></i>Cảm biến nhiệt</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-fan"></i>Quạt thông gió</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i>Đèn LED</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-weight"></i>Cân điện tử</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-actions">
+                                                <a href="coop-detail.html?id=1" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
+                                                <a href="device-detail.html?coop=1" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Chuồng 2 -->
+                                        <div class="coop-card">
+                                            <div class="coop-card-header">
+                                                <h3 class="coop-card-title">Chuồng B</h3>
+                                                <span class="coop-status online">Online</span>
+                                            </div>
+                                            <div class="coop-info">
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
+                                                    <span class="coop-info-value">280 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Sức chứa</span>
+                                                    <span class="coop-info-value">300 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Vị trí</span>
+                                                    <span class="coop-info-value">Khu vực A - Hàng 2</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-temp-humid">
+                                                <div class="coop-temp">
+                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                                    <div class="coop-temp-value">26°C</div>
+                                                    <div class="coop-temp-label">Nhiệt độ</div>
+                                                </div>
+                                                <div class="coop-humid">
+                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                                    <div class="coop-humid-value">70%</div>
+                                                    <div class="coop-humid-label">Độ ẩm</div>
+                                                </div>
+                                            </div>
+                                            <div class="coop-devices">
+                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                                                <div class="coop-device-list">
+                                                    <span class="coop-device-tag active"><i class="fas fa-wifi"></i>Cảm biến ẩm</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-fan"></i>Quạt hút</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-shower"></i>Hệ thống phun</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-actions">
+                                                <a href="coop-detail.html?id=2" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
+                                                <a href="device-detail.html?coop=2" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Chuồng 3 -->
+                                        <div class="coop-card">
+                                            <div class="coop-card-header">
+                                                <h3 class="coop-card-title">Chuồng C</h3>
+                                                <span class="coop-status offline">Offline</span>
+                                            </div>
+                                            <div class="coop-info">
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
+                                                    <span class="coop-info-value">380 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Sức chứa</span>
+                                                    <span class="coop-info-value">400 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Vị trí</span>
+                                                    <span class="coop-info-value">Khu vực B - Hàng 1</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-temp-humid">
+                                                <div class="coop-temp">
+                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                                    <div class="coop-temp-value">32°C</div>
+                                                    <div class="coop-temp-label">Nhiệt độ</div>
+                                                </div>
+                                                <div class="coop-humid">
+                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                                    <div class="coop-humid-value">80%</div>
+                                                    <div class="coop-humid-label">Độ ẩm</div>
+                                                </div>
+                                            </div>
+                                            <div class="coop-devices">
+                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                                                <div class="coop-device-list">
+                                                    <span class="coop-device-tag"><i class="fas fa-wifi"></i>Cảm biến nhiệt</span>
+                                                    <span class="coop-device-tag"><i class="fas fa-exclamation-triangle"></i>Báo động</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-actions">
+                                                <a href="coop-detail.html?id=3" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
+                                                <a href="device-detail.html?coop=3" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Chuồng 4 -->
+                                        <div class="coop-card">
+                                            <div class="coop-card-header">
+                                                <h3 class="coop-card-title">Chuồng D</h3>
+                                                <span class="coop-status online">Online</span>
+                                            </div>
+                                            <div class="coop-info">
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
+                                                    <span class="coop-info-value">180 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Sức chứa</span>
+                                                    <span class="coop-info-value">200 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Vị trí</span>
+                                                    <span class="coop-info-value">Khu vực B - Hàng 2</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-temp-humid">
+                                                <div class="coop-temp">
+                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                                    <div class="coop-temp-value">25°C</div>
+                                                    <div class="coop-temp-label">Nhiệt độ</div>
+                                                </div>
+                                                <div class="coop-humid">
+                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                                    <div class="coop-humid-value">60%</div>
+                                                    <div class="coop-humid-label">Độ ẩm</div>
+                                                </div>
+                                            </div>
+                                            <div class="coop-devices">
+                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                                                <div class="coop-device-list">
+                                                    <span class="coop-device-tag active"><i class="fas fa-wifi"></i>Cảm biến nhiệt</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-fan"></i>Quạt thông gió</span>
+                                                    <span class="coop-device-tag active"><i class="fas fa-camera"></i>Camera giám sát</span>
+                                                </div>
+                                            </div>
+                                            <div class="coop-actions">
+                                                <a href="coop-detail.html?id=4" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
+                                                <a href="device-detail.html?coop=4" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -511,65 +752,6 @@
 
                     <!-- Content Row -->
                     <div class="row">
-
-                        <!-- Content Column -->
-                        <div class="col-lg-6 mb-4">
-
-                            <!-- Danh sách chuồng -->
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên chuồng</th>
-                                                    <th>Sức chứa</th>
-                                                    <th>Thiết bị</th>
-                                                    <th>Trạng thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Chuồng A</td>
-                                                    <td>500 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng B</td>
-                                                    <td>300 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng C</td>
-                                                    <td>400 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-warning">Cảnh báo</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng D</td>
-                                                    <td>200 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng E</td>
-                                                    <td>350 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-danger">Lỗi</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <a href="coop-list.html" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
-                                </div>
-                            </div>
-
-                        </div>
 
                         <div class="col-lg-6 mb-4">
 
