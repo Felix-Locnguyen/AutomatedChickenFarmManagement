@@ -1,0 +1,41 @@
+TRANG WEB QUẢN LÝ TRANG TRẠI IOT
+│
+├── [NAV] Trang chủ · Quản lý chuồng · Thiết bị IoT · Báo cáo
+│
+├── 🏠 TRANG CHỦ
+│   ├── Thẻ tổng quan
+│   │   ├── Tổng số chuồng
+│   │   ├── Tổng số thiết bị
+│   │   ├── Thiết bị đang online
+│   │   └── Số cảnh báo
+│   ├── Biểu đồ nhiệt độ TB các chuồng
+│   ├── Biểu đồ trạng thái thiết bị
+│   │   └── Đang hoạt động / Chờ / Tắt
+│   ├── Bảng danh sách chuồng
+│   └── Bảng thiết bị gần đây
+│
+├── 🏗️ QUẢN LÝ CHUỒNG
+│   └── Danh sách chuồng
+│       ├── [Chuồng A]
+│       │   ├── Xem chi tiết
+│       │   │   ├── Thông tin cơ bản chuồng
+│       │   │   ├── Nơi setup / vị trí
+│       │   │   ├── Biểu đồ nhiệt độ TB
+│       │   │   └── Biểu đồ trạng thái thiết bị
+│       │   └── Thiết bị chuồng
+│       │       ├── Danh sách thiết bị trong chuồng
+│       │       ├── Form cập nhật thông tin thiết bị
+│       │       ├── Biểu đồ nhiệt độ thiết bị
+│       │       └── Biểu đồ trạng thái thiết bị
+│       ├── [Chuồng B] (tương tự)
+│       └── [Chuồng C] (tương tự)
+│
+├── 📡 THIẾT BỊ IOT
+│   ├── Danh sách thiết bị
+│   ├── Form cập nhật thông tin thiết bị
+│   └── Bảng trạng thái live (Online / Offline / Lỗi)
+│
+└── 📊 BÁO CÁO
+    ├── Báo cáo nhiệt độ (theo ngày / tuần)
+    ├── Báo cáo uptime thiết bị
+    └── Lịch sử cảnh báo
