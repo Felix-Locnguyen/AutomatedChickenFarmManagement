@@ -309,11 +309,8 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <div class="mb-4">
                         <h1 class="h3 mb-0 text-gray-800">Quản lý chuồng</h1>
-                        <button type="button" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addCoopModal">
-                            <i class="fas fa-plus fa-sm text-white-50"></i> Thêm chuồng mới
-                        </button>
                     </div>
 
                     <!-- Content Row -->
@@ -322,11 +319,77 @@
                         <!-- Danh sách chuồng dạng card grid -->
                         <div class="col-12">
                             <div class="card shadow mb-4">
-                                <div class="card-header py-3">
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center flex-wrap">
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
+                                    <div class="coop-actions-wrapper d-flex align-items-center flex-wrap">
+                                        <div class="coop-search-wrapper">
+                                            <i class="fas fa-search coop-search-icon"></i>
+                                            <input type="text" class="form-control coop-search-input" placeholder="Ví dụ: Chuồng A">
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-add-coop ml-2" data-toggle="modal" data-target="#addCoopModal">
+                                            <i class="fas fa-plus"></i> Thêm chuồng
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="card-body">
                                     <style>
+                                        .coop-actions-wrapper {
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 10px;
+                                        }
+                                        .coop-search-wrapper {
+                                            position: relative;
+                                            width: 250px;
+                                        }
+                                        .coop-search-icon {
+                                            position: absolute;
+                                            left: 12px;
+                                            top: 50%;
+                                            transform: translateY(-50%);
+                                            color: #858796;
+                                            pointer-events: none;
+                                        }
+                                        .coop-search-input {
+                                            padding-left: 35px;
+                                            border: 1px solid #d1d3e2;
+                                            border-radius: 4px;
+                                            font-size: 14px;
+                                        }
+                                        .coop-search-input:focus {
+                                            border-color: #4a90d9;
+                                            box-shadow: 0 0 0 0.2rem rgba(74, 144, 217, 0.25);
+                                        }
+                                        .btn-add-coop {
+                                            white-space: nowrap;
+                                        }
+                                        @media (max-width: 768px) {
+                                            .coop-actions-wrapper {
+                                                width: 100%;
+                                                margin-top: 10px;
+                                                justify-content: space-between;
+                                            }
+                                            .coop-search-wrapper {
+                                                flex: 1;
+                                            }
+                                            .btn-add-coop {
+                                                margin-left: 10px;
+                                            }
+                                        }
+                                        @media (max-width: 576px) {
+                                            .coop-actions-wrapper {
+                                                flex-direction: column;
+                                                align-items: stretch;
+                                            }
+                                            .coop-search-wrapper {
+                                                width: 100%;
+                                            }
+                                            .btn-add-coop {
+                                                width: 100%;
+                                                margin-left: 0;
+                                                margin-top: 10px;
+                                            }
+                                        }
                                         .coop-grid {
                                             display: grid;
                                             grid-template-columns: repeat(3, 1fr);
@@ -355,16 +418,32 @@
                                         .coop-card-header {
                                             display: flex;
                                             justify-content: space-between;
-                                            align-items: center;
+                                            align-items: flex-start;
                                             margin-bottom: 15px;
                                             padding-bottom: 10px;
                                             border-bottom: 1px solid #e3e6f0;
+                                        }
+                                        .coop-card-header-left {
+                                            flex: 1;
                                         }
                                         .coop-card-title {
                                             font-size: 18px;
                                             font-weight: 600;
                                             color: #2c3e50;
-                                            margin: 0;
+                                            margin: 0 0 5px 0;
+                                        }
+                                        .btn-delete-coop {
+                                            color: #dc3545;
+                                            background: transparent;
+                                            border: 1px solid #dc3545;
+                                            padding: 4px 8px;
+                                            font-size: 12px;
+                                            border-radius: 4px;
+                                            white-space: nowrap;
+                                        }
+                                        .btn-delete-coop:hover {
+                                            background: #dc3545;
+                                            color: #fff;
                                         }
                                         .coop-status {
                                             display: inline-flex;
@@ -489,8 +568,13 @@
                                         <!-- Chuồng 1 -->
                                         <div class="coop-card">
                                             <div class="coop-card-header">
-                                                <h3 class="coop-card-title">Chuồng A</h3>
-                                                <span class="coop-status online">Online</span>
+                                                <div class="coop-card-header-left">
+                                                    <h3 class="coop-card-title">Chuồng A</h3>
+                                                    <span class="coop-status online">Online</span>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
+                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                </button>
                                             </div>
                                             <div class="coop-info">
                                                 <div class="coop-info-item">
@@ -536,8 +620,13 @@
                                         <!-- Chuồng 2 -->
                                         <div class="coop-card">
                                             <div class="coop-card-header">
-                                                <h3 class="coop-card-title">Chuồng B</h3>
-                                                <span class="coop-status online">Online</span>
+                                                <div class="coop-card-header-left">
+                                                    <h3 class="coop-card-title">Chuồng B</h3>
+                                                    <span class="coop-status online">Online</span>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
+                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                </button>
                                             </div>
                                             <div class="coop-info">
                                                 <div class="coop-info-item">
@@ -582,8 +671,13 @@
                                         <!-- Chuồng 3 -->
                                         <div class="coop-card">
                                             <div class="coop-card-header">
-                                                <h3 class="coop-card-title">Chuồng C</h3>
-                                                <span class="coop-status offline">Offline</span>
+                                                <div class="coop-card-header-left">
+                                                    <h3 class="coop-card-title">Chuồng C</h3>
+                                                    <span class="coop-status offline">Offline</span>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
+                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                </button>
                                             </div>
                                             <div class="coop-info">
                                                 <div class="coop-info-item">
@@ -627,8 +721,13 @@
                                         <!-- Chuồng 4 -->
                                         <div class="coop-card">
                                             <div class="coop-card-header">
-                                                <h3 class="coop-card-title">Chuồng D</h3>
-                                                <span class="coop-status online">Online</span>
+                                                <div class="coop-card-header-left">
+                                                    <h3 class="coop-card-title">Chuồng D</h3>
+                                                    <span class="coop-status online">Online</span>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
+                                                    <i class="fas fa-trash-alt"></i> Xóa
+                                                </button>
                                             </div>
                                             <div class="coop-info">
                                                 <div class="coop-info-item">
@@ -834,6 +933,59 @@
     </div>
     <!-- End of Page Wrapper -->
 
+    <!-- Add Coop Modal-->
+    <div class="modal fade" id="addCoopModal" tabindex="-1" role="dialog" aria-labelledby="addCoopModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCoopModalLabel">Thêm chuồng mới</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="coopName">Tên chuồng</label>
+                            <input type="text" class="form-control" id="coopName" placeholder="Ví dụ: Chuồng A">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopQuantity">Số lượng hiện tại</label>
+                            <input type="number" class="form-control" id="coopQuantity" placeholder="Số gà đang có">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopCapacity">Sức chứa</label>
+                            <input type="number" class="form-control" id="coopCapacity" placeholder="Tối đa có thể nuôi">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopArea">Khu vực</label>
+                            <input type="text" class="form-control" id="coopArea" placeholder="Có thể để trống">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" id="saveCoopBtn">Lưu chuồng</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteCoopModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center py-4">
+                    <h5 class="mb-0">Bạn có chắc muốn xóa?</h5>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
@@ -875,6 +1027,15 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script>
+        document.getElementById('saveCoopBtn').addEventListener('click', function() {
+            $('#addCoopModal').modal('hide');
+        });
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            $('#deleteCoopModal').modal('hide');
+        });
+    </script>
 
 </body>
 

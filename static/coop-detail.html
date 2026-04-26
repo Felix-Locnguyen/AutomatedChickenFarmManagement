@@ -20,6 +20,78 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
+    <style>
+        .coop-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e3e6f0;
+        }
+        .coop-info-item:last-child {
+            border-bottom: none;
+        }
+        .coop-info-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .coop-info-value {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+        .coop-temp-humid {
+            display: flex;
+            gap: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .coop-temp, .coop-humid {
+            flex: 1;
+            text-align: center;
+        }
+        .coop-temp-icon, .coop-humid-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .coop-temp-value, .coop-humid-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .coop-temp-label, .coop-humid-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .coop-devices-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        .coop-device-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .coop-device-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #e3e6f0;
+            color: #5a6268;
+        }
+        .coop-device-tag.active {
+            background: #cce5ff;
+            color: #004085;
+        }
+        .coop-device-tag i {
+            margin-right: 5px;
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -324,114 +396,173 @@
                     <!-- Content Row -->
                     <div class="row">
 
-                        <!-- Form Thông tin chuồng -->
-                        <div class="col-lg-6">
+                        <!-- Form Thông tin chuồng + Cấu hình -->
+                        <div class="col-lg-12">
                             <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Thông tin chuồng</h6>
+                                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary">Quản lý chuồng</h6>
+                                    <button class="btn btn-sm btn-outline-primary" id="editCoopBtn" onclick="toggleCoopEdit()">
+                                        <i class="fas fa-cog"></i> Chỉnh sửa & Thiết lập
+                                    </button>
                                 </div>
                                 <div class="card-body">
-                                    <form>
-                                        <div class="form-group">
-                                            <label for="coopName">Tên chuồng</label>
-                                            <input type="text" class="form-control" id="coopName" value="Chuồng A">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="coopLocation">Vị trí</label>
-                                            <input type="text" class="form-control" id="coopLocation" value="Khu vực A - Hàng 1">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="coopCapacity">Sức chứa (con)</label>
-                                            <input type="number" class="form-control" id="coopCapacity" value="500">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="coopCurrent">Số gà hiện tại</label>
-                                            <input type="number" class="form-control" id="coopCurrent" value="450">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="coopArea">Diện tích (m²)</label>
-                                            <input type="number" class="form-control" id="coopArea" value="100">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="coopStatus">Trạng thái</label>
-                                            <select class="form-control" id="coopStatus">
-                                                <option selected>Bình thường</option>
-                                                <option>Cảnh báo</option>
-                                                <option>Lỗi</option>
-                                            </select>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Form Cấu hình chuồng -->
-                        <div class="col-lg-6">
-                            <div class="card shadow mb-4">
-                                <div class="card-header py-3">
-                                    <h6 class="m-0 font-weight-bold text-primary">Cấu hình chuồng</h6>
-                                </div>
-                                <div class="card-body">
-                                    <form>
-                                        <h6 class="text-muted mb-3">Cảnh báo nhiệt độ</h6>
+                                    <!-- Phần hiển thị thông tin trực quan -->
+                                    <div id="coopDisplay">
                                         <div class="row">
-                                            <div class="col-6">
-                                                <div class="form-group">
-                                                    <label for="tempMin">Nhiệt độ tối thiểu (°C)</label>
-                                                    <input type="number" class="form-control" id="tempMin" value="18">
+                                            <div class="col-md-6">
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Số lượng gà</span>
+                                                    <span class="coop-info-value">450 con</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Diện tích chuồng</span>
+                                                    <span class="coop-info-value">100 m²</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Vị trí chuồng</span>
+                                                    <span class="coop-info-value">Khu vực A - Hàng 1</span>
+                                                </div>
+                                                <div class="coop-info-item">
+                                                    <span class="coop-info-label">Trạng thái</span>
+                                                    <span class="badge badge-success">Bình thường</span>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
-                                                <div class="form-group">
-                                                    <label for="tempMax">Nhiệt độ tối đa (°C)</label>
-                                                    <input type="number" class="form-control" id="tempMax" value="28">
+                                            <div class="col-md-6">
+                                                <div class="coop-temp-humid">
+                                                    <div class="coop-temp">
+                                                        <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                                        <div class="coop-temp-value">28°C</div>
+                                                        <div class="coop-temp-label">Nhiệt độ</div>
+                                                    </div>
+                                                    <div class="coop-humid">
+                                                        <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                                        <div class="coop-humid-value">65%</div>
+                                                        <div class="coop-humid-label">Độ ẩm</div>
+                                                    </div>
+                                                </div>
+                                                <div class="coop-temp-humid mt-2">
+                                                    <div class="coop-temp">
+                                                        <div class="coop-temp-icon"><i class="fas fa-drumstick-bite" style="color: #ffc107;"></i></div>
+                                                        <div class="coop-temp-value">80%</div>
+                                                        <div class="coop-temp-label">Thức ăn</div>
+                                                    </div>
+                                                    <div class="coop-humid">
+                                                        <div class="coop-humid-icon"><i class="fas fa-water" style="color: #007bff;"></i></div>
+                                                        <div class="coop-humid-value">75%</div>
+                                                        <div class="coop-humid-label">Nước</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        
+                                        <!-- Thiết bị đang hoạt động -->
+                                        <div class="coop-devices mt-3">
+                                            <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                                            <div class="coop-device-list">
+                                                <span class="coop-device-tag active"><i class="fas fa-wifi"></i> Cảm biến nhiệt</span>
+                                                <span class="coop-device-tag active"><i class="fas fa-fan"></i> Quạt thông gió</span>
+                                                <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i> Đèn LED</span>
+                                                <span class="coop-device-tag active"><i class="fas fa-weight"></i> Cân điện tử</span>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                        <h6 class="text-muted mb-3 mt-4">Cảnh báo độ ẩm</h6>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="form-group">
-                                                    <label for="humidityMin">Độ ẩm tối thiểu (%)</label>
-                                                    <input type="number" class="form-control" id="humidityMin" value="40">
+                                    <!-- Phần chỉnh sửa (ẩn mặc định) -->
+                                    <div id="coopEditForm" style="display: none;">
+                                        <form>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <h6 class="text-muted mb-3">Thông tin chuồng</h6>
+                                                    <div class="form-group">
+                                                        <label for="coopName">Tên chuồng</label>
+                                                        <input type="text" class="form-control" id="coopName" value="Chuồng A">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="coopLocation">Vị trí</label>
+                                                        <input type="text" class="form-control" id="coopLocation" value="Khu vực A - Hàng 1">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="coopCapacity">Sức chứa (con)</label>
+                                                        <input type="number" class="form-control" id="coopCapacity" value="500">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="coopCurrent">Số gà hiện tại</label>
+                                                        <input type="number" class="form-control" id="coopCurrent" value="450">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="coopArea">Diện tích (m²)</label>
+                                                        <input type="number" class="form-control" id="coopArea" value="100">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="coopStatus">Trạng thái</label>
+                                                        <select class="form-control" id="coopStatus">
+                                                            <option selected>Bình thường</option>
+                                                            <option>Cảnh báo</option>
+                                                            <option>Lỗi</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <h6 class="text-muted mb-3">Cấu hình chuồng</h6>
+                                                    <h6 class="text-muted mb-2 mt-3">Cảnh báo nhiệt độ</h6>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="tempMin">Nhiệt độ tối thiểu (°C)</label>
+                                                                <input type="number" class="form-control" id="tempMin" value="18">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="tempMax">Nhiệt độ tối đa (°C)</label>
+                                                                <input type="number" class="form-control" id="tempMax" value="28">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <h6 class="text-muted mb-2 mt-3">Cảnh báo độ ẩm</h6>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="humidityMin">Độ ẩm tối thiểu (%)</label>
+                                                                <input type="number" class="form-control" id="humidityMin" value="40">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="form-group">
+                                                                <label for="humidityMax">Độ ẩm tối đa (%)</label>
+                                                                <input type="number" class="form-control" id="humidityMax" value="70">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <h6 class="text-muted mb-2 mt-3">Lịch cho ăn</h6>
+                                                    <div class="form-group">
+                                                        <label for="feedTime1">Giờ cho ăn lần 1</label>
+                                                        <input type="time" class="form-control" id="feedTime1" value="06:00">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="feedTime2">Giờ cho ăn lần 2</label>
+                                                        <input type="time" class="form-control" id="feedTime2" value="12:00">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="feedTime3">Giờ cho ăn lần 3</label>
+                                                        <input type="time" class="form-control" id="feedTime3" value="18:00">
+                                                    </div>
+                                                    <div class="form-group mt-3">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="autoFan" checked>
+                                                            <label class="custom-control-label" for="autoFan">Bật quạt tự động khi quá nhiệt</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input" id="autoLight" checked>
+                                                            <label class="custom-control-label" for="autoLight">Bật đèn tự động khi tối</label>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="col-6">
-                                                <div class="form-group">
-                                                    <label for="humidityMax">Độ ẩm tối đa (%)</label>
-                                                    <input type="number" class="form-control" id="humidityMax" value="70">
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <h6 class="text-muted mb-3 mt-4">Lịch cho ăn</h6>
-                                        <div class="form-group">
-                                            <label for="feedTime1">Giờ cho ăn lần 1</label>
-                                            <input type="time" class="form-control" id="feedTime1" value="06:00">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="feedTime2">Giờ cho ăn lần 2</label>
-                                            <input type="time" class="form-control" id="feedTime2" value="12:00">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="feedTime3">Giờ cho ăn lần 3</label>
-                                            <input type="time" class="form-control" id="feedTime3" value="18:00">
-                                        </div>
-
-                                        <div class="form-group mt-4">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="autoFan" checked>
-                                                <label class="custom-control-label" for="autoFan">Bật quạt tự động khi quá nhiệt</label>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="autoLight" checked>
-                                                <label class="custom-control-label" for="autoLight">Bật đèn tự động khi tối</label>
-                                            </div>
-                                        </div>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -696,6 +827,24 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script>
+        function toggleCoopEdit() {
+            var displaySection = document.getElementById('coopDisplay');
+            var editSection = document.getElementById('coopEditForm');
+            var btn = document.getElementById('editCoopBtn');
+            
+            if (displaySection.style.display === 'none') {
+                displaySection.style.display = 'block';
+                editSection.style.display = 'none';
+                btn.innerHTML = '<i class="fas fa-cog"></i> Chỉnh sửa & Thiết lập';
+            } else {
+                displaySection.style.display = 'none';
+                editSection.style.display = 'block';
+                btn.innerHTML = '<i class="fas fa-times"></i> Đóng';
+            }
+        }
+    </script>
 
 </body>
 
