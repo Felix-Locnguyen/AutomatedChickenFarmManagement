@@ -1,0 +1,78 @@
+Kế hoạch cho ngày 26/04 
+
+# Thiết kê lại trang chi tiết chuồng ( phần thiết bị)
+- xóa phần cập nhật thiết bị
+- rename lại tiêu đê Quản lý thiết bị IOT 
+- reaname lại tiêu đề Danh sách thiết bị IOT 
+- xóa chức năng thêm mới ở phần tiêu đề quản lí thiết bị IOT
+- Thêm chức thêm thiết bị mới ( nằm bên phải tiêu đề )
+	+ hiện ra bảng với tiêu đề là các thiết bị trong danh sách 
+		-----------------------------------
+		|     Thêm thiết bị vào chuồng     |
+		-----------------------------------
+		
+		[Tìm thiết bị 🔍..................]
+		
+		☐ Cảm biến nhiệt độ 1
+		☐ Cảm biến độ ẩm 2
+		☐ Máy nước 1
+		☐ Quạt thông gió 3
+		☐ Đèn sưởi 1
+
+		-----------------------------------
+		Đã chọn: 0 thiết bị
+
+		[ Hủy ]        [ Thêm thiết bị ]
+		-----------------------------------
+
+- Thiết kế lại cách trình bài cho danh sách thiết bị 
+	+ mỗi thiết bị sẽ là một thẻ 
+	+ thiết kế mỗi thẻ
+		> dấu chấm xanh/vàng/đỏ ( xanh: online, chờ, lỗi ) nằm phía bên trái của thẻ
+		> tên thiết bị ví dụ nhiệt kế A1
+		> dưới tên thiết bị là pin và sóng
+		> bên phải sẽ có 2 nút cài đặt và xóa ( khi ấn xóa hỏi xác nhận)
+		> thêm nút tắt/ bật ( kiểu thiết kế [ ON/OFF toggle ], khi thực hiện tắt bật thì hiện ra 1 ô nhỏ
+		  thông báo đã tắt, bật )
+	+ Logic: > trường hợp thiết bị lỗi thì sẽ thay pin và sóng kết nói sẽ đổi thành chữ mất kết nối
+		 > trường hợp thiết bị ở trạng thái chờ sẽ giữ pin nhưng sóng sẽ đổi thành chờ kết nối
+	   	 > trường hợp tắt thì thông báo sẽ là tên "đã tắt {thiết bị}" với ô màu xám chữ trắng
+		 > trường hợp bật thì thông báo sẽ là tên "đã bật {thiết bị}" với ô màu xanh lá chữ trắng
+
+- Xóa bỏ nhiệt độ trung bình các chuồng
+- Chỉnh chỉnh phần trạng thái thiết bị
+	+ thiết kế sơ đồ tròn rỗng ở giữ, hiển bị % ở rìa vành tròn, khi ấn phần trên sơ đồ tròn thì hiện ra phần 	trăm, tên mục của biểu đồ ( ví dụ Hoạt động) và số lượng thiết bị, khi ấn thì cho phần chọn phòng to ra cho 	dễ nhìn 
+
+# trang xem chi tiết chuồng
+- Thêm sơ đồ tròn trạng thái các thiết bị trong chuồng (lấy cảm hứng trong phần thiết bị )
+
+# trang xem thông các chuồng
+- Chỉnh lại sơ đồ nhiệt độ  (sơ đồ sẽ được lấy cảm hứng từ phần xem chi tiết)
+- chỉnh lại sơ đồ trạng thái thiết bị ( lấy cảm hứng trong phần thiết bị )
+
+][=================================================================================================================][
+@ Thanh tiện ích
+- thay đổi cấu thanh tiện tích từ sidebar sang các dạng sau 
+ 	========================================================|
+	+ Fixed Bottom Navigation				|
+	+ Sticky Bottom Navigation				|
+	+ Hide on Scroll Bottom Navigation			|
+	+ Tab Bar (iOS style)					|
+	+ Bottom Navigation + Floating Button (FAB)		|
+	========================================================|
+=> Tối ưu nhất lúc này là nên dùng Fixed Bottom navigation
+ 	+ Các thông tin hiển thị
+		> Quản lí chuồng
+		> Quản lí thiết bị 
+		> ( Ở GIỮA ) Trang chủ
+		> Kiểm tra camera
+		> Khác ( báo cáo, xuất file)
+
+@ Thay đổi toàn bộ 
+- Thay đổi lại bố cục trình bài thiết bị gần đây 
+	+ Danh sách các thiết bị dưới dạng thẻ
+	+ mỗi thẻ chứa tên thiết bị ( tên chuồng chứa thiết bị ) và phần trạng thái [(hoạt động / đang chờ / ngắt 	kết nối) dấu chấm ( xanh/ vàng/ đỏ tương với 3 trạng thái)]
+- Thay đổi lại bố cục trình bài danh sách các chuồng gần đây
+	+ Danh sách các thiết bị dưới dạng thẻ
+	+ mỗi thẻ chứa tên chuồng, số lượng gà và số lượng thiết bị và góc bên phải sẽ chứa trạng thái ( bình 	thường, cảnh báo, lỗi ) giao diện phù hợp với điện thoại
+
