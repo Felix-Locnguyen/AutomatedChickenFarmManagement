@@ -1,41 +1,107 @@
-TRANG WEB QUẢN LÝ TRANG TRẠI IOT
+TRANG WEB QUẢN LÝ TRANG TRẠI GÀ (IoT)
 │
-├── [NAV] Trang chủ · Quản lý chuồng · Thiết bị IoT · Báo cáo
+├── [SIDEBAR - Menu điều hướng chính]
+│   ├── 🏠 Trang chủ → index.html
+│   ├── 🏠 Quản lý chuồng → coop-list.html
+│   ├── 📡 Thiết bị IoT → device-list.html
+│   ├── 📊 Biểu đồ → charts.html
+│   └── 📋 Bảng dữ liệu → tables.html
 │
-├── 🏠 TRANG CHỦ
-│   ├── Thẻ tổng quan
-│   │   ├── Tổng số chuồng
-│   │   ├── Tổng số thiết bị
-│   │   ├── Thiết bị đang online
-│   │   └── Số cảnh báo
-│   ├── Biểu đồ nhiệt độ TB các chuồng
-│   ├── Biểu đồ trạng thái thiết bị
-│   │   └── Đang hoạt động / Chờ / Tắt
-│   ├── Bảng danh sách chuồng
-│   └── Bảng thiết bị gần đây
+├── 📄 CÁC TRANG CHÍNH
+│   ├── index.html (Dashboard - Trang chủ)
+│   │   ├── Thẻ tổng quan
+│   │   │   ├── Tổng số chuồng
+│   │   │   ├── Tổng số thiết bị
+│   │   │   ├── Thiết bị đang online
+│   │   │   └── Số cảnh báo
+│   │   ├── Biểu đồ nhiệt độ các chuồng (Area Chart)
+│   │   ├── Biểu đồ trạng thái thiết bị (Pie Chart)
+│   │   │   └── Đang hoạt động / Chờ / Tắt
+│   │   ├── Bảng danh sách chuồng
+│   │   └── Bảng thiết bị gần đây
+│   │
+│   ├── coop-list.html (Danh sách chuồng)
+│   │   ├── Bảng danh sách các chuồng (A, B, C, D, E)
+│   │   │   ├── Tên chuồng, Sức chứa, Thiết bị, Trạng thái
+│   │   └── Link → [Xem chi tiết] → coop-detail.html
+│   │
+│   ├── coop-detail.html (Chi tiết chuồng) ⚠️ [ĐÃ CẬP NHẬT]
+│   │   ├── Thông tin chuồng (Hiển thị)
+│   │   │   ├── Số lượng gà, Diện tích, Vị trí, Trạng thái
+│   │   │   ├── Nhiệt độ, Độ ẩm
+│   │   │   ├── Lượng thức ăn, Lượng nước
+│   │   │   └── Thiết bị đang hoạt động
+│   │   ├── Nút "Chỉnh sửa & Thiết lập" → Mở Modal ⚠️ [MỚI]
+│   │   │       ├── Thông tin: Tên, Vị trí, Sức chứa, Số gà, Diện tích
+│   │   │       ├── Cấu hình: Nhiệt độ min/max, Độ ẩm min/max
+│   │   │       ├── Ngưỡng: Thức ăn min, Nước min
+│   │   │       ├── Lịch cho ăn: Lần 1, 2, 3
+│   │   │       ├── Tự động hóa: Quạt, Đèn, Cho ăn, Nước ⚠️ [TOGGLE]
+│   │   │       ├── ⚠️ Cho phép thông báo khẩn cấp ⚠️ [TRƯỜNG ĐẶC BIỆT]
+│   │   │       └── Nút: Rollback | Lưu → Xác nhận → Thông báo thành công
+│   │   ├── Biểu đồ (Area Chart) ⚠️ [ĐÃ CẬP NHẬT]
+│   │   │   ├── Tiêu đề: "Biểu đồ"
+│   │   │   ├── Dropdown chọn dữ liệu (bên trái)
+│   │   │   │   ├── Nhiệt độ (°C)
+│   │   │   │   ├── Độ ẩm (%)
+│   │   │   │   ├── Lượng thức ăn (kg)
+│   │   │   │   ├── Lượng nước (lít)
+│   │   │   │   └── Số lượng gà (con)
+│   │   │   ├── Trạng thái mặc định: "Chọn dữ liệu để xem biểu đồ"
+│   │   │   ├── Trục X: T2, T3, T4, T5, T6, T7, CN (7 ngày)
+│   │   │   ├── Trục Y: Tự động theo loại dữ liệu
+│   │   │   │   ├── Nhiệt độ: °C
+│   │   │   │   ├── Độ ẩm: %
+│   │   │   │   ├── Thức ăn: kg
+│   │   │   │   ├── Nước: lít
+│   │   │   │   └── Số gà: con
+│   │   │   └── ⚠️ Đường sức chứa (nét đứt) khi chọn "Số lượng gà"
+│   │   └── Nút [Quay lại] → coop-list.html
+│   │
+│   ├── device-list.html (Danh sách thiết bị IoT)
+│   │   ├── Bảng danh sách thiết bị
+│   │   │   ├── Tên thiết bị, Loại, Chuồng, Trạng thái
+│   │   │   ├── Loại: Cảm biến, Quạt, Đèn, Hệ thống
+│   │   │   ├── Trạng thái: Online, Offline, Lỗi
+│   │   └── Link → [Xem chi tiết] → device-detail.html
+│   │
+│   ├── device-detail.html (Chi tiết thiết bị)
+│   │   ├── Thông tin thiết bị
+│   │   ├── Biểu đồ nhiệt độ thiết bị
+│   │   └── Quay lại → device-list.html
+│   │
+│   ├── charts.html (Ví dụ biểu đồ Chart.js)
+│   └── tables.html (Ví dụ DataTables)
 │
-├── 🏗️ QUẢN LÝ CHUỒNG
-│   └── Danh sách chuồng
-│       ├── [Chuồng A]
-│       │   ├── Xem chi tiết
-│       │   │   ├── Thông tin cơ bản chuồng
-│       │   │   ├── Nơi setup / vị trí
-│       │   │   ├── Biểu đồ nhiệt độ TB
-│       │   │   └── Biểu đồ trạng thái thiết bị
-│       │   └── Thiết bị chuồng
-│       │       ├── Danh sách thiết bị trong chuồng
-│       │       ├── Form cập nhật thông tin thiết bị
-│       │       ├── Biểu đồ nhiệt độ thiết bị
-│       │       └── Biểu đồ trạng thái thiết bị
-│       ├── [Chuồng B] (tương tự)
-│       └── [Chuồng C] (tương tự)
+├── 📄 TRANG PHỤ (Authentication)
+│   ├── login.html (Đăng nhập)
+│   ├── register.html (Đăng ký)
+│   └── forgot-password.html (Quên mật khẩu)
 │
-├── 📡 THIẾT BỊ IOT
-│   ├── Danh sách thiết bị
-│   ├── Form cập nhật thông tin thiết bị
-│   └── Bảng trạng thái live (Online / Offline / Lỗi)
-│
-└── 📊 BÁO CÁO
-    ├── Báo cáo nhiệt độ (theo ngày / tuần)
-    ├── Báo cáo uptime thiết bị
-    └── Lịch sử cảnh báo
+└── 📄 TRANG TIỆN ÍCH
+    ├── 404.html (Lỗi)
+    ├── blank.html (Trang trắng)
+    └── utilities-*.html (Bootstrap utilities)
+
+---
+CẬP NHẬT NGÀY 26/04/2026
+==========================
+⚠️ = Phần đã được cập nhật/chỉnh sửa trong ngày
+
+1. coop-detail.html - Modal Chỉnh sửa:
+   - Modal với hiệu ứng blur nền
+   - Các trường cho phép chỉnh sửa
+   - Toggle tự động hóa (Quạt, Đèn, Cho ăn, Nước)
+   - Trường đặc biệt "Thông báo khẩn cấp" (viền đỏ)
+   - Nút Rollback, Lưu với xác nhận
+
+2. coop-detail.html - Biểu đồ Area Chart:
+   - Tiêu đề: "Biểu đồ"
+   - Dropdown bên trái (chọn 1 loại dữ liệu)
+   - Trạng thái mặc định: Trống + gợi ý
+   - Trục X: T2-CN (7 ngày)
+   - Đường sức chứa (nét đứt) cho Số lượng gà
+   - Sửa lỗi hiển thị (absolute positioning)
+
+3. coop-detail.html - Xóa Pie Chart:
+   - Loại bỏ biểu đồ "Trạng thái thiết bị"

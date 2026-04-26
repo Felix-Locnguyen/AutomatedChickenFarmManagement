@@ -28,9 +28,14 @@ Dự án hiện đang trong giai đoạn phát triển ban đầu. Frontend đã
 AutomatedChickenFarmManagement/
 ├── README.md              # This file
 ├── .gitignore
+├── coop_page_structure.txt # Coop page structure notes
 ├── static/                # Frontend static files (SB Admin 2 theme)
 │   ├── README.md          # Static files documentation
 │   ├── index.html       # Dashboard - Trang chính
+│   ├── coop-list.html   # Coop List - Danh sách chuồng
+│   ├── coop-detail.html # Coop Detail - Chi tiết chuồng
+│   ├── device-list.html # Device List - Danh sách thiết bị
+│   ├── device-detail.html # Device Detail - Chi tiết thiết bị
 │   ├── forms.html      # Forms - Tổng hợp tất cả form Bootstrap
 │   ├── buttons.html   # Buttons components
 │   ├── cards.html    # Cards components
@@ -50,6 +55,53 @@ AutomatedChickenFarmManagement/
 └── templates/           # (Planned) Django/Flask templates
 ```
 
+## Progress Today (April 26, 2026)
+
+### Changes Made to `coop-detail.html`
+
+#### 1. Removed "Save" button in header
+- Removed the "Lưu" button from the page header
+
+#### 2. Redesigned Edit Modal
+- Created a modal-based "Edit Settings" interface with blur background effect
+- Removed the in-page edit form section
+
+#### 3. Editable Fields in Modal
+- Coop name, Location, Capacity, Current chickens, Area
+- Temperature min/max, Humidity min/max
+- Feed threshold, Water threshold
+- Feeding schedule (Time 1, 2, 3)
+- Automation toggles: Auto fan, Auto light, Auto feed, Auto water
+- Removed "Status" field from editing
+
+#### 4. Emergency Alert Field
+- Added "Cho phép thông báo khẩn cấp" field with prominent styling (red border, warning label)
+
+#### 5. Modal Actions
+- Rollback button: Restores original values
+- Save button: Shows confirmation dialog
+- Confirmation dialog: "Bạn có muốn lưu thông tin này không?" with "Hủy" and "Lưu" options
+- Success notification: Full-screen "Đã cập nhật thông tin thành công"
+
+#### 6. Redesigned Area Chart
+- Removed "Options" dropdown
+- Changed title to "Biểu đồ" with data type dropdown on the left
+- Single-select dropdown with options: Temperature, Humidity, Feed, Water, Chicken count
+- Default state: Empty with "Chọn dữ liệu để xem biểu đồ" message
+- No default chart displayed
+- X-axis: T2, T3, T4, T5, T6, T7, CN (7 days)
+- Y-axis: Auto-adjusts based on selected data type (°C, %, kg, liters, con)
+- Capacity line (dashed) when "Chicken count" is selected
+- Tooltip on hover: Shows time and value
+
+#### 7. Fixed Chart Display Issue
+- Fixed chart positioning to use single container
+- Used absolute positioning to prevent overlap
+- Removed conflicting Chart.js auto-loading
+
+#### 8. Removed Pie Chart
+- Removed "Trạng thái thiết bị" pie chart from the page
+
 ## Features Planned
 
 ### 1. Dashboard & Monitoring
@@ -57,23 +109,25 @@ AutomatedChickenFarmManagement/
 - [ ] Số lượng gà hiện tại
 - [ ] Tình trạng sức khỏe
 - [ ] Nhiệt độ, độ ẩm chuồng
-- [ ] Biểu đồ thống kê
+- [x] Biểu đồ thống kê
 
 ### 2. Quản lý đàn gà
+- [x] Quản lý chuồng (basic UI)
 - [ ] Thêm/xóa/sửa thông tin gà
 - [ ] Theo dõi tuổi, giống, cân nặng
 - [ ] Ghi chép tiêm phòng
 - [ ] Lịch sử sức khỏe
 
 ### 3. Quản lý cho ăn
-- [ ] Lịch cho ăn tự động
+- [x] Lịch cho ăn tự động
 - [ ] Cài đặt lượng thức ăn
 - [ ] Thống kê tiêu thụ
 
 ### 4. Quản lý chuồng
-- [ ] Giám sát môi trường (nhiệt độ, độ ẩm)
-- [ ] Điều khiển quạt, đèn tự động
-- [ ] Cảnh báo nhiệt độ
+- [x] Giám sát môi trường (nhiệt độ, độ ẩm)
+- [x] Điều khiển quạt, đèn tự động
+- [x] Cảnh báo nhiệt độ
+- [x] Thiết bị IoT
 
 ### 5. Báo cáo
 - [ ] Xuất báo cáo Excel/PDF
@@ -113,17 +167,30 @@ Trang `forms.html` chứa tất cả các loại form Bootstrap 4:
 - Server Side (.is-valid/.is-invalid)
 - Tooltips
 
+## Key Pages
+
+| Page | Purpose |
+|-----|---------|
+| `static/index.html` | Main dashboard entry point |
+| `static/coop-list.html` | Coop list management |
+| `static/coop-detail.html` | Coop detail with chart |
+| `static/device-list.html` | IoT device list |
+| `static/device-detail.html` | Device detail |
+| `static/forms.html` | Form components reference |
+
 ## API Endpoints (Planned)
 
 ```
 GET    /api/dashboard          # Dashboard data
-GET    /api/chickens         # List all chickens
-POST   /api/chickens        # Add new chicken
-GET    /api/chickens/<id>   # Get chicken details
-PUT    /api/chickens/<id>   # Update chicken
-DELETE /api/chickens/<id>   # Delete chicken
-GET    /api/feed-schedule  # Feed schedule
-POST   /api/feed-schedule # Add feed schedule
+GET    /api/coops            # List all coops
+POST   /api/coops           # Add new coop
+GET    /api/coops/<id>      # Get coop details
+PUT    /api/coops/<id>      # Update coop
+DELETE /api/coops/<id>     # Delete coop
+GET    /api/devices        # List all devices
+POST   /api/devices       # Add new device
+GET    /api/feed-schedule # Feed schedule
+POST   /api/feed-schedule# Add feed schedule
 GET    /api/environment   # Environment data
 POST   /api/environment  # Environment settings
 GET    /api/reports      # Reports
@@ -131,17 +198,38 @@ GET    /api/reports      # Reports
 
 ## Database Schema (Planned)
 
-### Chickens
+### Coops
 | Field | Type | Description |
 |-------|------|------------|
 | id | INTEGER | Primary key |
-| rfid_tag | VARCHAR | RFID tag number |
-| breed | VARCHAR | Giống gà |
-| birth_date | DATE | Ngày sinh |
-| weight | FLOAT | Cân nặng hiện tại |
-| gender | VARCHAR | Trống/Mái |
+| name | VARCHAR | Tên chuồng |
+| location | VARCHAR | Vị trí |
+| capacity | INTEGER | Sức chứa tối đa |
+| current_count | INTEGER | Số lượng gà hiện tại |
+| area | FLOAT | Diện tích (m²) |
+| temp_min | FLOAT | Nhiệt độ tối thiểu |
+| temp_max | FLOAT | Nhiệt độ tối đa |
+| humidity_min | FLOAT | Độ ẩm tối thiểu |
+| humidity_max | FLOAT | Độ ẩm tối đa |
+| feed_threshold | FLOAT | Ngưỡng thức ăn |
+| water_threshold | FLOAT | Ngưỡng nước |
+| feed_time_1 | TIME | Giờ cho ăn lần 1 |
+| feed_time_2 | TIME | Giờ cho ăn lần 2 |
+| feed_time_3 | TIME | Giờ cho ăn lần 3 |
+| auto_fan | BOOLEAN | Tự động bật quạt |
+| auto_light | BOOLEAN | Tự động bật đèn |
+| auto_feed | BOOLEAN | Tự động cho ăn |
+| auto_water | BOOLEAN | Tự động cấp nước |
+| emergency_alert | BOOLEAN | Thông báo khẩn cấp |
+
+### Devices
+| Field | Type | Description |
+|-------|------|------------|
+| id | INTEGER | Primary key |
+| name | VARCHAR | Tên thiết bị |
+| type | VARCHAR | Loại thiết bị |
+| coop_id | INTEGER | FK to Coops |
 | status | VARCHAR | Trạng thái |
-| created_at | DATETIME | Ngày tạo |
 
 ### Health Records
 | Field | Type | Description |
@@ -168,6 +256,8 @@ GET    /api/reports      # Reports
 | coop_id | INTEGER | Mã chuồng |
 | temperature | FLOAT | Nhiệt độ |
 | humidity | FLOAT | Độ ẩm |
+| feed_level | FLOAT | Mức thức ăn |
+| water_level | FLOAT | Mức nước |
 | recorded_at | DATETIME | Thời gian |
 
 ## Setup Instructions
@@ -191,14 +281,6 @@ pip install flask flask-sqlalchemy
 # Run server
 flask run
 ```
-
-## Key Files for AI Agents
-
-| File | Purpose |
-|------|--------|
-| `static/index.html` | Main dashboard entry point |
-| `static/forms.html` | Form components reference |
-| `static/README.md` | Detailed static files docs |
 
 ## Notes for Development
 
