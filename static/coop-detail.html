@@ -90,6 +90,214 @@
         .coop-device-tag i {
             margin-right: 5px;
         }
+        .modal-backdrop-custom {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1040;
+            display: none;
+        }
+        .modal-backdrop-custom.show {
+            display: block;
+        }
+        .edit-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            z-index: 1050;
+            display: none;
+            overflow: hidden;
+        }
+        .edit-modal.show {
+            display: block;
+        }
+        .edit-modal-header {
+            padding: 15px 20px;
+            background: #4e73df;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .edit-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: calc(90vh - 140px);
+        }
+        .edit-modal-footer {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e3e6f0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .close-modal-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .close-modal-btn:hover {
+            color: #d1d3e2;
+        }
+        .emergency-field {
+            border: 2px solid #e74c3c !important;
+            background: #fff5f5 !important;
+            position: relative;
+        }
+        .emergency-field::before {
+            content: "Cảnh báo quan trọng!";
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            font-size: 10px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .emergency-label {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        .emergency-description {
+            font-size: 11px;
+            color: #e74c3c;
+            margin-top: 4px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #4e73df;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        .automation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        .automation-label {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .automation-desc {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .confirm-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 1060;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .confirm-dialog.show {
+            display: flex;
+        }
+        .confirm-dialog-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        .confirm-dialog-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .confirm-dialog-btn {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .success-notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(40, 167, 69, 0.95);
+            z-index: 1070;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+        }
+        .success-notification.show {
+            display: flex;
+        }
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        .success-text {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
     </style>
 
 </head>
@@ -387,9 +595,6 @@
                             <a href="coop-list.html" class="btn btn-secondary btn-sm shadow-sm">
                                 <i class="fas fa-arrow-left fa-sm"></i> Quay lại
                             </a>
-                            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-                                <i class="fas fa-save fa-sm text-white-50"></i> Lưu
-                            </a>
                         </div>
                     </div>
 
@@ -401,7 +606,7 @@
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                                     <h6 class="m-0 font-weight-bold text-primary">Quản lý chuồng</h6>
-                                    <button class="btn btn-sm btn-outline-primary" id="editCoopBtn" onclick="toggleCoopEdit()">
+                                    <button class="btn btn-sm btn-outline-primary" id="editCoopBtn" onclick="openEditModal()">
                                         <i class="fas fa-cog"></i> Chỉnh sửa & Thiết lập
                                     </button>
                                 </div>
@@ -467,102 +672,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Phần chỉnh sửa (ẩn mặc định) -->
-                                    <div id="coopEditForm" style="display: none;">
-                                        <form>
-                                            <div class="row">
-                                                <div class="col-lg-6">
-                                                    <h6 class="text-muted mb-3">Thông tin chuồng</h6>
-                                                    <div class="form-group">
-                                                        <label for="coopName">Tên chuồng</label>
-                                                        <input type="text" class="form-control" id="coopName" value="Chuồng A">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="coopLocation">Vị trí</label>
-                                                        <input type="text" class="form-control" id="coopLocation" value="Khu vực A - Hàng 1">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="coopCapacity">Sức chứa (con)</label>
-                                                        <input type="number" class="form-control" id="coopCapacity" value="500">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="coopCurrent">Số gà hiện tại</label>
-                                                        <input type="number" class="form-control" id="coopCurrent" value="450">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="coopArea">Diện tích (m²)</label>
-                                                        <input type="number" class="form-control" id="coopArea" value="100">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="coopStatus">Trạng thái</label>
-                                                        <select class="form-control" id="coopStatus">
-                                                            <option selected>Bình thường</option>
-                                                            <option>Cảnh báo</option>
-                                                            <option>Lỗi</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6">
-                                                    <h6 class="text-muted mb-3">Cấu hình chuồng</h6>
-                                                    <h6 class="text-muted mb-2 mt-3">Cảnh báo nhiệt độ</h6>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="form-group">
-                                                                <label for="tempMin">Nhiệt độ tối thiểu (°C)</label>
-                                                                <input type="number" class="form-control" id="tempMin" value="18">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="form-group">
-                                                                <label for="tempMax">Nhiệt độ tối đa (°C)</label>
-                                                                <input type="number" class="form-control" id="tempMax" value="28">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <h6 class="text-muted mb-2 mt-3">Cảnh báo độ ẩm</h6>
-                                                    <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="form-group">
-                                                                <label for="humidityMin">Độ ẩm tối thiểu (%)</label>
-                                                                <input type="number" class="form-control" id="humidityMin" value="40">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="form-group">
-                                                                <label for="humidityMax">Độ ẩm tối đa (%)</label>
-                                                                <input type="number" class="form-control" id="humidityMax" value="70">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <h6 class="text-muted mb-2 mt-3">Lịch cho ăn</h6>
-                                                    <div class="form-group">
-                                                        <label for="feedTime1">Giờ cho ăn lần 1</label>
-                                                        <input type="time" class="form-control" id="feedTime1" value="06:00">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="feedTime2">Giờ cho ăn lần 2</label>
-                                                        <input type="time" class="form-control" id="feedTime2" value="12:00">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="feedTime3">Giờ cho ăn lần 3</label>
-                                                        <input type="time" class="form-control" id="feedTime3" value="18:00">
-                                                    </div>
-                                                    <div class="form-group mt-3">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="autoFan" checked>
-                                                            <label class="custom-control-label" for="autoFan">Bật quạt tự động khi quá nhiệt</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="checkbox" class="custom-control-input" id="autoLight" checked>
-                                                            <label class="custom-control-label" for="autoLight">Bật đèn tự động khi tối</label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -576,72 +686,28 @@
                         <!-- Area Chart -->
                         <div class="col-xl-8 col-lg-7">
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Nhiệt độ trung bình các chuồng</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Tùy chọn:</div>
-                                            <a class="dropdown-item" href="#">Xem chi tiết</a>
-                                            <a class="dropdown-item" href="#">Xuất dữ liệu</a>
-                                        </div>
-                                    </div>
+                                <!-- Card Header -->
+                                <div class="card-header py-3 d-flex align-items-center">
+                                    <h6 class="m-0 font-weight-bold text-primary mr-3">Biểu đồ</h6>
+                                    <select class="form-control form-control-sm" id="dataTypeSelect" onchange="updateChart()" style="width: 180px;">
+                                        <option value="">-- Chọn dữ liệu --</option>
+                                        <option value="temp">Nhiệt độ</option>
+                                        <option value="humidity">Độ ẩm</option>
+                                        <option value="feed">Lượng thức ăn</option>
+                                        <option value="water">Lượng nước</option>
+                                        <option value="chickens">Số lượng gà</option>
+                                    </select>
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                    <div class="chart-area" id="chartArea" style="position: relative;">
+                                        <div id="chartPlaceholder" class="d-flex align-items-center justify-content-center text-muted" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0;">
+                                        </div>
+                                        <canvas id="myAreaChart" style="display: none;"></canvas>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Trạng thái thiết bị</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Tùy chọn:</div>
-                                            <a class="dropdown-item" href="#">Xem chi tiết</a>
-                                            <a class="dropdown-item" href="#">Xuất dữ liệu</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Hoạt động
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-warning"></i> Chờ
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-danger"></i> Offline
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Content Row -->
                     <div class="row">
@@ -811,6 +877,192 @@
         </div>
     </div>
 
+    <!-- Edit Modal -->
+    <div class="modal-backdrop-custom" id="modalBackdrop" onclick="closeEditModal()"></div>
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-header">
+            <h5 class="m-0">Chỉnh sửa & Thiết lập</h5>
+            <button class="close-modal-btn" onclick="closeEditModal()">×</button>
+        </div>
+        <div class="edit-modal-body">
+            <form id="coopEditFormModal">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h6 class="text-muted mb-3">Thông tin chuồng</h6>
+                        <div class="form-group">
+                            <label for="coopNameModal">Tên chuồng</label>
+                            <input type="text" class="form-control" id="coopNameModal" value="Chuồng A">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopLocationModal">Vị trí</label>
+                            <input type="text" class="form-control" id="coopLocationModal" value="Khu vực A - Hàng 1">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopCapacityModal">Sức chứa (con)</label>
+                            <input type="number" class="form-control" id="coopCapacityModal" value="500">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopCurrentModal">Số gà hiện tại</label>
+                            <input type="number" class="form-control" id="coopCurrentModal" value="450">
+                        </div>
+                        <div class="form-group">
+                            <label for="coopAreaModal">Diện tích (m²)</label>
+                            <input type="number" class="form-control" id="coopAreaModal" value="100">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <h6 class="text-muted mb-3">Cấu hình chuồng</h6>
+                        <h6 class="text-muted mb-2 mt-3">Cảnh báo nhiệt độ</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="tempMinModal">Nhiệt độ tối thiểu (°C)</label>
+                                    <input type="number" class="form-control" id="tempMinModal" value="18">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="tempMaxModal">Nhiệt độ tối đa (°C)</label>
+                                    <input type="number" class="form-control" id="tempMaxModal" value="28">
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted mb-2 mt-3">Cảnh báo độ ẩm</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="humidityMinModal">Độ ẩm tối thiểu (%)</label>
+                                    <input type="number" class="form-control" id="humidityMinModal" value="40">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="humidityMaxModal">Độ ẩm tối đa (%)</label>
+                                    <input type="number" class="form-control" id="humidityMaxModal" value="70">
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted mb-2 mt-3">Ngưỡng cảnh báo</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="feedThresholdModal">Thức ăn tối thiểu (%)</label>
+                                    <input type="number" class="form-control" id="feedThresholdModal" value="20">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    <label for="waterThresholdModal">Nước tối thiểu (%)</label>
+                                    <input type="number" class="form-control" id="waterThresholdModal" value="30">
+                                </div>
+                            </div>
+                        </div>
+                        <h6 class="text-muted mb-2 mt-3">Lịch cho ăn</h6>
+                        <div class="form-group">
+                            <label for="feedTime1Modal">Giờ cho ăn lần 1</label>
+                            <input type="time" class="form-control" id="feedTime1Modal" value="06:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="feedTime2Modal">Giờ cho ăn lần 2</label>
+                            <input type="time" class="form-control" id="feedTime2Modal" value="12:00">
+                        </div>
+                        <div class="form-group">
+                            <label for="feedTime3Modal">Giờ cho ăn lần 3</label>
+                            <input type="time" class="form-control" id="feedTime3Modal" value="18:00">
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted mb-3 mt-4">Tự động hóa</h6>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="automation-item">
+                            <div>
+                                <div class="automation-label">Tự động bật quạt</div>
+                                <div class="automation-desc">Bật quạt khi nhiệt độ vượt ngưỡng</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoFanModal" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="automation-item">
+                            <div>
+                                <div class="automation-label">Tự động bật đèn</div>
+                                <div class="automation-desc">Bật đèn khi trời tối</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoLightModal" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="automation-item">
+                            <div>
+                                <div class="automation-label">Tự động cho ăn</div>
+                                <div class="automation-desc">Cho ăn theo lịch đã thiết lập</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoFeedModal" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="automation-item">
+                            <div>
+                                <div class="automation-label">Tự động cung cấp nước</div>
+                                <div class="automation-desc">Cấp nước tự động khi cạn</div>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="autoWaterModal" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted mb-3 mt-4">Thông báo khẩn cấp</h6>
+                <div class="form-group emergency-field p-3 rounded">
+                    <label class="emergency-label" for="emergencyAlertModal">Cho phép thông báo khẩn cấp</label>
+                    <div class="emergency-description">Khi bật, hệ thống sẽ gửi cảnh báo ngay lập tức khi phát hiện sự cố nghiêm trọng (nhiệt độ quá cao/thấp, mất điện, thiết bị lỗi...)</div>
+                    <div class="mt-2">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emergencyAlertModal" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="edit-modal-footer">
+            <button class="btn btn-secondary" onclick="rollbackChanges()">
+                <i class="fas fa-undo"></i> Khôi phục dữ liệu cũ
+            </button>
+            <button class="btn btn-primary" onclick="showConfirmDialog()">
+                <i class="fas fa-save"></i> Lưu
+            </button>
+        </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-dialog-content">
+            <div class="confirm-dialog-title">Bạn có muốn lưu thông tin này không?</div>
+            <div class="confirm-dialog-btn">
+                <button class="btn btn-secondary" onclick="hideConfirmDialog()">Hủy</button>
+                <button class="btn btn-primary" onclick="saveChanges()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Notification -->
+    <div class="success-notification" id="successNotification">
+        <i class="fas fa-check-circle success-icon"></i>
+        <div class="success-text">Đã cập nhật thông tin thành công</div>
+    </div>
+
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -825,25 +1077,251 @@
     <script src="vendor/chart.js/Chart.min.js"></script>
 
     <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
 
     <script>
-        function toggleCoopEdit() {
-            var displaySection = document.getElementById('coopDisplay');
-            var editSection = document.getElementById('coopEditForm');
-            var btn = document.getElementById('editCoopBtn');
-            
-            if (displaySection.style.display === 'none') {
-                displaySection.style.display = 'block';
-                editSection.style.display = 'none';
-                btn.innerHTML = '<i class="fas fa-cog"></i> Chỉnh sửa & Thiết lập';
-            } else {
-                displaySection.style.display = 'none';
-                editSection.style.display = 'block';
-                btn.innerHTML = '<i class="fas fa-times"></i> Đóng';
-            }
+        var originalValues = {};
+
+        function saveOriginalValues() {
+            originalValues = {
+                coopNameModal: document.getElementById('coopNameModal').value,
+                coopLocationModal: document.getElementById('coopLocationModal').value,
+                coopCapacityModal: document.getElementById('coopCapacityModal').value,
+                coopCurrentModal: document.getElementById('coopCurrentModal').value,
+                coopAreaModal: document.getElementById('coopAreaModal').value,
+                tempMinModal: document.getElementById('tempMinModal').value,
+                tempMaxModal: document.getElementById('tempMaxModal').value,
+                humidityMinModal: document.getElementById('humidityMinModal').value,
+                humidityMaxModal: document.getElementById('humidityMaxModal').value,
+                feedThresholdModal: document.getElementById('feedThresholdModal').value,
+                waterThresholdModal: document.getElementById('waterThresholdModal').value,
+                feedTime1Modal: document.getElementById('feedTime1Modal').value,
+                feedTime2Modal: document.getElementById('feedTime2Modal').value,
+                feedTime3Modal: document.getElementById('feedTime3Modal').value,
+                autoFanModal: document.getElementById('autoFanModal').checked,
+                autoLightModal: document.getElementById('autoLightModal').checked,
+                autoFeedModal: document.getElementById('autoFeedModal').checked,
+                autoWaterModal: document.getElementById('autoWaterModal').checked,
+                emergencyAlertModal: document.getElementById('emergencyAlertModal').checked
+            };
         }
+
+        function openEditModal() {
+            saveOriginalValues();
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.getElementById('editModal').classList.add('show');
+        }
+
+        function closeEditModal() {
+            document.getElementById('modalBackdrop').classList.remove('show');
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        function rollbackChanges() {
+            document.getElementById('coopNameModal').value = originalValues.coopNameModal;
+            document.getElementById('coopLocationModal').value = originalValues.coopLocationModal;
+            document.getElementById('coopCapacityModal').value = originalValues.coopCapacityModal;
+            document.getElementById('coopCurrentModal').value = originalValues.coopCurrentModal;
+            document.getElementById('coopAreaModal').value = originalValues.coopAreaModal;
+            document.getElementById('tempMinModal').value = originalValues.tempMinModal;
+            document.getElementById('tempMaxModal').value = originalValues.tempMaxModal;
+            document.getElementById('humidityMinModal').value = originalValues.humidityMinModal;
+            document.getElementById('humidityMaxModal').value = originalValues.humidityMaxModal;
+            document.getElementById('feedThresholdModal').value = originalValues.feedThresholdModal;
+            document.getElementById('waterThresholdModal').value = originalValues.waterThresholdModal;
+            document.getElementById('feedTime1Modal').value = originalValues.feedTime1Modal;
+            document.getElementById('feedTime2Modal').value = originalValues.feedTime2Modal;
+            document.getElementById('feedTime3Modal').value = originalValues.feedTime3Modal;
+            document.getElementById('autoFanModal').checked = originalValues.autoFanModal;
+            document.getElementById('autoLightModal').checked = originalValues.autoLightModal;
+            document.getElementById('autoFeedModal').checked = originalValues.autoFeedModal;
+            document.getElementById('autoWaterModal').checked = originalValues.autoWaterModal;
+            document.getElementById('emergencyAlertModal').checked = originalValues.emergencyAlertModal;
+        }
+
+        function showConfirmDialog() {
+            document.getElementById('confirmDialog').classList.add('show');
+        }
+
+        function hideConfirmDialog() {
+            document.getElementById('confirmDialog').classList.remove('show');
+        }
+
+        function saveChanges() {
+            hideConfirmDialog();
+            closeEditModal();
+            document.getElementById('successNotification').classList.add('show');
+            setTimeout(function() {
+                document.getElementById('successNotification').classList.remove('show');
+            }, 2000);
+        }
+
+        var areaChart = null;
+        var coopCapacity = 500;
+
+        function updateChart() {
+            var selectedType = document.getElementById('dataTypeSelect').value;
+            var placeholder = document.getElementById('chartPlaceholder');
+            var canvas = document.getElementById('myAreaChart');
+
+            if (!selectedType) {
+                placeholder.style.display = 'flex';
+                canvas.style.display = 'none';
+                if (areaChart) {
+                    areaChart.destroy();
+                    areaChart = null;
+                }
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            canvas.style.display = 'block';
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+
+            var ctx = canvas.getContext('2d');
+
+            var labels = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+            var datasets = [];
+
+            var dataConfig = {
+                temp: { 
+                    data: [26, 27, 28, 25, 24, 26, 28], 
+                    color: '#dc3545', 
+                    label: 'Nhiệt độ (°C)',
+                    yTitle: 'Nhiệt độ (°C)'
+                },
+                humidity: { 
+                    data: [65, 68, 70, 62, 60, 65, 68], 
+                    color: '#17a2b8', 
+                    label: 'Độ ẩm (%)',
+                    yTitle: 'Độ ẩm (%)'
+                },
+                feed: { 
+                    data: [80, 75, 70, 65, 60, 55, 50], 
+                    color: '#ffc107', 
+                    label: 'Lượng thức ăn (kg)',
+                    yTitle: 'Lượng thức ăn (kg)'
+                },
+                water: { 
+                    data: [75, 70, 65, 60, 55, 50, 45], 
+                    color: '#007bff', 
+                    label: 'Lượng nước (lít)',
+                    yTitle: 'Lượng nước (lít)'
+                },
+                chickens: { 
+                    data: [420, 425, 430, 435, 440, 445, 450], 
+                    color: '#28a745', 
+                    label: 'Số lượng gà (con)',
+                    yTitle: 'Số lượng gà (con)',
+                    showCapacity: true
+                }
+            };
+
+            var config = dataConfig[selectedType];
+
+            datasets.push({
+                label: config.label,
+                data: config.data,
+                borderColor: config.color,
+                backgroundColor: config.color + '20',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: config.color,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7
+            });
+
+            if(config.showCapacity) {
+                datasets.push({
+                    label: 'Sức chứa tối đa',
+                    data: Array(7).fill(coopCapacity),
+                    borderColor: '#6c757d',
+                    borderDash: [8, 4],
+                    backgroundColor: 'transparent',
+                    fill: false,
+                    tension: 0,
+                    pointRadius: 0,
+                    pointHoverRadius: 0
+                });
+            }
+
+            if(areaChart) {
+                areaChart.destroy();
+            }
+
+            areaChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: { 
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        },
+                        tooltip: { 
+                            enabled: true,
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14 },
+                            padding: 12,
+                            callbacks: {
+                                title: function(context) {
+                                    return 'Ngày: ' + context[0].label;
+                                },
+                                label: function(context) {
+                                    if(context.dataset.label === 'Sức chứa tối đa') {
+                                        return null;
+                                    }
+                                    var value = context.parsed.y;
+                                    return context.dataset.label + ': ' + value;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Thời gian (7 ngày gần nhất)',
+                                font: { size: 12, weight: 'bold' }
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: config.yTitle,
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('chartPlaceholder').style.display = 'flex';
+            document.getElementById('myAreaChart').style.display = 'none';
+        });
     </script>
 
 </body>
