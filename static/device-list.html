@@ -20,6 +20,107 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
+    <style>
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 0;
+        }
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 11px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .bottom-nav-item:hover {
+            color: #4e73df;
+            text-decoration: none;
+        }
+        .bottom-nav-item.active {
+            color: #4e73df;
+        }
+        .bottom-nav-item i {
+            font-size: 18px;
+            margin-bottom: 2px;
+            display: block;
+        }
+        @media (max-width: 767px) {
+            .bottom-nav { display: flex; }
+            #accordionSidebar { display: none !important; }
+            body { padding-bottom: 60px; }
+        }
+        /* Card Chuồng */
+        .coop-summary-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-left: 4px solid #22c55e;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fff;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            min-height: 75px;
+            height: 100%;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .coop-summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .coop-summary-card.online { border-left-color: #22c55e; }
+        .coop-summary-card.warning { border-left-color: #ffc107; }
+        .coop-summary-card.error { border-left-color: #dc3545; }
+        .coop-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .coop-summary-name {
+            font-weight: 600;
+            font-size: 15px;
+            color: #2c3e50;
+        }
+        .coop-summary-status {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        .coop-summary-status.online { background: #d1fae5; color: #065f46; }
+        .coop-summary-status.warning { background: #fef3c7; color: #92400e; }
+        .coop-summary-status.error { background: #fee2e2; color: #991b1b; }
+        .coop-summary-info {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .coop-summary-info span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -553,49 +654,60 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên chuồng</th>
-                                                    <th>Sức chứa</th>
-                                                    <th>Thiết bị</th>
-                                                    <th>Trạng thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Chuồng A</td>
-                                                    <td>500 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng B</td>
-                                                    <td>300 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng C</td>
-                                                    <td>400 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-warning">Cảnh báo</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng D</td>
-                                                    <td>200 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-success">Bình thường</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Chuồng E</td>
-                                                    <td>350 con</td>
-                                                    <td>4</td>
-                                                    <td><span class="badge badge-danger">Lỗi</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <!-- Chuồng A -->
+                                    <div class="coop-summary-card online">
+                                        <div class="coop-summary-header">
+                                            <span class="coop-summary-name">Chuồng A</span>
+                                            <span class="coop-summary-status online">Bình thường</span>
+                                        </div>
+                                        <div class="coop-summary-info">
+                                            <span><i class="fas fa-feather-alt"></i> 480 gà</span>
+                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
+                                        </div>
+                                    </div>
+                                    <!-- Chuồng B -->
+                                    <div class="coop-summary-card online">
+                                        <div class="coop-summary-header">
+                                            <span class="coop-summary-name">Chuồng B</span>
+                                            <span class="coop-summary-status online">Bình thường</span>
+                                        </div>
+                                        <div class="coop-summary-info">
+                                            <span><i class="fas fa-feather-alt"></i> 280 gà</span>
+                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
+                                        </div>
+                                    </div>
+                                    <!-- Chuồng C -->
+                                    <div class="coop-summary-card warning">
+                                        <div class="coop-summary-header">
+                                            <span class="coop-summary-name">Chuồng C</span>
+                                            <span class="coop-summary-status warning">Cảnh báo</span>
+                                        </div>
+                                        <div class="coop-summary-info">
+                                            <span><i class="fas fa-feather-alt"></i> 380 gà</span>
+                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
+                                        </div>
+                                    </div>
+                                    <!-- Chuồng D -->
+                                    <div class="coop-summary-card online">
+                                        <div class="coop-summary-header">
+                                            <span class="coop-summary-name">Chuồng D</span>
+                                            <span class="coop-summary-status online">Bình thường</span>
+                                        </div>
+                                        <div class="coop-summary-info">
+                                            <span><i class="fas fa-feather-alt"></i> 180 gà</span>
+                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
+                                        </div>
+                                    </div>
+                                    <!-- Chuồng E -->
+                                    <div class="coop-summary-card error">
+                                        <div class="coop-summary-header">
+                                            <span class="coop-summary-name">Chuồng E</span>
+                                            <span class="coop-summary-status error">Lỗi</span>
+                                        </div>
+                                        <div class="coop-summary-info">
+                                            <span><i class="fas fa-feather-alt"></i> 320 gà</span>
+                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
+                                        </div>
                                     </div>
                                     <a href="coop-list.html" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
                                 </div>
@@ -725,6 +837,30 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a class="bottom-nav-item" href="coop-list.html">
+            <i class="fas fa-home"></i>
+            <span>Chuồng</span>
+        </a>
+        <a class="bottom-nav-item" href="device-list.html">
+            <i class="fas fa-wifi"></i>
+            <span>Thiết bị</span>
+        </a>
+        <a class="bottom-nav-item" href="index.html">
+            <i class="fas fa-home"></i>
+            <span>Trang chủ</span>
+        </a>
+        <a class="bottom-nav-item" href="camera.html">
+            <i class="fas fa-video"></i>
+            <span>Camera</span>
+        </a>
+        <a class="bottom-nav-item" href="other.html">
+            <i class="fas fa-ellipsis-h"></i>
+            <span>Khác</span>
+        </a>
+    </div>
 
 </body>
 

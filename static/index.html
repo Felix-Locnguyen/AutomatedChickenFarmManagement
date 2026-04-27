@@ -20,6 +20,177 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 
+    <style>
+        /* Donut Chart */
+        .donut-chart-container-coop {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .donut-chart-coop {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
+        }
+        .donut-chart-coop svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .donut-segment-coop {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .donut-segment-coop:hover {
+            stroke-width: 28;
+            filter: brightness(1.15);
+        }
+        .donut-center-coop {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .donut-total-coop {
+            display: block;
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
+        }
+        .donut-label-coop {
+            display: block;
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+        .donut-tooltip-coop {
+            display: none;
+            position: fixed;
+            background: white;
+            border-radius: 8px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            text-align: center;
+            z-index: 1000;
+            min-width: 100px;
+            pointer-events: none;
+        }
+        .donut-tooltip-coop.show {
+            display: block;
+        }
+        .tooltip-content-coop {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .tooltip-name-coop {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .tooltip-percent-coop {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .donut-legend-coop {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .legend-item-coop {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .legend-text-coop {
+            font-weight: 500;
+        }
+        .legend-dot-coop {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        /* Giá trị trung bình */
+        .coop-temp-humid {
+            display: flex;
+            gap: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+        .coop-temp, .coop-humid {
+            flex: 1;
+            text-align: center;
+        }
+        .coop-temp-icon, .coop-humid-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .coop-temp-value, .coop-humid-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .coop-temp-label, .coop-humid-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        /* Bottom Navigation */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 0;
+        }
+        .bottom-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 0;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 11px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .bottom-nav-item:hover {
+            color: #4e73df;
+            text-decoration: none;
+        }
+        .bottom-nav-item.active {
+            color: #4e73df;
+        }
+        .bottom-nav-item i {
+            font-size: 18px;
+            margin-bottom: 2px;
+            display: block;
+        }
+        @media (max-width: 767px) {
+            .bottom-nav { display: flex; }
+            #accordionSidebar { display: none !important; }
+            body { padding-bottom: 60px; }
+        }
+    </style>
+
 </head>
 
 <body id="page-top">
@@ -406,30 +577,24 @@
 
                     <div class="row">
 
-                        <!-- Area Chart -->
+                        <!-- Giá trị trung bình các chuồng -->
                         <div class="col-xl-8 col-lg-7">
                             <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Nhiệt độ trung bình các chuồng</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Tùy chọn:</div>
-                                            <a class="dropdown-item" href="#">Xem chi tiết</a>
-                                            <a class="dropdown-item" href="#">Xuất dữ liệu</a>
-                                        </div>
-                                    </div>
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Nhiệt độ và độ ẩm trung bình các chuồng</h6>
                                 </div>
-                                <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
+                                    <div class="coop-temp-humid">
+                                        <div class="coop-temp">
+                                            <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                            <div class="coop-temp-value">27°C</div>
+                                            <div class="coop-temp-label">Nhiệt độ</div>
+                                        </div>
+                                        <div class="coop-humid">
+                                            <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                            <div class="coop-humid-value">65%</div>
+                                            <div class="coop-humid-label">Độ ẩm</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -441,7 +606,7 @@
                                 <!-- Card Header - Dropdown -->
                                 <div
                                     class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Trạng thái thiết bị</h6>
+                                    <h6 class="m-0 font-weight-bold text-primary">Sơ đồ trạng thái thiết bị</h6>
                                     <div class="dropdown no-arrow">
                                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -457,19 +622,55 @@
                                 </div>
                                 <!-- Card Body -->
                                 <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
+                                    <div class="donut-chart-container-coop">
+                                        <div class="donut-chart-coop" id="donutChartCoop">
+                                            <svg viewBox="0 0 200 200">
+                                                <!-- Hoạt động (60%) - 9 thiết bị -->
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70"
+                                                    fill="none" stroke="#22c55e" stroke-width="22"
+                                                    stroke-dasharray="264 440" stroke-dashoffset="0"
+                                                    data-segment="hoatdong" data-name="Hoạt động" data-count="9" data-percent="60">
+                                                </circle>
+                                                <!-- Chờ (20%) - 3 thiết bị -->
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70"
+                                                    fill="none" stroke="#ffc107" stroke-width="22"
+                                                    stroke-dasharray="88 440" stroke-dashoffset="-264"
+                                                    data-segment="cho" data-name="Chờ" data-count="3" data-percent="20">
+                                                </circle>
+                                                <!-- Lỗi (20%) - 3 thiết bị -->
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70"
+                                                    fill="none" stroke="#dc3545" stroke-width="22"
+                                                    stroke-dasharray="88 440" stroke-dashoffset="-352"
+                                                    data-segment="loi" data-name="Lỗi" data-count="3" data-percent="20">
+                                                </circle>
+                                                <!-- Center circle -->
+                                                <circle cx="100" cy="100" r="52" fill="white"></circle>
+                                            </svg>
+                                            <div class="donut-center-coop">
+                                                <span class="donut-total-coop">15</span>
+                                                <span class="donut-label-coop">thiết bị</span>
+                                            </div>
+                                        </div>
+                                        <div class="donut-tooltip-coop" id="donutTooltipCoop">
+                                            <div class="tooltip-content-coop">
+                                                <span class="tooltip-name-coop">Hoạt động</span>
+                                                <span class="tooltip-percent-coop">60%</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Hoạt động
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-warning"></i> Chờ
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-danger"></i> Offline
-                                        </span>
+                                    <div class="donut-legend-coop">
+                                        <div class="legend-item-coop" data-segment="hoatdong">
+                                            <span class="legend-dot-coop" style="background: #22c55e;"></span>
+                                            <span class="legend-text-coop">Hoạt động (9)</span>
+                                        </div>
+                                        <div class="legend-item-coop" data-segment="cho">
+                                            <span class="legend-dot-coop" style="background: #ffc107;"></span>
+                                            <span class="legend-text-coop">Chờ (3)</span>
+                                        </div>
+                                        <div class="legend-item-coop" data-segment="loi">
+                                            <span class="legend-dot-coop" style="background: #dc3545;"></span>
+                                            <span class="legend-text-coop">Lỗi (3)</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -527,7 +728,7 @@
                                                     <td>Chuồng E</td>
                                                     <td>350 con</td>
                                                     <td>4</td>
-                                                    <td><span class="badge badge-danger">Lỗi</span></td>
+                                                    <td><span class="badge badge-danger">Ljj</span></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -660,6 +861,57 @@
     <!-- Page level custom scripts -->
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
+
+    <script>
+        // Donut Chart Interaction - index.html
+        (function() {
+            var segments = document.querySelectorAll('.donut-segment-coop');
+            var tooltip = document.getElementById('donutTooltipCoop');
+            var legendItems = document.querySelectorAll('.legend-item-coop');
+            
+            segments.forEach(function(segment) {
+                segment.addEventListener('mouseenter', function() {
+                    var name = this.getAttribute('data-name');
+                    var percent = this.getAttribute('data-percent');
+                    var count = this.getAttribute('data-count');
+                    var color = this.getAttribute('stroke');
+                    
+                    tooltip.querySelector('.tooltip-name-coop').textContent = name;
+                    tooltip.querySelector('.tooltip-percent-coop').textContent = percent + '% (' + count + ')';
+                    tooltip.querySelector('.tooltip-percent-coop').style.color = color;
+                    tooltip.classList.add('show');
+                });
+                
+                segment.addEventListener('mousemove', function(e) {
+                    tooltip.style.left = (e.clientX + 15) + 'px';
+                    tooltip.style.top = (e.clientY - 10) + 'px';
+                });
+                
+                segment.addEventListener('mouseleave', function() {
+                    tooltip.classList.remove('show');
+                });
+            });
+            
+            legendItems.forEach(function(item) {
+                item.addEventListener('mouseenter', function() {
+                    var segmentType = this.getAttribute('data-segment');
+                    segments.forEach(function(seg) {
+                        if (seg.getAttribute('data-segment') === segmentType) {
+                            seg.style.strokeWidth = '28';
+                            seg.style.filter = 'brightness(1.15)';
+                        }
+                    });
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    segments.forEach(function(seg) {
+                        seg.style.strokeWidth = '22';
+                        seg.style.filter = 'none';
+                    });
+                });
+            });
+        })();
+    </script>
 
 </body>
 
