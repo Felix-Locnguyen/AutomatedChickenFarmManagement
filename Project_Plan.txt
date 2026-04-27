@@ -41,24 +41,24 @@ Kế hoạch cho ngày 26/04
 - Chỉnh chỉnh phần trạng thái thiết bị [xong]
 	+ thiết kế sơ đồ tròn rỗng ở giữ, hiển bị % ở rìa vành tròn, khi ấn phần trên sơ đồ tròn thì hiện ra phần 	trăm, tên mục của biểu đồ ( ví dụ Hoạt động) và số lượng thiết bị, khi ấn thì cho phần chọn phòng to ra cho 	dễ nhìn 
 
-# trang xem chi tiết chuồng 
+# trang xem chi tiết chuồng [xong]
 - Thêm sơ đồ tròn trạng thái các thiết bị trong chuồng (lấy cảm hứng trong phần thiết bị )
 
-# trang xem thông các chuồng
-- Chỉnh lại sơ đồ nhiệt độ  (sơ đồ sẽ được lấy cảm hứng từ phần xem chi tiết)
-- chỉnh lại sơ đồ trạng thái thiết bị ( lấy cảm hứng trong phần thiết bị )
+# trang xem thông các chuồng [xong]
+- Chỉnh lại sơ đồ nhiệt độ  (sơ đồ sẽ được lấy cảm hứng từ phần xem chi tiết) [xong]
+- chỉnh lại sơ đồ trạng thái thiết bị ( lấy cảm hứng trong phần thiết bị ) [xong]
 
-][=================================================================================================================][
+[=================================================================================================================]
 @ Thanh tiện ích
 - thay đổi cấu thanh tiện tích từ sidebar sang các dạng sau 
  	========================================================|
-	+ Fixed Bottom Navigation				|
-	+ Sticky Bottom Navigation				|
-	+ Hide on Scroll Bottom Navigation			|
-	+ Tab Bar (iOS style)					|
-	+ Bottom Navigation + Floating Button (FAB)		|
+	+ Fixed Bottom Navigation								|
+	+ Sticky Bottom Navigation								|
+	+ Hide on Scroll Bottom Navigation						|
+	+ Tab Bar (iOS style)									|
+	+ Bottom Navigation + Floating Button (FAB)				|
 	========================================================|
-=> Tối ưu nhất lúc này là nên dùng Fixed Bottom navigation
+=> Tối ưu nhất lúc này là nên dùng Fixed Bottom Navigation 			[Xong]
  	+ Các thông tin hiển thị
 		> Quản lí chuồng
 		> Quản lí thiết bị 
