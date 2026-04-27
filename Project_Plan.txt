@@ -1,4 +1,71 @@
-Kế hoạch cho ngày 26/04 
+================================================================================================================================================================================================================================================
+Kế hoạch cho ngày 28/04
+
+# Thanh công cụ
+-Thêm logic cho thanh Fixed botton navigation
+	+ Làm cho nút hôm trở nên đặc biệt hơn 
+	+ Thêm hiệu ứng khi ấn vào mục trong thành công cụ, phần được ấn sẽ được tô đậm và khi
+	di chuyển ( ấn ô khác thì ô màu đó sẽ trượt qua ô được vừa được chọn mới)
+
+# Trang quản lí thiết bị 
+- Chỉnh sửa bố cục trang 
+	+ Xóa nút thêm thiết bị mới 
+	+ Thêm chức năng thêm thiết bị mới nằm bên phải tiêu đề Danh sách thiết bị IOT
+	+ Chuyển bố cục Danh sách thiết bị IOT từ dạng table sang dạng card
+	+ thiết kế mỗi thẻ
+		> dấu chấm xanh/vàng/đỏ ( xanh: online, chờ, lỗi ) nằm phía bên trái của thẻ
+		> tên thiết bị ví dụ nhiệt kế A1
+		> dưới tên thiết bị là pin và sóng
+		> bên phải sẽ có 2 nút cài đặt và xóa ( khi ấn xóa hỏi xác nhận)
+		> thêm nút tắt/ bật ( kiểu thiết kế [ ON/OFF toggle ], khi thực hiện tắt bật thì hiện ra 1 ô nhỏ
+		  thông báo đã tắt, bật )
+	+ Logic:
+		 > trường hợp thiết bị lỗi thì sẽ thay pin và sóng kết nói sẽ đổi thành chữ mất kết nối
+		 > trường hợp thiết bị ở trạng thái chờ sẽ giữ pin nhưng sóng sẽ đổi thành chờ kết nối
+	   	 > trường hợp tắt thì thông báo sẽ là tên "đã tắt {thiết bị}" với ô màu xám chữ trắng
+		 > trường hợp bật thì thông báo sẽ là tên "đã bật {thiết bị}" với ô màu xanh lá chữ trắng
+		 > Khi ấn nút icon bánh răn sẽ hiện ra thông tin chỉnh sửa thiết bị có nút lưu và quay lại 
+		 khi ấn nút lưu thì thông báo lưu thành công và khi bấm nút quay lại thì sẽ quay lại giá trị đã
+		 được thiết lập trước đó
+	+ Xóa biểu đồ nhiệt đồ trung bình các chuồng 
+	+ Cập nhật bản mới (lấy từ trang chuồng)
+
+# Trang camera
+- Khởi tạo bố cục 
+	+ Tạo ô với tiêu đề là Danh sách các chuồng
+	+ Tạo chức năng tìm kiếm
+	+ Mỗi chuồng được biểu diễn dưới dạng thẻ
+	+ Mỗi thẻ chứa:
+		> Thông tin tên chuồng, trạng thái camera, trạng thái chuồng
+		> Có nút kiểm tra
+		> Nút Xóa 
+	+ Thêm tính roll list cho ô Danh sách các chuồng (Trường hợp quá nhiều chuồng cần quả lí để
+	người dùng có thể kéo lên xuống)
+
+- Logic:
+	+ Khi ấn nút kiểm tra sẽ hiện ra 1 trang mới  	+++++( SẼ PHÁT TRIÊN THÊM VÀO 29/4 )+++++
+	+ Khi nút xóa hỏi xác nhận
+		> Trường hợp hủy thì sẽ out 
+		> Trường hợp ấn nút xóa sẽ đánh dấu tick màu xanh toàn màn hình 
+		> Nếu lỗi khác thì sẽ hiện ra thông báo lỗi xin vui lòng thử lại 
+
+
+# Trang khác
+- Khởi tạo 4 chức năng 
+	+ Báo cáo
+	+ Cài đặt
+	+ Xuất file báo cáo
+	+ Hỗ trợ 
+	+ Góp ý với nhà phát hành 
+	
+
+# kiểm tra và cập nhật lại cấu trúc và tiến độ
+- Cập nhật file readme 
+- Cập nhật coop-page-structure
+- Push code lên github 
+
+================================================================================================================================================================================================================================================
+Kế hoạch cho ngày 27/04 
 
 # Thiết kê lại trang chi tiết chuồng ( phần thiết bị)		[xong]
 - xóa phần cập nhật thiết bị		[xong]
