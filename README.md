@@ -102,6 +102,133 @@ AutomatedChickenFarmManagement/
 #### 8. Removed Pie Chart
 - Removed "Trạng thái thiết bị" pie chart from the page
 
+## Progress Today (April 27, 2026)
+
+### Changes Made to `device-detail.html`
+
+#### 1. Page Title and Header Changes
+- Changed page title from "Thiết bị IoT" to "Quản lý thiết bị chuồng trại"
+- Updated sidebar: "Thiết bị IoT" → "Quản lý thiết bị"
+- Removed "Cập nhật thông tin thiết bị" form section
+- Removed "Thêm thiết bị" button from page header
+
+#### 2. Add Device Modal (Thêm thiết bị vào chuồng)
+- Added "+ Thêm thiết bị" button in "Danh sách thiết bị trong Chuồng" card header
+- Modal with blur background effect, centered on screen
+- Search input with placeholder "Tìm thiết bị..."
+- Checkbox list with 5 sample devices
+- Real-time counter: "Đã chọn: X thiết bị"
+- Two buttons: "Hủy" and "Thêm thiết bị"
+- Success notification: Full-screen green background
+- Warning toast: "Vui lòng chọn thiết bị" (yellow)
+- Error toast: "Không thành công, vui lòng thử lại" (red)
+- Toast positioned center-top with 25px offset, min-width 350px
+
+#### 3. Redesigned Device List (Card Layout)
+- Each device displayed as individual card
+- Status dot indicators: ● Green (Hoạt động), ● Yellow (Chờ), ● Red (Lỗi)
+- Device info: Name, Battery %, Connection status
+- Toggle button: "Bật" (green) / "Tắt" (gray)
+- Delete button with "Xóa" text
+- Removed Settings (gear) button
+- Removed table-based layout
+- Device card layout:
+  ```
+  | ● Device Name |
+  | 🔋 85%  📶 Đã kết nối |
+  | [Bật]  [Xóa] |
+  ```
+
+#### 4. Mobile Responsive Design
+- CSS optimized with green color #22c55e
+- Page title: 20px, font-weight 600, line-height 1.3
+- Card header: flexbox with justify-content: space-between
+- Device cards: border-left 4px solid #22c55e, border-radius 8px
+- Responsive: max-width 576px - cards stack vertically
+- Toggle switch: 50px x 26px for better touch target
+
+#### 5. Scrollable Device List
+- Container with max-height: 400px (desktop), 300px (mobile)
+- overflow-y: auto with smooth scrolling
+- Custom scrollbar styling (6px width, gray thumb)
+- Prevents page from becoming too long with >10 devices
+
+#### 6. Donut Chart (Trạng thái thiết bị)
+- Removed Area Chart (Nhiệt độ trung bình các chuồng)
+- New Donut Chart design:
+  - Center circle with total device count (5)
+  - 3 segments: Hoạt động 60% (green), Chờ 20% (yellow), Lỗi 20% (red)
+  - Legend below: "Hoạt động (3)", "Chờ (1)", "Lỗi (1)"
+- Hover interactions:
+  - Segment highlight with brightness increase
+  - Tooltip at cursor position showing: Name + Percentage
+  - Legend text changes color to match hovered segment
+- Click outside to reset
+
+#### 7. Toggle Logic Based on Connection Status
+- Added `data-connection-status` attribute to device cards:
+  - `connected`: Allows toggle, shows "Đã bật/Đã tắt" toast
+  - `connecting`: Click shows warning "Thiết bị đang kết nối, vui lòng thử lại sau"
+  - `disconnected`: Click shows error "Thiết bị không kết nối với chuồng, vui lòng kiểm tra lại kết nối"
+
+#### 8. Sample Device Data
+
+| # | Device Name | Status | Connection | Pin/Signal | Toggle |
+|---|-------------|--------|-------------|------------|--------|
+| 1 | Cảm biến nhiệt độ A1 | Hoạt động | connected | 85%, Đã kết nối | Bật |
+| 2 | Cảm biến ẩm A1 | Hoạt động | connected | 92%, Đã kết nối | Bật |
+| 3 | Quạt thông gió A1 | Hoạt động | connected | Quạt công nghiệp | Bật |
+| 4 | Đèn LED A1 | Chờ | connecting | 70%, Chờ kết nối | Tắt |
+| 5 | Hệ thống cho ăn B1 | Lỗi | disconnected | Mất kết nối | Tắt |
+
+### Sample Code Structure
+
+#### Device Card HTML
+```html
+<div class="device-card status-active" 
+     data-device-id="1" 
+     data-device-name="Cảm biến nhiệt độ A1" 
+     data-connection-status="connected">
+    <div class="device-card-row device-card-header">
+        <span class="status-dot active"></span>
+        <span class="device-name">Cảm biến nhiệt độ A1</span>
+    </div>
+    <div class="device-card-row device-card-info">
+        <span><i class="fas fa-battery-full"></i> 85%</span>
+        <span><i class="fas fa-wifi"></i> Đã kết nối</span>
+    </div>
+    <div class="device-card-row device-card-actions">
+        <button class="btn btn-sm status-btn status-on device-toggle-btn">Bật</button>
+        <button class="btn btn-sm btn-outline-danger btn-delete-device">Xóa</button>
+    </div>
+</div>
+```
+
+#### Donut Chart SVG
+```html
+<svg viewBox="0 0 200 200">
+    <circle class="donut-segment" data-segment="hoatdong" 
+            data-name="Hoạt động" data-percent="60" ... />
+    <circle class="donut-segment" data-segment="cho" 
+            data-name="Chờ" data-percent="20" ... />
+    <circle class="donut-segment" data-segment="loi" 
+            data-name="Lỗi" data-percent="20" ... />
+    <circle cx="100" cy="100" r="50" fill="white" />
+</svg>
+```
+
+### Key CSS Classes
+
+| Class | Purpose |
+|-------|---------|
+| `.device-card` | Individual device card container |
+| `.device-list-container` | Scrollable container with max-height |
+| `.status-btn` | Toggle button (Bật/Tắt) |
+| `.donut-chart` | SVG donut chart container |
+| `.donut-segment` | Individual chart segment |
+| `.donut-tooltip` | Tooltip displayed on hover |
+| `.legend-item` | Legend items below chart |
+
 ## Features Planned
 
 ### 1. Dashboard & Monitoring

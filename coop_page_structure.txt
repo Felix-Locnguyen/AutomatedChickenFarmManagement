@@ -1,6 +1,6 @@
 TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 │
-├── [NAV] Trang chủ · Quản lý chuồng · Thiết bị IoT · Báo cáo
+├── [NAV] Trang chủ · Quản lý chuồng · Thiết bị · Báo cáo
 │
 ├── 🏠 TRANG CHỦ
 │   ├── Thẻ tổng quan
@@ -9,8 +9,7 @@ TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 │   │   ├── Thiết bị đang online
 │   │   └── Số cảnh báo
 │   ├── Biểu đồ nhiệt độ TB các chuồng
-│   ├── Biểu đồ trạng thái thiết bị
-│   │   └── Đang hoạt động / Chờ / Tắt
+│   ├── Biểu đồ trạng thái thiết bị (Donut Chart)
 │   ├── Bảng danh sách chuồng
 │   └── Bảng thiết bị gần đây
 │
@@ -22,22 +21,76 @@ TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 │       │   │   ├── Nơi setup / vị trí
 │       │   │   ├── Biểu đồ nhiệt độ TB
 │       │   │   └── Biểu đồ trạng thái thiết bị
-│       │   └── Thiết bị chuồng
-│       │       ├── Danh sách thiết bị trong chuồng
-│       │       ├── Form cập nhật thông tin thiết bị
-│       │       ├── Biểu đồ nhiệt độ thiết bị
-│       │       └── Biểu đồ trạng thái thiết bị
+│       │   └── Chi tiết chuồng
+│       │       ├── [+] Thêm thiết bị (Button → Modal)
+│       │       │   ├── Ô tìm kiếm "Tìm thiết bị..."
+│       │       │   ├── Danh sách checkbox (đa chọn)
+│       │       │   ├── Đếm số lượng: "Đã chọn: X thiết bị"
+│       │       │   ├── Nút Hủy / Thêm thiết bị
+│       │       │   └── Toast notification (thành công/lỗi)
+│       │       ├── Danh sách thiết bị trong chuồng (Scrollable Container)
+│       │       │   └── max-height: 400px (desktop) / 300px (mobile)
+│       │       │   └── Card thiết bị
+│       │       │       ├── Dấu chấm trạng thái
+│       │       │       │   ├── ● Xanh (Hoạt động)
+│       │       │       │   ├── ● Vàng (Chờ)
+│       │       │       │   └── ● Đỏ (Lỗi)
+│       │       │       ├── Tên thiết bị
+│       │       │       ├── Thông tin Pin + Kết nối
+│       │       │       │   ├── Hoạt động: 85% + Đã kết nối
+│       │       │       │   ├── Chờ: 70% + Chờ kết nối
+│       │       │       │   └── Lỗi: Mất kết nối
+│       │       │       └── Nút thao tác
+│       │       │           ├── [Bật/Tắt] Button
+│       │       │           │   ├── "Bật" (màu xanh #22c55e)
+│       │       │           │   └── "Tắt" (màu xám #9ca3af)
+│       │       │           └── [Xóa] Button + Modal xác nhận
+│       │       │       └── Logic toggle theo trạng thái kết nối
+│       │       │           ├── connected: Cho phép toggle → "Đã bật/Đã tắt"
+│       │       │           ├── connecting: Cảnh báo → "Thiết bị đang kết nối, vui lòng thử lại sau"
+│       │       │           └── disconnected: Lỗi → "Thiết bị không kết nối với chuồng, vui lòng kiểm tra lại kết nối"
+│       │       └── Biểu đồ trạng thái thiết bị (Donut Chart)
+│       │           ├── Center: Tổng số thiết bị (5)
+│       │           ├── Vành tròn rỗng
+│       │           │   ├── Hoạt động: 60% (xanh #22c55e)
+│       │           │   ├── Chờ: 20% (vàng #ffc107)
+│       │           │   └── Lỗi: 20% (đỏ #dc3545)
+│       │           ├── Tương tác hover
+│       │           │   ├── Highlight segment (tăng độ sáng)
+│       │           │   ├── Tooltip tại cursor: Tên + %
+│       │           │   └── Legend đổi màu theo segment
+│       │           └── Legend bên dưới
 │       ├── [Chuồng B] (tương tự)
 │       └── [Chuồng C] (tương tự)
 │
-├── 📡 THIẾT BỊ IOT
-│   ├── Danh sách thiết bị
-│   ├── Form cập nhật thông tin thiết bị
-│   └── Bảng trạng thái live (Online / Offline / Lỗi)
+├── 📡 THIẾT BỊ
+│   ├── Danh sách thiết bị (tổng quan)
+│   └── Trạng thái: Online / Offline / Lỗi
 │
 └── 📊 BÁO CÁO
     ├── Báo cáo nhiệt độ (theo ngày / tuần)
     ├── Báo cáo uptime thiết bị
     └── Lịch sử cảnh báo
 
+---
+GHI CHÚ THIẾT KẾ:
 
+1. Card Layout thiết bị:
+   - Layout dọc: Tên → Pin/Kết nối → [Bật/Tắt] [Xóa]
+   - Scrollable container giới hạn chiều cao
+   - Tối ưu cho mobile (1 card/hàng)
+
+2. Donut Chart:
+   - Sơ đồ tròn rỗng với tổng ở giữa
+   - Tương tác hover: hiện tooltip + đổi màu legend
+   - Phù hợp hiển thị phân bố trạng thái
+
+3. Logic Toggle:
+   - Kiểm tra data-connection-status trước khi toggle
+   - Toast notification với màu sắc tương ứng
+
+4. Màu sắc chủ đạo:
+   - Xanh lá: #22c55e (Hoạt động, Bật)
+   - Vàng: #ffc107 (Chờ, Cảnh báo)
+   - Đỏ: #dc3545 (Lỗi, Xóa)
+   - Xám: #9ca3af (Tắt, Mặc định)

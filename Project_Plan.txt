@@ -1,12 +1,11 @@
 Kế hoạch cho ngày 26/04 
 
-# Thiết kê lại trang chi tiết chuồng ( phần thiết bị)
-- xóa phần cập nhật thiết bị
-- rename lại tiêu đê Quản lý thiết bị IOT 
-- reaname lại tiêu đề Danh sách thiết bị IOT 
-- xóa chức năng thêm mới ở phần tiêu đề quản lí thiết bị IOT
-- Thêm chức thêm thiết bị mới ( nằm bên phải tiêu đề )
-	+ hiện ra bảng với tiêu đề là các thiết bị trong danh sách 
+# Thiết kê lại trang chi tiết chuồng ( phần thiết bị)		[xong]
+- xóa phần cập nhật thiết bị		[xong]
+- rename lại tiêu đê Quản lý thiết bị IOT 		[xong]
+- xóa chức năng thêm mới ở phần tiêu đề quản lí thiết bị IOT		[xong]
+- Thêm chức thêm thiết bị mới ( nằm bên phải tiêu đề )		[xong]
+	+ hiện ra bảng với tiêu đề là các thiết bị trong danh sách			[xong]
 		-----------------------------------
 		|     Thêm thiết bị vào chuồng     |
 		-----------------------------------
@@ -25,7 +24,7 @@ Kế hoạch cho ngày 26/04
 		[ Hủy ]        [ Thêm thiết bị ]
 		-----------------------------------
 
-- Thiết kế lại cách trình bài cho danh sách thiết bị 
+- Thiết kế lại cách trình bài cho danh sách thiết bị			[xong]
 	+ mỗi thiết bị sẽ là một thẻ 
 	+ thiết kế mỗi thẻ
 		> dấu chấm xanh/vàng/đỏ ( xanh: online, chờ, lỗi ) nằm phía bên trái của thẻ
@@ -38,12 +37,11 @@ Kế hoạch cho ngày 26/04
 		 > trường hợp thiết bị ở trạng thái chờ sẽ giữ pin nhưng sóng sẽ đổi thành chờ kết nối
 	   	 > trường hợp tắt thì thông báo sẽ là tên "đã tắt {thiết bị}" với ô màu xám chữ trắng
 		 > trường hợp bật thì thông báo sẽ là tên "đã bật {thiết bị}" với ô màu xanh lá chữ trắng
-
-- Xóa bỏ nhiệt độ trung bình các chuồng
-- Chỉnh chỉnh phần trạng thái thiết bị
+- Xóa bỏ nhiệt độ trung bình các chuồng 
+- Chỉnh chỉnh phần trạng thái thiết bị [xong]
 	+ thiết kế sơ đồ tròn rỗng ở giữ, hiển bị % ở rìa vành tròn, khi ấn phần trên sơ đồ tròn thì hiện ra phần 	trăm, tên mục của biểu đồ ( ví dụ Hoạt động) và số lượng thiết bị, khi ấn thì cho phần chọn phòng to ra cho 	dễ nhìn 
 
-# trang xem chi tiết chuồng
+# trang xem chi tiết chuồng 
 - Thêm sơ đồ tròn trạng thái các thiết bị trong chuồng (lấy cảm hứng trong phần thiết bị )
 
 # trang xem thông các chuồng
