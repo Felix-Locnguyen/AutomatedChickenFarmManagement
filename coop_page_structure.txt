@@ -3,15 +3,25 @@ TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 ├── [NAV] Trang chủ · Quản lý chuồng · Thiết bị · Báo cáo
 │
 ├── 🏠 TRANG CHỦ
-│   ├── Thẻ tổng quan
+│   ├── Thẻ tổngquan
 │   │   ├── Tổng số chuồng
 │   │   ├── Tổng số thiết bị
 │   │   ├── Thiết bị đang online
 │   │   └── Số cảnh báo
 │   ├── Biểu đồ nhiệt độ TB các chuồng
 │   ├── Biểu đồ trạng thái thiết bị (Donut Chart)
-│   ├── Bảng danh sách chuồng
-│   └── Bảng thiết bị gần đây
+│   ├── Danh sách chuồng (Card Layout)
+│   │   ├── [Chuồng A] → border-left: #22c55e (Xanh)
+│   │   ├── [Chuồng B] → border-left: #22c55e (Xanh)
+│   │   ├── [Chuồng C] → border-left: #ffc107 (Vàng)
+│   │   ├── [Chuồng D] → border-left: #22c55e (Xanh)
+│   │   └── [Chuồng E] → border-left: #dc3545 (Đỏ)
+│   └── Thiết bị gần đây (Card Layout)
+│       ├── [Thiết bị 1] → Tên + Chuồng + Trạng thái
+│       ├── [Thiết bị 2] → Tên + Chuồng + Trạng thái
+│       ├── [Thiết bị 3] → Tên + Chuồng + Trạng thái
+│       ├── [Thiết bị 4] → Tên + Chuồng + Trạng thái
+│       └── [Thiết bị 5] → Tên + Chuồng + Trạng thái
 │
 ├── 🏗️ QUẢN LÝ CHUỒNG
 │   └── Danh sách chuồng
@@ -65,6 +75,8 @@ TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 │
 ├── 📡 THIẾT BỊ
 │   ├── Danh sách thiết bị (tổng quan)
+│   │   ├── Danh sách chuồng (Card Layout)
+│   │   └── Thiết bị gần đây (Card Layout)
 │   └── Trạng thái: Online / Offline / Lỗi
 │
 └── 📊 BÁO CÁO
@@ -75,21 +87,34 @@ TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 ---
 GHI CHÚ THIẾT KẾ:
 
-1. Card Layout thiết bị:
+1. Card Layout (Danh sách chuồng & Thiết bị gần đây):
+   - border-left: 4px solid theo trạng thái
+   - border-radius: 8px
+   - padding: 10px 12px
+   - min-height: 60-70px
+   - Hover effect: translateY(-2px) + shadow
+   - Tối ưu cho mobile
+
+2. Trạng thái thiết bị gần đây:
+   - Card hiển thị: Tên thiết bị + Tên chuồng + Trạng thái
+   - Dấu chấm (●) màu theo trạng thái
+   - Nhãn text: Hoạt động / Đang chờ / Ngắt kết nối
+
+3. Card Layout thiết bị (trong chuồng):
    - Layout dọc: Tên → Pin/Kết nối → [Bật/Tắt] [Xóa]
    - Scrollable container giới hạn chiều cao
    - Tối ưu cho mobile (1 card/hàng)
 
-2. Donut Chart:
+4. Donut Chart:
    - Sơ đồ tròn rỗng với tổng ở giữa
    - Tương tác hover: hiện tooltip + đổi màu legend
    - Phù hợp hiển thị phân bố trạng thái
 
-3. Logic Toggle:
+5. Logic Toggle:
    - Kiểm tra data-connection-status trước khi toggle
    - Toast notification với màu sắc tương ứng
 
-4. Màu sắc chủ đạo:
+6. Màu sắc chủ đạo:
    - Xanh lá: #22c55e (Hoạt động, Bật)
    - Vàng: #ffc107 (Chờ, Cảnh báo)
    - Đỏ: #dc3545 (Lỗi, Xóa)
