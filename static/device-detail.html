@@ -576,49 +576,60 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Thiết bị gần đây</h6>
                                 </div>
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                            <thead>
-                                                <tr>
-                                                    <th>Tên thiết bị</th>
-                                                    <th>Loại</th>
-                                                    <th>Chuồng</th>
-                                                    <th>Trạng thái</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>Cảm biến nhiệt A1</td>
-                                                    <td>Cảm biến</td>
-                                                    <td>Chuồng A</td>
-                                                    <td><span class="badge badge-success">Online</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Quạt thông gió A1</td>
-                                                    <td>Quạt</td>
-                                                    <td>Chuồng A</td>
-                                                    <td><span class="badge badge-success">Online</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Đèn LED B1</td>
-                                                    <td>Đèn</td>
-                                                    <td>Chuồng B</td>
-                                                    <td><span class="badge badge-success">Online</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Cảm biến ẩm C1</td>
-                                                    <td>Cảm biến</td>
-                                                    <td>Chuồng C</td>
-                                                    <td><span class="badge badge-warning">Chờ</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <td>Hệ thống cho ăn E1</td>
-                                                    <td>Hệ thống</td>
-                                                    <td>Chuồng E</td>
-                                                    <td><span class="badge badge-danger">Offline</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                    <!-- Thiết bị 1 -->
+                                    <div class="device-recent-card online">
+                                        <div class="device-recent-header">
+                                            <span class="device-recent-name">Cảm biến nhiệt A1</span>
+                                            <span class="device-recent-coop">Chuồng A</span>
+                                        </div>
+                                        <div class="device-recent-status">
+                                            <span class="status-dot online"></span>
+                                            <span class="status-text online">Hoạt động</span>
+                                        </div>
+                                    </div>
+                                    <!-- Thiết bị 2 -->
+                                    <div class="device-recent-card online">
+                                        <div class="device-recent-header">
+                                            <span class="device-recent-name">Quạt thông gió A1</span>
+                                            <span class="device-recent-coop">Chuồng A</span>
+                                        </div>
+                                        <div class="device-recent-status">
+                                            <span class="status-dot online"></span>
+                                            <span class="status-text online">Hoạt động</span>
+                                        </div>
+                                    </div>
+                                    <!-- Thiết bị 3 -->
+                                    <div class="device-recent-card online">
+                                        <div class="device-recent-header">
+                                            <span class="device-recent-name">Đèn LED B1</span>
+                                            <span class="device-recent-coop">Chuồng B</span>
+                                        </div>
+                                        <div class="device-recent-status">
+                                            <span class="status-dot online"></span>
+                                            <span class="status-text online">Hoạt động</span>
+                                        </div>
+                                    </div>
+                                    <!-- Thiết bị 4 -->
+                                    <div class="device-recent-card waiting">
+                                        <div class="device-recent-header">
+                                            <span class="device-recent-name">Cảm biến ẩm C1</span>
+                                            <span class="device-recent-coop">Chuồng C</span>
+                                        </div>
+                                        <div class="device-recent-status">
+                                            <span class="status-dot waiting"></span>
+                                            <span class="status-text waiting">Đang chờ</span>
+                                        </div>
+                                    </div>
+                                    <!-- Thiết bị 5 -->
+                                    <div class="device-recent-card offline">
+                                        <div class="device-recent-header">
+                                            <span class="device-recent-name">Hệ thống cho ăn E1</span>
+                                            <span class="device-recent-coop">Chuồng E</span>
+                                        </div>
+                                        <div class="device-recent-status">
+                                            <span class="status-dot offline"></span>
+                                            <span class="status-text offline">Ngắt kết nối</span>
+                                        </div>
                                     </div>
                                     <a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>
                                 </div>
@@ -1220,22 +1231,25 @@
             #accordionSidebar { display: none !important; }
             body { padding-bottom: 60px; }
         }
-        /* Card Chuồng */
+/* Card Chuồng */
         .coop-summary-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            align-items: stretch;
             border-left: 4px solid #22c55e;
             border-radius: 8px;
-            padding: 12px;
+            padding: 10px 12px;
             background: #fff;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: transform 0.2s;
-            min-height: 75px;
-            height: 100%;
+            min-height: 70px;
+            height: auto;
             width: 100%;
+            max-width: 100%;
             box-sizing: border-box;
+            overflow: hidden;
         }
         .coop-summary-card:hover {
             transform: translateY(-2px);
@@ -1248,17 +1262,22 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
         }
         .coop-summary-name {
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             color: #2c3e50;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .coop-summary-status {
-            font-size: 11px;
+            font-size: 10px;
             padding: 3px 8px;
             border-radius: 12px;
+            white-space: nowrap;
         }
         .coop-summary-status.online { background: #d1fae5; color: #065f46; }
         .coop-summary-status.warning { background: #fef3c7; color: #92400e; }
@@ -1268,11 +1287,76 @@
             gap: 12px;
             font-size: 12px;
             color: #6c757d;
+            flex-shrink: 0;
         }
         .coop-summary-info span {
             display: flex;
             align-items: center;
             gap: 4px;
+        }
+        /* Thiết bị gần đây Card */
+        .device-recent-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #fff;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            min-height: 60px;
+            border-left: 4px solid #22c55e;
+        }
+        .device-recent-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .device-recent-card.online { border-left-color: #22c55e; }
+        .device-recent-card.waiting { border-left-color: #ffc107; }
+        .device-recent-card.offline { border-left-color: #dc3545; }
+        .device-recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .device-recent-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+        .device-recent-coop {
+            font-size: 11px;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .device-recent-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-dot.online { background: #22c55e; }
+        .status-dot.waiting { background: #ffc107; }
+        .status-dot.offline { background: #dc3545; }
+        .status-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-text.online { color: #22c55e; }
+        .status-text.waiting { color: #ffc107; }
+        .status-text.offline { color: #dc3545; }
+        @media (max-width: 767px) {
+            .bottom-nav { display: flex; }
+            #accordionSidebar { display: none !important; }
+            body { padding-bottom: 60px; }
         }
     </style>
 
