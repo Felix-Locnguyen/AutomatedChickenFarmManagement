@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Chi tiết Camera | Quản lý Trang trại Gà</title>
+
+    <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #4e73df;
+            --success: #1cc88a;
+            --danger: #e74c3c;
+        }
+
+        body {
+            opacity: 0;
+            animation: fadeInPage 0.4s ease-out forwards;
+            padding-bottom: 90px;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #2e59d9;
+            transform: translateX(-3px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .camera-detail-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .video-section {
+            width: 100%;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .video-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.7);
+            gap: 15px;
+        }
+
+        .video-placeholder i {
+            font-size: 60px;
+            opacity: 0.5;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .video-overlay-top {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0,0,0,0.7);
+            padding: 6px 14px;
+            border-radius: 6px;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--danger);
+            border-radius: 50%;
+            animation: pulseLive 1.5s infinite;
+        }
+
+        @keyframes pulseLive {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .live-text {
+            color: white;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        .video-timestamp {
+            background: rgba(0,0,0,0.7);
+            padding: 6px 14px;
+            border-radius: 6px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: monospace;
+        }
+
+        .video-overlay-bottom {
+            display: flex;
+            justify-content: center;
+            pointer-events: auto;
+        }
+
+        .btn-fullscreen {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+        }
+
+        .btn-fullscreen:hover {
+            transform: scale(1.1);
+            background: white;
+            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+        }
+
+        .info-section {
+            width: 100%;
+        }
+
+        .coop-info-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .coop-info-card .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #6f42c1 100%);
+            color: white;
+            padding: 16px 20px;
+            border: none;
+        }
+
+        .coop-info-card .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .coop-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e3e6f0;
+        }
+
+        .coop-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .coop-info-label {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .coop-info-value {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .coop-temp-humid {
+            display: flex;
+            gap: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .coop-temp, .coop-humid {
+            flex: 1;
+            text-align: center;
+        }
+
+        .coop-temp-icon, .coop-humid-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .coop-temp-value, .coop-humid-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .coop-temp-label, .coop-humid-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .coop-devices-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 8px;
+            margin-top: 15px;
+        }
+
+        .coop-device-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .coop-device-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            background: #e3e6f0;
+            color: #5a6268;
+        }
+
+        .coop-device-tag.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .coop-device-tag i {
+            margin-right: 5px;
+        }
+
+        @media (min-width: 992px) {
+            .camera-detail-container {
+                flex-direction: row;
+            }
+            .video-section {
+                flex: 7;
+            }
+            .info-section {
+                flex: 5;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #accordionSidebar { display: none !important; }
+        }
+
+        .fab-nav {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 70px;
+            background: white;
+            border-radius: 35px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2), 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 0 10px;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .fab-nav-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .fab-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .fab-nav-item:hover { color: #6f42c1; text-decoration: none; }
+        .fab-nav-item i { font-size: 20px; margin-bottom: 4px; display: block; transition: all 0.3s ease; }
+        .fab-nav-item span { font-weight: 500; transition: all 0.3s ease; }
+        .fab-nav-item.active { color: #6f42c1; }
+        .fab-nav-item.active i { transform: scale(1.1); }
+        .fab-nav-item.active span { font-weight: 700; }
+        
+        .fab-home-wrapper { position: relative; z-index: 10; }
+        .fab-home-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #0d00ff 0%, #5569db 100%);
+            display: flex; align-items: center; justify-content: center;
+            margin-top: -30px; box-shadow: 0 4px 15px rgb(57 58 202 / 50%);
+            transition: all 0.2s ease; cursor: pointer; border: none;
+        }
+        .fab-home-btn i { font-size: 22px; color: white; margin: 0; }
+        .fab-home-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgb(57 58 202 / 60%); }
+        .fab-home-label { font-size: 10px; color: #5569db; font-weight: 700; margin-top: 2px; display: block; text-align: center; }
+
+        @media (max-width: 767px) {
+            .fab-nav { display: flex; }
+            body { padding-bottom: 90px; }
+        }
+
+        .fullscreen-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fullscreen-video.show {
+            display: flex;
+        }
+
+        .fullscreen-video video, 
+        .fullscreen-video .video-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        .fullscreen-close:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+
+    <div id="wrapper">
+
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+                <div class="sidebar-brand-icon rotate-n-15">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Chicken Farm<sup>2</sup></div>
+            </a>
+
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
+                <a class="nav-link" href="index.html">
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>Trang chủ</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="coop-list.html">
+                    <i class="fas fa-fw fa-home"></i>
+                    <span>Quản lý chuồng</span></a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="device-list.html">
+                    <i class="fas fa-fw fa-wifi"></i>
+                    <span>Thiết bị IoT</span></a>
+            </li>
+
+            <li class="nav-item active">
+                <a class="nav-link" href="camera.html">
+                    <i class="fas fa-fw fa-video"></i>
+                    <span>Camera</span></a>
+            </li>
+
+            <!-- Nav Item - Tiện ích -->
+            <li class="nav-item">
+                <a class="nav-link" href="other.html">
+                    <i class="fas fa-fw fa-cogs"></i>
+                    <span>Tiện ích</span></a>
+            </li>
+
+            <hr class="sidebar-divider">
+
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+        </ul>
+
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <div id="content">
+
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-4">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <a href="camera.html" class="back-btn d-lg-none">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Quay lại</span>
+                    </a>
+
+                    <div class="d-sm-flex align-items-center justify-content-between mb-0 ml-3">
+                        <h1 class="h3 mb-0 text-gray-800">Chi tiết Camera</h1>
+                    </div>
+
+                </nav>
+
+                <div class="container-fluid">
+
+                    <div class="camera-detail-container">
+
+                        <div class="video-section">
+                            <div class="video-wrapper" id="videoWrapper">
+                                <div class="video-placeholder">
+                                    <i class="fas fa-video"></i>
+                                    <span>Đang tải camera...</span>
+                                </div>
+                                <div class="video-overlay">
+                                    <div class="video-overlay-top">
+                                        <div class="live-badge">
+                                            <div class="live-dot"></div>
+                                            <span class="live-text">LIVE</span>
+                                        </div>
+                                        <div class="video-timestamp" id="videoTimestamp">
+                                            00:00:00
+                                        </div>
+                                    </div>
+                                    <div class="video-overlay-bottom">
+                                        <button class="btn-fullscreen" onclick="toggleFullscreen()" title="Phóng to toàn màn hình">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-section">
+                            <div class="card coop-info-card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-building"></i> <span id="coopName">Chuồng A</span></h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="coop-info-item">
+                                        <span class="coop-info-label">Số lượng gà</span>
+                                        <span class="coop-info-value" id="chickenCount">450 con</span>
+                                    </div>
+                                    <div class="coop-info-item">
+                                        <span class="coop-info-label">Diện tích chuồng</span>
+                                        <span class="coop-info-value" id="coopArea">100 m²</span>
+                                    </div>
+                                    <div class="coop-info-item">
+                                        <span class="coop-info-label">Vị trí chuồng</span>
+                                        <span class="coop-info-value" id="coopLocation">Khu vực A - Hàng 1</span>
+                                    </div>
+                                    <div class="coop-info-item">
+                                        <span class="coop-info-label">Trạng thái</span>
+                                        <span class="badge badge-success" id="coopStatus">Bình thường</span>
+                                    </div>
+
+                                    <div class="coop-temp-humid">
+                                        <div class="coop-temp">
+                                            <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                            <div class="coop-temp-value" id="tempValue">28°C</div>
+                                            <div class="coop-temp-label">Nhiệt độ</div>
+                                        </div>
+                                        <div class="coop-humid">
+                                            <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                            <div class="coop-humid-value" id="humidityValue">65%</div>
+                                            <div class="coop-humid-label">Độ ẩm</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="coop-temp-humid mt-2">
+                                        <div class="coop-temp">
+                                            <div class="coop-temp-icon"><i class="fas fa-drumstick-bite" style="color: #ffc107;"></i></div>
+                                            <div class="coop-temp-value" id="feedValue">80%</div>
+                                            <div class="coop-temp-label">Thức ăn</div>
+                                        </div>
+                                        <div class="coop-humid">
+                                            <div class="coop-humid-icon"><i class="fas fa-water" style="color: #007bff;"></i></div>
+                                            <div class="coop-humid-value" id="waterValue">75%</div>
+                                            <div class="coop-humid-label">Nước</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="coop-devices">
+                                        <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                                        <div class="coop-device-list" id="deviceList">
+                                            <span class="coop-device-tag active"><i class="fas fa-wifi"></i> Cảm biến nhiệt</span>
+                                            <span class="coop-device-tag active"><i class="fas fa-fan"></i> Quạt thông gió</span>
+                                            <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i> Đèn LED</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <div id="fullscreenVideo" class="fullscreen-video">
+        <button class="fullscreen-close" onclick="toggleFullscreen()">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="video-placeholder" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+            <i class="fas fa-video" style="font-size: 80px; opacity: 0.5;"></i>
+            <span style="color: rgba(255,255,255,0.7);">Chế độ toàn màn hình</span>
+        </div>
+    </div>
+
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <nav class="fab-nav">
+        <div class="fab-nav-container">
+            <a class="fab-nav-item" href="coop-list.html" data-index="0">
+                <i class="fas fa-home"></i>
+                <span>Chuồng</span>
+            </a>
+            <a class="fab-nav-item" href="device-list.html" data-index="1">
+                <i class="fas fa-wifi"></i>
+                <span>Thiết bị</span>
+            </a>
+            <div class="fab-home-wrapper">
+                <a class="fab-nav-item fab-home-btn" href="index.html" data-index="2">
+                    <i class="fas fa-home"></i>
+                </a>
+                <span class="fab-home-label">Trang chủ</span>
+            </div>
+            <a class="fab-nav-item active" href="camera.html" data-index="3">
+                <i class="fas fa-video"></i>
+                <span>Camera</span>
+            </a>
+            <a class="fab-nav-item" href="other.html" data-index="4">
+                <i class="fas fa-ellipsis-h"></i>
+                <span>Khác</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        const coopData = {
+            'A': {
+                name: 'Chuồng A - Khu vực nuôi lấy trứng',
+                chickenCount: '450 con',
+                area: '100 m²',
+                location: 'Khu vực A - Hàng 1',
+                status: 'success',
+                statusText: 'Bình thường',
+                tempRange: [26, 30],
+                humRange: [60, 70],
+                feedRange: [70, 90],
+                waterRange: [60, 80],
+                devices: [
+                    { name: 'Cảm biến nhiệt', active: true },
+                    { name: 'Quạt thông gió', active: true },
+                    { name: 'Đèn LED', active: true }
+                ]
+            },
+            'B': {
+                name: 'Chuồng B - Khu vực nuôi thịt',
+                chickenCount: '320 con',
+                area: '80 m²',
+                location: 'Khu vực B - Hàng 2',
+                status: 'success',
+                statusText: 'Bình thường',
+                tempRange: [24, 28],
+                humRange: [55, 65],
+                feedRange: [75, 95],
+                waterRange: [65, 85],
+                devices: [
+                    { name: 'Cảm biến nhiệt', active: true },
+                    { name: 'Quạt thông gió', active: true },
+                    { name: 'Hệ thống cho ăn', active: true }
+                ]
+            },
+            'C': {
+                name: 'Chuồng C - Khu vực ấp trứng',
+                chickenCount: '200 con',
+                area: '50 m²',
+                location: 'Khu vực C - Hàng 1',
+                status: 'warning',
+                statusText: 'Cảnh báo',
+                tempRange: [37, 38],
+                humRange: [50, 60],
+                feedRange: [50, 70],
+                waterRange: [40, 60],
+                devices: [
+                    { name: 'Máy ấp trứng', active: true },
+                    { name: 'Cảm biến nhiệt', active: true },
+                    { name: 'Đèn sưởi', active: false }
+                ]
+            },
+            'D': {
+                name: 'Chuồng D - Khu vực nuôi gà con',
+                chickenCount: '150 con',
+                area: '40 m²',
+                location: 'Khu vực D - Hàng 3',
+                status: 'success',
+                statusText: 'Bình thường',
+                tempRange: [30, 34],
+                humRange: [65, 75],
+                feedRange: [60, 85],
+                waterRange: [55, 75],
+                devices: [
+                    { name: 'Đèn sưởi', active: true },
+                    { name: 'Cảm biến nhiệt', active: true },
+                    { name: 'Hệ thống cho ăn', active: true }
+                ]
+            },
+            'E': {
+                name: 'Chuồng E - Khu vực chế biến',
+                chickenCount: '0 con',
+                area: '60 m²',
+                location: 'Khu vực E - Hàng 4',
+                status: 'secondary',
+                statusText: 'Không hoạt động',
+                tempRange: [20, 25],
+                humRange: [45, 55],
+                feedRange: [0, 10],
+                waterRange: [0, 10],
+                devices: [
+                    { name: 'Hệ thống chiếu sáng', active: false },
+                    { name: 'Quạt thông gió', active: false }
+                ]
+            }
+        };
+
+        function getUrlParameter(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        function loadCoopData(coopId) {
+            const data = coopData[coopId];
+            if (!data) {
+                window.location.href = 'camera.html';
+                return;
+            }
+
+            document.getElementById('coopName').textContent = data.name;
+            document.getElementById('chickenCount').textContent = data.chickenCount;
+            document.getElementById('coopArea').textContent = data.area;
+            document.getElementById('coopLocation').textContent = data.location;
+            
+            const statusEl = document.getElementById('coopStatus');
+            statusEl.className = 'badge badge-' + data.status;
+            statusEl.textContent = data.statusText;
+
+            const deviceList = document.getElementById('deviceList');
+            deviceList.innerHTML = data.devices.map(device => 
+                `<span class="coop-device-tag ${device.active ? 'active' : ''}">
+                    <i class="fas fa-${device.active ? 'check-circle' : 'times-circle'}"></i> ${device.name}
+                </span>`
+            ).join('');
+        }
+
+        function simulateSensorData(coopId) {
+            const data = coopData[coopId] || coopData['A'];
+            const temp = data.tempRange[0] + Math.random() * (data.tempRange[1] - data.tempRange[0]);
+            const hum = data.humRange[0] + Math.random() * (data.humRange[1] - data.humRange[0]);
+            const feed = data.feedRange[0] + Math.random() * ((data.feedRange[1] || 100) - data.feedRange[0]);
+            const water = data.waterRange[0] + Math.random() * ((data.waterRange[1] || 100) - data.waterRange[0]);
+
+            document.getElementById('tempValue').textContent = temp.toFixed(1) + '°C';
+            document.getElementById('humidityValue').textContent = hum.toFixed(0) + '%';
+            document.getElementById('feedValue').textContent = feed.toFixed(0) + '%';
+            document.getElementById('waterValue').textContent = water.toFixed(0) + '%';
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('videoTimestamp').textContent = 
+                hours + ':' + minutes + ':' + seconds;
+        }
+
+        function toggleFullscreen() {
+            const fs = document.getElementById('fullscreenVideo');
+            fs.classList.toggle('show');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const coopId = getUrlParameter('coop') || 'A';
+            loadCoopData(coopId);
+
+            updateTimestamp();
+            setInterval(updateTimestamp, 1000);
+            simulateSensorData(coopId);
+            setInterval(() => simulateSensorData(coopId), 5000);
+
+            const navItems = document.querySelectorAll('.fab-nav-item');
+            navItems.forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    navItems.forEach(function(i) { i.classList.remove('active'); });
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+
+</body>
+
+</html>
