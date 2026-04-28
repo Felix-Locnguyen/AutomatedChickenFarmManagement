@@ -1,4 +1,21 @@
 ================================================================================================================================================================================================================================================
+Kế hoạch 
+# trang camera-detail
+- Thiết lập trang camra detail
+	+ Khi ấn vào kiểm tra sẽ hiện ra trang mới với giao diện 
+		> 1 ô lớn (khu vực show camera)
+		> 1 ô là hiển thị thông tin tổng quan của chuồng đó
+- Thiết lâp chức năng đăng nhập và đăng xuất
+- lên plan logic và xây bộ data ảo để vận hành thử (Backend)
+	+ Cho Minimax tra và đưa ra cấu trúc web, tạo một file nói về các mối quan hệ giữa các trang với nhau
+	+ Đưa khung xương cho gemini để xây dựng logic
+	+ Cài đặt và đưa cho copilot đánh giá tính khả thi 
+	+ Cho claude AI quét và kiểm duyệt lưới đợt 2
+- Tổng kết lại thành task 
+	+ đưa cho AI notion để sắp xếp plan cho dự án
+	+ cập nhật lên file project_plan.txt
+
+================================================================================================================================================================================================================================================
 Kế hoạch cho ngày 28/04
 
 # Thanh công cụ
