@@ -434,11 +434,30 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 60px;
+            height: 65px;
             background: white;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
             z-index: 1000;
             padding: 0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .bottom-nav-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+        }
+        .bottom-nav-slider {
+            position: absolute;
+            bottom: 8px;
+            height: 50px;
+            background: linear-gradient(135deg, #4e73df 0%, #6f42c1 100%);
+            border-radius: 25px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.4);
         }
         .bottom-nav-item {
             flex: 1;
@@ -453,26 +472,112 @@
             background: none;
             border: none;
             cursor: pointer;
+            position: relative;
+            z-index: 1;
+            transition: color 0.3s ease;
         }
         .bottom-nav-item:hover {
             color: #4e73df;
             text-decoration: none;
         }
         .bottom-nav-item.active {
-            color: #4e73df;
+            color: white;
+        }
+        .bottom-nav-item.active i {
+            transform: scale(1.1);
         }
         .bottom-nav-item i {
-            font-size: 18px;
-            margin-bottom: 2px;
+            font-size: 20px;
+            margin-bottom: 4px;
             display: block;
+            transition: transform 0.3s ease;
+        }
+        .bottom-nav-item .nav-icon-large {
+            font-size: 26px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            border-radius: 50%;
+            color: white !important;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+            margin-bottom: 2px;
+        }
+        .bottom-nav-item .nav-label-large {
+            font-weight: 700;
+            font-size: 12px;
         }
         @media (max-width: 767px) {
-            .bottom-nav { display: flex; }
+            .fab-nav { display: flex; }
+            .bottom-nav { display: none; }
             #accordionSidebar { display: none !important; }
-            body { padding-bottom: 60px; }
+            body { padding-bottom: 20px; }
         }
-/* Card Chuồng */
-        .coop-summary-card {
+        /* FAB Bottom Navigation */
+        .fab-nav {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 70px;
+            background: white;
+            border-radius: 35px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2), 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding: 0 10px;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .fab-nav-container {
+            position: relative;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .fab-nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 10px;
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 10px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .fab-nav-item:hover { color: #6f42c1; text-decoration: none; }
+        .fab-nav-item i { font-size: 20px; margin-bottom: 4px; display: block; transition: all 0.3s ease; }
+        .fab-nav-item span { font-weight: 500; transition: all 0.3s ease; }
+        .fab-nav-item.active { color: #6f42c1; }
+        .fab-nav-item.active i { transform: scale(1.1); }
+        .fab-nav-item.active span { font-weight: 700; }
+        .fab-home-wrapper { position: relative; z-index: 10; }
+        .fab-home-btn {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #0d00ff 0%, #5569db 100%);
+            display: flex; align-items: center; justify-content: center;
+            margin-top: -30px; box-shadow: 0 4px 15px rgb(57 58 202 / 50%);
+            transition: all 0.2s ease; cursor: pointer; border: none;
+        }
+        .fab-home-btn i { font-size: 22px; color: white; margin: 0; }
+        .fab-home-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgb(57 58 202 / 60%); }
+        .fab-home-btn:active { transform: scale(0.95); box-shadow: 0 2px 10px rgb(57 58 202 / 40%); }
+        .fab-home-label { font-size: 10px; color: #5569db; font-weight: 700; margin-top: 2px; display: block; text-align: center; }
+        @media (max-width: 767px) {
+            .fab-nav { display: flex; }
+            .bottom-nav { display: none; }
+            #accordionSidebar { display: none !important; }
+            body { padding-bottom: 20px; }
+        }
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -1684,29 +1789,46 @@
         })();
     </script>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <a class="bottom-nav-item" href="coop-list.html">
-            <i class="fas fa-home"></i>
-            <span>Chuồng</span>
-        </a>
-        <a class="bottom-nav-item" href="device-list.html">
-            <i class="fas fa-wifi"></i>
-            <span>Thiết bị</span>
-        </a>
-        <a class="bottom-nav-item" href="index.html">
-            <i class="fas fa-home"></i>
-            <span>Trang chủ</span>
-        </a>
-        <a class="bottom-nav-item" href="camera.html">
-            <i class="fas fa-video"></i>
-            <span>Camera</span>
-        </a>
-        <a class="bottom-nav-item" href="other.html">
-            <i class="fas fa-ellipsis-h"></i>
-            <span>Khác</span>
-        </a>
-    </div>
+    <!-- FAB Bottom Navigation -->
+    <nav class="fab-nav">
+        <div class="fab-nav-container">
+            <a class="fab-nav-item active" href="coop-list.html" data-index="0">
+                <i class="fas fa-home"></i>
+                <span>Chuồng</span>
+            </a>
+            <a class="fab-nav-item" href="device-list.html" data-index="1">
+                <i class="fas fa-wifi"></i>
+                <span>Thiết bị</span>
+            </a>
+            <div class="fab-home-wrapper">
+                <a class="fab-nav-item fab-home-btn" href="index.html" data-index="2">
+                    <i class="fas fa-home"></i>
+                </a>
+                <span class="fab-home-label">Trang chủ</span>
+            </div>
+            <a class="fab-nav-item" href="camera.html" data-index="3">
+                <i class="fas fa-video"></i>
+                <span>Camera</span>
+            </a>
+            <a class="fab-nav-item" href="other.html" data-index="4">
+                <i class="fas fa-ellipsis-h"></i>
+                <span>Khác</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+    (function() {
+        function handleNavClick(e) {
+            var target = e.currentTarget;
+            var items = document.querySelectorAll('.fab-nav-item');
+            items.forEach(function(item) { item.classList.remove('active'); });
+            target.classList.add('active');
+        }
+        var navItems = document.querySelectorAll('.fab-nav-item');
+        navItems.forEach(function(item) { item.addEventListener('click', handleNavClick); });
+    })();
+    </script>
 
 </body>
 
