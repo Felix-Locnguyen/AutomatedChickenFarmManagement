@@ -1,3 +1,176 @@
+===============================================================================================
+KẾ HOẠCH BACKEND (Flask + SQLite)
+# Giai đoạn 1: Setup & Cơ bản
+## 1.1 Tạo requirements.txt
+- flask==3.0.0
+- flask-sqlalchemy==3.1.1
+- flask-jwt-extended==4.6.0
+- flask-cors==4.0.0
+- python-dotenv==1.0.0
+- werkzeug==3.0.1
+
+## 1.2 Tạo config.py
+- class Config:
+  - SECRET_KEY
+  - SQLALCHEMY_DATABASE_URI
+  - JWT_SECRET_KEY
+  - JWT_ACCESS_TOKEN_EXPIRES
+
+## 1.3 Tạo thư mục api/routes/
+- api/__init__.py
+- api/routes/__init__.py
+- api/routes/auth.py
+- api/routes/coops.py
+- api/routes/devices.py
+- api/routes/dashboard.py
+- api/routes/camera.py
+
+## 1.4 Tạo app.py
+- Flask app factory
+- SQLAlchemy init
+- Blueprint registration
+
+# Giai đoạn 2: Database Models
+## 2.1 User model
+- id, username, email, password_hash, full_name, role, created_at, updated_at
+
+## 2.2 Coop model
+- id, name, location, capacity, current_count, area
+- temp_min, temp_max, humidity_min, humidity_max
+- feed_threshold, water_threshold
+- feed_time_1, feed_time_2, feed_time_3
+- auto_fan, auto_light, auto_feed, auto_water
+- emergency_alert, status
+
+## 2.3 Device model
+- id, name, type (temperature/humidity/fan/light/feed/camera)
+- mac_address, status (online/offline/connecting)
+- is_active, battery
+
+## 2.4 CoopDevice model (many-to-many)
+- id, coop_id, device_id, is_active
+
+## 2.5 Environment model
+- id, coop_id, temperature, humidity
+- feed_level, water_level, recorded_at
+
+## 2.6 FeedSchedule model
+- id, coop_id, time, amount, enabled
+
+## 2.7 Alert model
+- id, coop_id, device_id, type, level, message, is_resolved, created_at
+
+# Giai đoạn 3: Seed Data
+## 3.1 Seed 5 chuồng
+- Chuồng A: 480 gà, capacity 500, area 50m²
+- Chuồng B: 450 gà, capacity 500, area 50m²
+- Chuồng C: 420 gà, capacity 500, area 50m²
+- Chuồng D: 500 gà, capacity 500, area 50m²
+- Chuồng E: 380 gà, capacity 500, area 50m²
+
+## 3.2 Seed ~15 thiết bị
+- Mỗi chuồng: Cảm biến nhiệt, Cảm biến ẩm, Quạt/Đèn
+- Trạng thái: online/offline/connecting
+
+## 3.3 Seed environment data
+- Nhiệt độ: 22-28°C
+- Độ ẩm: 55-75%
+- Feed level: 30-90%
+- Water level: 40-95%
+
+## 3.4 Seed feed schedule
+- 6:00, 12:00, 18:00
+
+## 3.5 Tạo user mặc định
+- admin / admin123
+
+# Giai đoạn 4: API Endpoints
+## 4.1 Auth API
+- POST /api/auth/login
+- POST /api/auth/register
+- POST /api/auth/logout
+- GET /api/auth/me
+
+## 4.2 Dashboard API
+- GET /api/dashboard
+- GET /api/dashboard/stats
+- GET /api/dashboard/alerts
+
+## 4.3 Coop CRUD API
+- GET /api/coops
+- POST /api/coops
+- GET /api/coops/<id>
+- PUT /api/coops/<id>
+- DELETE /api/coops/<id>
+- GET /api/coops/<id>/devices
+- GET /api/coops/<id>/environment
+- GET /api/coops/<id>/history
+
+## 4.4 Device CRUD API
+- GET /api/devices
+- POST /api/devices
+- GET /api/devices/<id>
+- PUT /api/devices/<id>
+- DELETE /api/devices/<id>
+- POST /api/devices/<id>/toggle
+- POST /api/devices/<id>/assign
+
+## 4.5 Feed Schedule API
+- GET /api/feed-schedule
+- POST /api/feed-schedule
+- PUT /api/feed-schedule/<id>
+- DELETE /api/feed-schedule/<id>
+
+## 4.6 Environment API
+- POST /api/environment
+- GET /api/environment/<coop_id>
+- GET /api/environment/<coop_id>/history
+
+## 4.7 Alert API
+- GET /api/alerts
+- PUT /api/alerts/<id>/resolve
+
+# Giai đoạn 5: Pages (Jinja2 Routes)
+- GET / -> render index.html
+- GET /coops -> render coop-list.html
+- GET /coops/<id> -> render coop-detail.html
+- GET /devices -> render device-list.html
+- GET /devices/<id> -> render device-detail.html
+- GET /cameras -> render camera.html
+- GET /cameras/<coop> -> render camera-detail.html
+- GET /other -> render other.html
+- GET /login -> render login.html
+
+# Giai đoạn 6: Frontend Integration
+## 6.1 Tạo api.js
+- Helper functions gọi API
+- fetch() với JWT token
+
+## 6.2 Cập nhật index.html
+- Load dữ liệu từ /api/dashboard
+
+## 6.3 Cập nhật coop-list.html
+- Load dữ liệu từ /api/coops
+
+## 6.4 Cập nhật device-list.html
+- Load dữ liệu từ /api/devices
+
+## 6.5 Cập nhật camera.html
+- Load dữ liệu từ /api/cameras
+
+# Giai đoạn 7: Authentication
+- Login/Logout logic
+- JWT token management
+- Bảo vệ các route cần đăng nhập
+- Redirect về login nếu chưa auth
+
+===============================================================================================
+
+
+
+
+
+
 ================================================================================================================================================================================================================================================
 Kế hoạch 
 # trang camera-detail
@@ -5,7 +178,6 @@ Kế hoạch
 	+ Khi ấn vào kiểm tra sẽ hiện ra trang mới với giao diện 
 		> 1 ô lớn (khu vực show camera)
 		> 1 ô là hiển thị thông tin tổng quan của chuồng đó
-- Thiết lâp chức năng đăng nhập và đăng xuất
 - lên plan logic và xây bộ data ảo để vận hành thử (Backend)
 	+ Cho Minimax tra và đưa ra cấu trúc web, tạo một file nói về các mối quan hệ giữa các trang với nhau
 	+ Đưa khung xương cho gemini để xây dựng logic
