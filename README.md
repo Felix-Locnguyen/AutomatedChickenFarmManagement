@@ -12,7 +12,48 @@ Dự án hiện đang trong giai đoạn phát triển ban đầu. Frontend đã
 
 ## Cập nhật gần đây (April 2026)
 
-### 1. Biểu đồ tròn (Donut Chart) cho trạng thái thiết bị
+### 1. Trang Camera và Camera Detail (April 28, 2026)
+
+#### 1.1 Tạo trang camera-detail.html
+
+- **Khu vực hiển thị camera:**
+  - Chỉ hiển thị Live badge + Timestamp + Nút Phóng to toàn màn hình
+  - Không có chức năng chụp ảnh/quay video (tối ưu hệ thống)
+  - Giao diện tối giản, tập trung vào nội dung camera
+
+- **Bảng thông tin tổng quát (lấy từ Coop Detail):**
+  - Số lượng gà
+  - Diện tích chuồng
+  - Vị trí chuồng
+  - Trạng thái hoạt động (badge)
+  - Nhiệt độ + Độ ẩm
+  - **Thức ăn + Nước** (mới bổ sung)
+  - Danh sách thiết bị và trạng thái hoạt động
+
+- **Dữ liệu động theo từng chuồng:**
+  - Load từ query parameter `?coop=A/B/C/D/E`
+  - Mỗi chuồng có thông tin riêng (số lượng gà, diện tích, vị trí, thiết bị)
+  - Redirect về camera.html nếu không có param hợp lệ
+
+#### 1.2 Cập nhật camera.html
+
+- Đổi button "Kiểm tra" thành link với href tương ứng:
+  - Chuồng A → `camera-detail.html?coop=A`
+  - Chuồng B → `camera-detail.html?coop=B`
+  - ... (tương tự cho C, D, E)
+
+- **Sửa lỗi layout card:**
+  - Đổi layout thành CSS Grid: 1 cột (mobile) → 2 cột (tablet) → 3 cột (desktop)
+  - Thêm `min-height: 160px` cho card đồng nhất kích thước
+  - Footer buttons sử dụng `margin-top: auto` để luôn ở dưới cùng
+
+#### 1.3 Fixed Bottom Navigation
+
+- FAB Navigation hiển thị cố định ở cạnh dưới màn hình trên mobile
+- 5 mục: Chuồng, Thiết bị, Trang chủ, Camera, Khác
+- Z-index cao, không bị che bởi nội dung khác
+
+### 2. Biểu đồ tròn (Donut Chart) cho trạng thái thiết bị
 
 - **coop-list.html**: Thay thế Pie Chart (Chart.js) bằng Donut Chart SVG
   - Dữ liệu mẫu: 15 thiết bị (9 hoạt động, 3 chờ, 3 lỗi)
@@ -136,7 +177,8 @@ Dự án hiện đang trong giai đoạn phát triển ban đầu. Frontend đã
 | `coop-detail.html` | Donut chart, Card chuồng, Bottom Nav |
 | `device-list.html` | Card chuồng, Card thiết bị, Bottom Nav |
 | `device-detail.html` | Donut chart, Card chuồng, Card thiết bị, Bottom Nav |
-| `camera.html` | Trang mới, Bottom Nav |
+| `camera.html` | Card layout, Link đến camera-detail, Bottom Nav |
+| `camera-detail.html` | **Trang mới** - Camera view + Thông tin tổng quát (Số lượng gà, Diện tích, Vị trí, Trạng thái, Nhiệt độ, Độ ẩm, Thức ăn, Nước, Thiết bị), Bottom Nav |
 | `other.html` | Trang mới, Bottom Nav |
 | `sb-admin-2.css` | Sửa lỗi 404 error page |
 
@@ -167,6 +209,7 @@ AutomatedChickenFarmManagement/
 │   ├── device-list.html # Device List - Danh sách thiết bị
 │   ├── device-detail.html # Device Detail - Chi tiết thiết bị
 │   ├── camera.html      # Camera - Theo dõi camera
+│   ├── camera-detail.html # Camera Detail - Chi tiết camera từng chuồng
 │   ├── other.html       # Other - Chức năng khác
 │   ├── forms.html      # Forms - Tổng hợp tất cả form Bootstrap
 │   ├── buttons.html   # Buttons components
@@ -440,8 +483,9 @@ Trang `forms.html` chứa tất cả các loại form Bootstrap 4:
 | `static/coop-list.html` | Coop list management |
 | `static/coop-detail.html` | Coop detail with chart |
 | `static/device-list.html` | IoT device list |
-| `static/device-detail.html` | Device detail |
-| `static/camera.html` | Camera monitoring |
+| `static/device-detail.html` | Device detail with toggle |
+| `static/camera.html` | Camera monitoring - Danh sách camera |
+| `static/camera-detail.html` | Camera detail - Xem camera từng chuồng |
 | `static/other.html` | Other functions |
 | `static/forms.html` | Form components reference |
 

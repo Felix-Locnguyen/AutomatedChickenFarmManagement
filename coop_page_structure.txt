@@ -79,6 +79,31 @@ TRANG WEB QUẢN LÝ TRANG TRẠI IOT
 │   │   └── Thiết bị gần đây (Card Layout)
 │   └── Trạng thái: Online / Offline / Lỗi
 │
+├── 📷 CAMERA
+│   ├── Danh sách camera (Grid Layout: 1→2→3 cột)
+│   │   ├── [Chuồng A] → Kiểm tra → camera-detail.html?coop=A
+│   │   ├── [Chuồng B] → Kiểm tra → camera-detail.html?coop=B
+│   │   ├── [Chuồng C] → Kiểm tra → camera-detail.html?coop=C
+│   │   ├── [Chuồng D] → Kiểm tra → camera-detail.html?coop=D
+│   │   └── [Chuồng E] → Kiểm tra → camera-detail.html?coop=E
+│   │
+│   └── 📷 CHI TIẾT CAMERA (camera-detail.html)
+│       ├── Khu vực hiển thị camera
+│       │   ├── Live badge (nhấp nháy) + Timestamp
+│       │   ├── Video 16:9 ratio
+│       │   └── Nút [Phóng to toàn màn hình]
+│       │       └── (Không có chụp ảnh/quay - tối ưu hệ thống)
+│       │
+│       └── Bảng thông tin tổng quát (Card)
+│           ├── Tên chuồng (header)
+│           ├── Số lượng gà
+│           ├── Diện tích chuồng
+│           ├── Vị trí chuồng
+│           ├── Trạng thái hoạt động (badge)
+│           ├── Nhiệt độ + Độ ẩm
+│           ├── Thức ăn + Nước
+│           └── Danh sách thiết bị hoạt động
+│
 └── 📊 BÁO CÁO
     ├── Báo cáo nhiệt độ (theo ngày / tuần)
     ├── Báo cáo uptime thiết bị
@@ -119,3 +144,9 @@ GHI CHÚ THIẾT KẾ:
    - Vàng: #ffc107 (Chờ, Cảnh báo)
    - Đỏ: #dc3545 (Lỗi, Xóa)
    - Xám: #9ca3af (Tắt, Mặc định)
+
+7. Camera Detail Layout:
+   - Responsive: Mobile (stacked) / Desktop (7:5)
+   - Query parameter: ?coop=A/B/C/D/E để load dữ liệu từng chuồng
+   - FAB Navigation cố định ở cạnh dưới màn hình
+   - Tự động redirect về camera.html nếu không có param
