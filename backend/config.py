@@ -80,8 +80,10 @@ class ProductionConfig(Config):
     # Ghi đè SECRET_KEY bắt buộc phải set từ env trong production
     @property
     def SECRET_KEY(cls):
-        return os.environ.get('SECRET_KEY') or raise Error("SECRET_KEY must be set in production")
-
+        key = os.environ.get('SECRET_KEY')
+        if not key:
+            raise ValueError("SECRET_KEY must be set in production")
+        return key
 
 class TestingConfig(Config):
     """

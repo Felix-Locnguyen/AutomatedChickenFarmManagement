@@ -1,0 +1,107 @@
+CÂU HỎI SỐ 1: Configuration là gì, lí do ra đời, tại sao lại cần sử dụng
+
+    - Config (viết tắt của Configuration) là chương trình thiết lập và cấu hình
+    cài đặt cho hệ thống của dự án có thể hoạt động hiệu và dễ bảo trì 
+    
+    - Lí do ra đời:
+        + Trước đây người ta muốn thay đổi chỉ số, code của hệ thống thì phải 
+        thay đổi code trực tiếp trong chương trình, gây mất thời gian và nhiều 
+        công sức như
+            > Dễ xảy ra lỗi khi đổi code
+            > Phải xây dụng lại hệ thống
+            > Yêu cầu kiến thức và hiểu cấu trúc dự án chuyên sâu để thay đổi
+        => chính vì điều đó người ta tổng hợp lại thành 1 folder quản lí chung 
+        để có thể để có thể dễ dàng thay đổi code dễ dàng
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 2: Tại sao phải làm routes, lí do nó ra đời và lợi ích là gì???
+
+    - Routes: là cách để định nghĩa các đường dẫn URL cho các trang web hoặc API trong
+    dự án
+
+    - Lí do ra đời:
+        Trước đây mỗi URL tương ứng với một file vật lý trên server (ví dụ /trangchu.html, /lienhe.html).
+        Khi dự án lớn lên, hàng trăm file nằm rải rác → loạn. Routes ra đời để tách URL khỏi file vật lý, 
+        URL chỉ là "tên gọi", còn logic xử lý nằm trong code.
+    
+    - Lợi ích:
+        + Quản lí và định tuyến các yêu cầu trong dự án một cách dễ dàng và hiệu quả hơn 
+        + Cải thiện tính hoạt động và khả năng mở rộng của dự án 
+        + Giảm thiểu thời gian và công sức khi quản lí và cập nhật các trang web
+    
+    - Nguyên lí hoạt động 
+        + sơ đồ tổng quan
+            Người dùng → Server kiểm tra URL → Chạy hàm xử lý (function) → Trả về kết quả → Hiển thị trang
+
+
+            + Mô tả:
+            > khi người dùng truy cập vào URL thì hệ thống sẽ gửi yêu cầu đến sever để kiểm tra xem đường dẫn
+            có tồn tại hay không trong routes, nếu tồn tại sẽ truy cập được trang web nếu không thì sẽ bị lỗi 404
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 3: Blueprint, request, jsonify là gì và tại sao chúng được dùng nhiều trong backend?
+    - Blueprint:
+        + Là công cụ chia nhỏ ứng dụng thành các phần độc lập, mỗi phần quả lí một nhóm routes riêng 
+        + Lý do ra đời: Khi dự án lớn lên nếu để tất cả routes trong một file app.py thì file đó sẽ fafi và 
+        có hàng nghìn dòng => khó quản lí và phát triễn thêm
+            ví dụ không Blueprint
+                @app.route('/api/a')
+                @app.route('/api/a/a1')
+                @app.route('/api/a/a1/a1.1')
+                @app.route('/api/b')
+                ...
+            ví dụ có Blueprint
+            Tách ra từng file 
+                livestock_bp  → livestock/routes.py
+                feed_bp       → feed/routes.py
+                sensor_bp     → sensor/routes.py
+                user_bp       → user/routes.py
+        + tác dụng chính là chia nhỏ dự án thành nhiều module (file) đảm bảo dễ đọc, dễ bão trì, dễ mở rộng
+
+    - Request:
+        + Là công cụ đọc dữ liệu của người dùng gửi cho sever
+        + ví dụ cách sử dụng
+        # ví vụ về đăng nhập
+        @app.routes('/app/login', methouds=['POST])
+        def login()
+            data = request.get_json()    # đọc dữ liệu join
+            username = data['username']
+            password = data['password]
+
+            # hoặc lấy giá trị 
+            farm_id = request.args.get('farm_id')
+    
+    - jsonify 
+        + Là công cụ đóng gói dữ liệu thành dạng json và trả về cho người dùng
+        + lý do ra đời: Sever xử lí xong cần trả kết quả, hiện tại web và mobile đều xử dụng JSON
+        để trao đổi dữ liệu vì nó nhanh 
+        + ví dụ 
+            @app.route('/api/livestock')
+            def get_livestock():
+                data = {
+                    "total": 150,
+                    "healthy": 142,
+                    "sick": 8
+                }
+                return jsonify(data)  # ← đóng gói và trả về
+
+            # Người dùng nhận được:
+            # {
+            #     "total": 150,
+            #     "healthy": 142,
+            #     "sick": 8
+            # }
+        + tác dụng: chuyển dữ liệu list, dict,.. thành JSON chuẩn để trả về cho fontend/mobile app để đọc và hiển thị
+
+
+        sơ đồ khi kết hợp Blueprint, Request và jsonify
+              
+            [ NGƯỜI DÙNG GỬI YÊU CẦU ]
+                    ↓
+                Blueprint           → xác định đúng file/module xử lý
+                    ↓
+                request             → đọc dữ liệu người dùng gửi lên
+                    ↓
+            [ XỬ LÝ LOGIC ]         → truy vấn DB, tính toán...
+                    ↓
+                jsonify             → đóng gói kết quả thành JSON
+                    ↓
+            [ TRẢ VỀ CHO NGƯỜI DÙNG ]
