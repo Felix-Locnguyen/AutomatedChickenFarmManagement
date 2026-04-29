@@ -521,6 +521,556 @@
             #accordionSidebar { display: none !important; }
             body { padding-bottom: 20px; }
         }
+        /* Add Device Flow Modal */
+        .add-device-flow-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            z-index: 9999;
+            overflow-y: auto;
+        }
+        .add-device-flow-modal.active {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .add-device-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .add-device-header h5 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .add-device-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            color: #6b7280;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .add-device-close:hover {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+        .add-device-content {
+            padding: 24px 20px;
+            min-height: calc(100vh - 70px);
+            display: flex;
+            flex-direction: column;
+        }
+        .add-device-step {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+        .add-device-step.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .add-device-step-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        /* Select Method */
+        .method-options {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .method-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .method-option:hover {
+            border-color: #4e73df;
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.15);
+            transform: translateY(-2px);
+        }
+        .method-option.selected {
+            border-color: #4e73df;
+            background: #eff6ff;
+        }
+        .method-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4e73df 0%, #6f42c1 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .method-icon i {
+            font-size: 24px;
+            color: white;
+        }
+        .method-text h6 {
+            margin: 0 0 4px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .method-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        /* Scan QR */
+        .qr-scanner-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            aspect-ratio: 1;
+            margin: 0 auto 24px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #1f2937;
+        }
+        #qr-reader {
+            width: 100%;
+            height: 100%;
+            border: none !important;
+            background: transparent !important;
+        }
+        #qr-reader video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+        #qr-reader__scan_region {
+            background: transparent !important;
+        }
+        #qr-reader__dashboard {
+            display: none !important;
+        }
+        .qr-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .qr-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+        .qr-frame {
+            width: 65%;
+            height: 65%;
+            border: 3px solid #4e73df;
+            border-radius: 12px;
+            background: transparent;
+            position: relative;
+        }
+        .qr-frame::before,
+        .qr-frame::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-color: #4e73df;
+            border-style: solid;
+        }
+        .qr-frame::before {
+            top: -3px;
+            left: -3px;
+            border-width: 3px 0 0 3px;
+            border-radius: 12px 0 0 0;
+        }
+        .qr-frame::after {
+            bottom: -3px;
+            right: -3px;
+            border-width: 0 3px 3px 0;
+            border-radius: 0 0 12px 0;
+        }
+        .qr-scan-line {
+            position: absolute;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4e73df, transparent);
+            animation: scanMove 2s ease-in-out infinite;
+        }
+        @keyframes scanMove {
+            0%, 100% { top: 10%; }
+            50% { top: 85%; }
+        }
+        .qr-hint {
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+        .qr-status {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .qr-status.scanning {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+        .qr-status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .qr-status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        /* Input Code */
+        .input-code-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .input-code-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+        .input-code-field {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            background: white;
+        }
+        .input-code-field:focus {
+            outline: none;
+            border-color: #4e73df;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+        }
+        .input-code-field::placeholder {
+            color: #9ca3af;
+        }
+        .code-hint {
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #6b7280;
+        }
+        .code-hint strong {
+            color: #1f2937;
+        }
+        /* Waiting */
+        .waiting-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            gap: 24px;
+        }
+        .waiting-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid #e5e7eb;
+            border-top-color: #4e73df;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .waiting-text {
+            text-align: center;
+        }
+        .waiting-text h6 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        .waiting-text p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        .waiting-progress {
+            width: 200px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .waiting-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4e73df, #6f42c1);
+            border-radius: 2px;
+            animation: progress 3s ease-in-out infinite;
+        }
+        @keyframes progress {
+            0% { width: 0; margin-left: 0; }
+            50% { width: 60%; margin-left: 20%; }
+            100% { width: 0; margin-left: 100%; }
+        }
+        /* Success */
+        .success-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+        }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pop 0.4s ease-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .success-icon i {
+            font-size: 36px;
+            color: white;
+        }
+        .success-text {
+            text-align: center;
+        }
+        .success-text h6 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        .success-text p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+        }
+        .device-name-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .device-name-input:focus {
+            outline: none;
+            border-color: #22c55e;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        }
+        /* Fail */
+        .fail-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            flex: 1;
+        }
+        .fail-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc3545 0%, #ef4444 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .fail-icon i {
+            font-size: 36px;
+            color: white;
+        }
+        .fail-text {
+            text-align: center;
+        }
+        .fail-text h6 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        .fail-text p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0 0 12px;
+        }
+        .fail-reasons {
+            text-align: left;
+            background: #fef2f2;
+            padding: 16px;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .fail-reasons p {
+            font-size: 13px;
+            color: #991b1b;
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .fail-reasons p i {
+            font-size: 8px;
+        }
+        /* Buttons */
+        .btn-connect {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #4e73df 0%, #6f42c1 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .btn-connect:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(78, 115, 223, 0.4);
+        }
+        .btn-connect:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .btn-confirm {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #22c55e 0%, #10b981 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        .btn-back {
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-back:hover {
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+        .btn-retry {
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: none;
+            background: #4e73df;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-retry:hover {
+            background: #3b5bd9;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+        .btn-group .btn-back,
+        .btn-group .btn-retry {
+            flex: 1;
+        }
+        /* Footer actions */
+        .step-footer {
+            margin-top: auto;
+            padding-top: 24px;
+        }
+        @media (max-width: 480px) {
+            .add-device-header {
+                padding: 12px 16px;
+            }
+            .add-device-header h5 {
+                font-size: 16px;
+            }
+            .add-device-content {
+                padding: 20px 16px;
+            }
+            .add-device-step-title {
+                font-size: 18px;
+            }
+            .method-option {
+                padding: 16px;
+            }
+            .method-icon {
+                width: 48px;
+                height: 48px;
+            }
+            .method-icon i {
+                font-size: 20px;
+            }
+            .method-text h6 {
+                font-size: 15px;
+            }
+            .qr-scanner-container {
+                max-width: 250px;
+            }
+        }
     </style>
 
 </head>
@@ -824,7 +1374,7 @@
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách thiết bị IoT</h6>
-                                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addDeviceModal">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnAddDevice">
                                         <i class="fas fa-plus"></i> Thêm thiết bị
                                     </button>
                                 </div>
@@ -1314,7 +1864,143 @@
     <!-- Toast Notification -->
     <div id="toastNotification" class="toast-notification"></div>
 
-    <!-- Add Device Modal -->
+    <!-- Add Device Flow Modal -->
+    <div class="add-device-flow-modal" id="addDeviceFlowModal">
+        <div class="add-device-header">
+            <button class="add-device-close" id="closeFlowModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <h5>Thêm thiết bị</h5>
+            <div style="width: 36px;"></div>
+        </div>
+        <div class="add-device-content">
+            <!-- Step: Select Method -->
+            <div class="add-device-step active" data-step="select">
+                <h5 class="add-device-step-title">Chọn cách kết nối</h5>
+                <div class="method-options">
+                    <div class="method-option" data-method="scan">
+                        <div class="method-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <div class="method-text">
+                            <h6>Quét mã QR</h6>
+                            <p>Sử dụng camera để quét mã trên thiết bị</p>
+                        </div>
+                    </div>
+                    <div class="method-option" data-method="input">
+                        <div class="method-icon">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                        <div class="method-text">
+                            <h6>Nhập mã thiết bị</h6>
+                            <p>Nhập mã được in trên thiết bị</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step: Scan QR -->
+            <div class="add-device-step" data-step="scan">
+                <h5 class="add-device-step-title">Quét mã QR</h5>
+                <div class="qr-scanner-container" id="qrScanner">
+                    <div id="qr-reader"></div>
+                    <video class="qr-video" id="qrVideo" autoplay playsinline></video>
+                    <div class="qr-overlay">
+                        <div class="qr-frame">
+                            <div class="qr-scan-line"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="qr-status" id="qrStatus">
+                    <i class="fas fa-camera"></i> Đưa mã QR vào khung để quét
+                </div>
+                <p class="qr-hint">Đảm bảo mã QR được chiếu sáng đầy đủ</p>
+            </div>
+
+            <!-- Step: Input Code -->
+            <div class="add-device-step" data-step="input">
+                <h5 class="add-device-step-title">Nhập mã thiết bị</h5>
+                <div class="input-code-container">
+                    <div>
+                        <label class="input-code-label">Nhập mã được in trên thiết bị</label>
+                        <input type="text" class="input-code-field" id="deviceCodeInput" placeholder="VD: ESP32_001">
+                    </div>
+                    <div class="code-hint">
+                        <i class="fas fa-lightbulb"></i> <strong>Mẹo:</strong> Mã thường nằm dưới đáy thiết bị. Ví dụ: ESP32_001, CAM_1234
+                    </div>
+                    <button class="btn-connect" id="btnConnectDevice" disabled>
+                        <i class="fas fa-wifi"></i> Kết nối
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step: Waiting -->
+            <div class="add-device-step" data-step="waiting">
+                <h5 class="add-device-step-title">Đang kết nối thiết bị...</h5>
+                <div class="waiting-container">
+                    <div class="waiting-spinner"></div>
+                    <div class="waiting-text">
+                        <h6>Vui lòng chờ trong giây lát</h6>
+                        <p>Đang xác thực thiết bị...</p>
+                        <p>Đang thiết lập kết nối...</p>
+                    </div>
+                    <div class="waiting-progress">
+                        <div class="waiting-progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step: Success -->
+            <div class="add-device-step" data-step="success">
+                <h5 class="add-device-step-title">Kết nối thành công</h5>
+                <div class="success-container">
+                    <div class="success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="success-text">
+                        <h6>Thiết bị đã sẵn sàng!</h6>
+                        <p>Thiết bị: <strong id="connectedDeviceId"></strong></p>
+                    </div>
+                    <div style="width: 100%;">
+                        <label class="input-code-label">Đặt tên thiết bị</label>
+                        <input type="text" class="device-name-input" id="deviceNameInput" placeholder="Nhập tên thiết bị...">
+                    </div>
+                    <button class="btn-confirm" id="btnConfirmDevice">
+                        <i class="fas fa-check"></i> Xác nhận
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step: Fail -->
+            <div class="add-device-step" data-step="fail">
+                <h5 class="add-device-step-title">Kết nối thất bại</h5>
+                <div class="fail-container">
+                    <div class="fail-icon">
+                        <i class="fas fa-times"></i>
+                    </div>
+                    <div class="fail-text">
+                        <h6>Không thể kết nối thiết bị</h6>
+                        <p>Vui lòng kiểm tra và thử lại</p>
+                    </div>
+                    <div class="fail-reasons">
+                        <p><i class="fas fa-circle"></i> Thiết bị đã được sử dụng</p>
+                        <p><i class="fas fa-circle"></i> Thiết bị không online</p>
+                        <p><i class="fas fa-circle"></i> Mã thiết bị không đúng</p>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-back" id="btnBackFromFail">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </button>
+                        <button class="btn-retry" id="btnRetryFromFail">
+                            <i class="fas fa-redo"></i> Thử lại
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Device Modal (Original - for selecting from list) -->
     <div class="modal fade" id="addDeviceModal" tabindex="-1" role="dialog" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -1448,6 +2134,7 @@
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
@@ -1651,6 +2338,174 @@
             setTimeout(function() { elem.remove(); }, 300);
         }, 1500);
     }
+
+    // Add Device Flow Script
+    (function() {
+        var state = { step: 'select', deviceId: null, error: null, method: null, scanner: null };
+
+        var flowModal = document.getElementById('addDeviceFlowModal');
+        var closeBtn = document.getElementById('closeFlowModal');
+        var steps = document.querySelectorAll('.add-device-step');
+        var methodOptions = document.querySelectorAll('.method-option');
+        var deviceCodeInput = document.getElementById('deviceCodeInput');
+        var btnConnectDevice = document.getElementById('btnConnectDevice');
+        var qrVideo = document.getElementById('qrVideo');
+        var qrStatus = document.getElementById('qrStatus');
+        var connectedDeviceIdEl = document.getElementById('connectedDeviceId');
+        var deviceNameInput = document.getElementById('deviceNameInput');
+        var btnConfirmDevice = document.getElementById('btnConfirmDevice');
+        var btnBackFromFail = document.getElementById('btnBackFromFail');
+        var btnRetryFromFail = document.getElementById('btnRetryFromFail');
+
+        function openModal() {
+            if (flowModal) flowModal.classList.add('active');
+            resetState();
+        }
+
+        function closeModal() {
+            stopScanning();
+            if (flowModal) flowModal.classList.remove('active');
+            resetState();
+        }
+
+        function resetState() {
+            state = { step: 'select', deviceId: null, error: null, method: null, scanner: null };
+            setStep('select');
+            if (deviceCodeInput) deviceCodeInput.value = '';
+            if (deviceNameInput) deviceNameInput.value = '';
+            if (btnConnectDevice) btnConnectDevice.disabled = true;
+        }
+
+        function setStep(stepName) {
+            steps.forEach(function(s) {
+                s.classList.remove('active');
+                if (s.dataset.step === stepName) s.classList.add('active');
+            });
+            state.step = stepName;
+        }
+
+        methodOptions.forEach(function(opt) {
+            opt.addEventListener('click', function() {
+                var method = this.dataset.method;
+                state.method = method;
+                methodOptions.forEach(function(m) { m.classList.remove('selected'); });
+                this.classList.add('selected');
+                if (method === 'scan') { setStep('scan'); startScanning(); }
+                else if (method === 'input') { setStep('input'); }
+            });
+        });
+
+        if (deviceCodeInput) {
+            deviceCodeInput.addEventListener('input', function() {
+                if (btnConnectDevice) btnConnectDevice.disabled = this.value.trim().length === 0;
+            });
+            deviceCodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && this.value.trim().length > 0) {
+                    connectDevice(this.value.trim());
+                }
+            });
+        }
+
+        if (btnConnectDevice) {
+            btnConnectDevice.addEventListener('click', function() {
+                if (deviceCodeInput && deviceCodeInput.value.trim()) {
+                    connectDevice(deviceCodeInput.value.trim());
+                }
+            });
+        }
+
+        async function startScanning() {
+            if (typeof Html5QrcodeScanner === 'undefined') {
+                showQrStatus('error', 'Thư viện chưa tải xong');
+                return;
+            }
+            
+            var html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                /* verbose= */ false
+            );
+            
+            showQrStatus('scanning', 'Đưa mã QR vào khung để quét');
+            
+            html5QrcodeScanner.render(
+                function(decodedText) {
+                    html5QrcodeScanner.clear();
+                    showQrStatus('success', 'Quét thành công!');
+                    setTimeout(function() { connectDevice(decodedText); }, 500);
+                },
+                function(errorMessage) {
+                    // Ignore continuous error messages during scanning
+                }
+            );
+            
+            state.scanner = html5QrcodeScanner;
+        }
+
+        function stopScanning() {
+            if (state.scanner && typeof state.scanner.clear === 'function') {
+                state.scanner.clear();
+                state.scanner = null;
+            }
+        }
+
+        function showQrStatus(type, message) {
+            if (!qrStatus) return;
+            qrStatus.className = 'qr-status ' + type;
+            var icon = type === 'scanning' ? '<i class="fas fa-camera"></i> ' : type === 'success' ? '<i class="fas fa-check"></i> ' : type === 'error' ? '<i class="fas fa-exclamation-triangle"></i> ' : '';
+            qrStatus.innerHTML = icon + message;
+        }
+
+        function connectDevice(deviceId) {
+            state.deviceId = deviceId;
+            setStep('waiting');
+            setTimeout(function() {
+                var success = Math.random() > 0.3;
+                if (success) {
+                    setStep('success');
+                    if (connectedDeviceIdEl) connectedDeviceIdEl.textContent = deviceId;
+                    if (deviceNameInput) deviceNameInput.focus();
+                } else {
+                    state.error = 'device_in_use';
+                    setStep('fail');
+                }
+            }, 3000);
+        }
+
+        if (btnConfirmDevice) {
+            btnConfirmDevice.addEventListener('click', function() {
+                var name = deviceNameInput.value.trim() || state.deviceId;
+                showToastNotification('Đã thêm thiết bị: ' + name, 'success');
+                closeModal();
+            });
+        }
+
+        if (btnBackFromFail) {
+            btnBackFromFail.addEventListener('click', function() { setStep('select'); });
+        }
+
+        if (btnRetryFromFail) {
+            btnRetryFromFail.addEventListener('click', function() {
+                if (state.method === 'scan') { setStep('scan'); startScanning(); }
+                else { setStep('input'); if (deviceCodeInput) deviceCodeInput.focus(); }
+            });
+        }
+
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (flowModal) flowModal.addEventListener('click', function(e) { if (e.target === flowModal) closeModal(); });
+
+        window.openAddDeviceFlow = openModal;
+
+        // Button open add device flow
+        var btnAddDevice = document.getElementById('btnAddDevice');
+        if (btnAddDevice) {
+            btnAddDevice.addEventListener('click', function() {
+                if (typeof openAddDeviceFlow === 'function') {
+                    openAddDeviceFlow();
+                }
+            });
+        }
+    })();
     </script>
 
 <!-- FAB Bottom Navigation -->
@@ -1698,11 +2553,6 @@
         });
     })();
     </script>
-
-</body>
-
-</html>
-    </div>
 
 </body>
 
