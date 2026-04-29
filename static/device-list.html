@@ -664,29 +664,7 @@
             overflow: hidden;
             background: #1f2937;
         }
-        #qr-reader {
-            width: 100%;
-            height: 100%;
-            border: none !important;
-            background: transparent !important;
-        }
-        #qr-reader video {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-        }
-        #qr-reader__scan_region {
-            background: transparent !important;
-        }
-        #qr-reader__dashboard {
-            display: none !important;
-        }
-        .qr-video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .qr-overlay {
+.qr-overlay {
             position: absolute;
             top: 0;
             left: 0;
@@ -1903,7 +1881,6 @@
             <div class="add-device-step" data-step="scan">
                 <h5 class="add-device-step-title">Quét mã QR</h5>
                 <div class="qr-scanner-container" id="qrScanner">
-                    <div id="qr-reader"></div>
                     <video class="qr-video" id="qrVideo" autoplay playsinline></video>
                     <div class="qr-overlay">
                         <div class="qr-frame">
@@ -2134,7 +2111,7 @@
 
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
@@ -2341,7 +2318,7 @@
 
     // Add Device Flow Script
     (function() {
-        var state = { step: 'select', deviceId: null, error: null, method: null, scanner: null };
+        var state = { step: 'select', deviceId: null, error: null, method: null, scanner: null, scanning: false, stream: null };
 
         var flowModal = document.getElementById('addDeviceFlowModal');
         var closeBtn = document.getElementById('closeFlowModal');
@@ -2369,7 +2346,8 @@
         }
 
         function resetState() {
-            state = { step: 'select', deviceId: null, error: null, method: null, scanner: null };
+            state = { step: 'select', deviceId: null, error: null, method: null, scanning: false, stream: null };
+            stopScanning();
             setStep('select');
             if (deviceCodeInput) deviceCodeInput.value = '';
             if (deviceNameInput) deviceNameInput.value = '';
@@ -2415,37 +2393,70 @@
         }
 
         async function startScanning() {
-            if (typeof Html5QrcodeScanner === 'undefined') {
+            if (typeof jsQR === 'undefined') {
                 showQrStatus('error', 'Thư viện chưa tải xong');
                 return;
             }
             
-            var html5QrcodeScanner = new Html5QrcodeScanner(
-                "qr-reader",
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                /* verbose= */ false
-            );
+            if (!qrVideo) {
+                showQrStatus('error', 'Không tìm thấy camera');
+                return;
+            }
             
-            showQrStatus('scanning', 'Đưa mã QR vào khung để quét');
-            
-            html5QrcodeScanner.render(
-                function(decodedText) {
-                    html5QrcodeScanner.clear();
-                    showQrStatus('success', 'Quét thành công!');
-                    setTimeout(function() { connectDevice(decodedText); }, 500);
-                },
-                function(errorMessage) {
-                    // Ignore continuous error messages during scanning
+            try {
+                var stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                qrVideo.srcObject = stream;
+                qrVideo.play();
+                
+                showQrStatus('scanning', 'Đưa mã QR vào khung để quét');
+                
+                state.scanning = true;
+                state.stream = stream;
+                
+                scanQRFrame();
+            } catch (e) {
+                showQrStatus('error', 'Không thể truy cập camera: ' + e.message);
+            }
+        }
+
+        function scanQRFrame() {
+            if (!state.scanning || !qrVideo || qrVideo.readyState !== qrVideo.HAVE_ENOUGH_DATA) {
+                if (state.scanning) {
+                    requestAnimationFrame(scanQRFrame);
                 }
-            );
+                return;
+            }
             
-            state.scanner = html5QrcodeScanner;
+            var canvas = document.createElement('canvas');
+            canvas.width = qrVideo.videoWidth;
+            canvas.height = qrVideo.videoHeight;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(qrVideo, 0, 0);
+            
+            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            var code = jsQR(imageData.data, imageData.width, imageData.height);
+            
+            if (code) {
+                stopScanning();
+                showQrStatus('success', 'Quét thành công!');
+                setTimeout(function() { connectDevice(code.data); }, 500);
+            } else {
+                requestAnimationFrame(scanQRFrame);
+            }
         }
 
         function stopScanning() {
-            if (state.scanner && typeof state.scanner.clear === 'function') {
-                state.scanner.clear();
-                state.scanner = null;
+            state.scanning = false;
+            if (state.stream) {
+                state.stream.getTracks().forEach(function(track) {
+                    track.stop();
+                });
+                state.stream = null;
+            }
+            if (qrVideo) {
+                qrVideo.srcObject = null;
             }
         }
 
