@@ -105,3 +105,99 @@ CÂU HỎI SỐ 3: Blueprint, request, jsonify là gì và tại sao chúng đư
                 jsonify             → đóng gói kết quả thành JSON
                     ↓
             [ TRẢ VỀ CHO NGƯỜI DÙNG ]
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 4: flask_jwt_extended , create_access_token, jwt_required, get_jwt_identity là gì, lí do ra đồi và nguyên lí hoạt động ?
+    - flask_jwt_extended (thư viện mẹ):
+        + Là thư viện mở rộng của Flask dùng để xác thực người dùng bằng JWT (JSON Web Token)
+        + Giúp xử lý các chức năng như:
+            > Tạo token khi đăng nhập
+            > Bảo vệ API (yêu cầu đăng nhập)
+            > Lấy thông tin người dùng từ toke
+        + JWT (JSON WEB TOKEN) cgiống như một “thẻ thông hành” — sau khi đăng nhập thành công, server cấp cho người dùng một token.
+        Mỗi lần gọi API, người dùng chỉ cần gửi token này thay vì phải đăng nhập lại.
+        + Lí do ra đời
+            > Ngày xưa khi người dùng đăng nhập, sever lưu thông tin vào Ram khi đạt tới số lượng người dùng nhất định (ví dụ 1000 người)
+            Ram sẽ đầy và dẫn tới sever sẽ chậm sinh ra nhiều vấn đề về trải nghiệm người dùng
+            > JWT ra đời: khi người dùng đăng nhập, sever sẽ cấp Token và lưu vào máy người dùng, sever sẽ không phải lưu gì cả điều này 
+            giúp giải phóng lượng lớn dữ liệu vào RAM giúp sever mượt mà hơn 
+            => Thay vì server phải lưu trạng thái đăng nhập của từng người dùng, JWT chuyển việc đó sang phía client bằng cách sử dụng token.
+            Điều này giúp hệ thống nhẹ hơn, dễ scale hơn và phù hợp với API hiện đại.
+    
+    - create_access_token:
+        + Hàm tạo ra token sau khi người dùng đăng nhập
+        
+        @app.route('/api/login', methods=['POST'])
+        def login():
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+
+        # Kiểm tra đúng mật khẩu
+        if username == "admin" and password == "1234":
+            
+            # Tạo token, đính kèm thông tin người dùng vào
+            token = create_access_token(identity=username)
+            #                           ↑
+            #              {{ gắn username vào trong token }}
+
+            return jsonify({"token": token})
+        
+        return jsonify({"error": "Sai mật khẩu"}), 401
+
+        + Cấu trúc Token 
+            | eyJhbGciOiJIUzI1NiJ9 |.eyJzdWIiOiJhZG1pbiJ9 | .abc123xyz |
+            |      Phần header     |      Phần data       |    chữ kí  |
+    
+    - jwt_required:
+        + Có thể hiểu là người bảo vệ kiểm tra vé (token) có hợp lệ hay không rồi mới
+        cho phép truy cập vào route:
+        + Nguyên lí hoạt động:
+
+            # Route KHÔNG có jwt_required → ai cũng vào được
+            @app.route('/api/public')
+            def public():
+                return "Trang công khai, ai cũng xem được"
+
+
+            # Route CÓ jwt_required → phải có token mới vào được
+            @app.route('/api/livestock', methods=['GET'])
+            @jwt_required()                  # ← bảo vệ cửa đứng đây
+            def get_livestock():
+                return "Danh sách vật nuôi — chỉ người đăng nhập mới thấy"
+    
+    - Các thông tin đầu ra của từng trường hợp 
+        Không có token -> 401 Unauthorized (chưa đăng nhập)
+        Token sai -> 422 Unprocessable (token không hợp lệ)
+        Token hết hạn -> 401 Unauthorized (Token đã hết hạn)
+        Token đúng -> vào trang web
+
+KIẾN THỨC THÊM
+    [1] Nhóm status code trong web
+        1xx Thông tin (ít dùng)
+        2xx Thành công
+        3xx chuyển hướng 
+        4xx Lỗi phía client
+        5xx lỗi phía server
+
+    [2] các mã thành công (2xx)
+        200: ok (Request thành công, Server trả dữ liệu bình thường)
+        201: Created (Tạo dữ liệu thành công)
+        204: No Content (Thành công nhưng không trả dữ liệu)
+
+    [3] các lỗi phía client (4xx)
+        400: Bad Request (request sai do thiểu file,sai format JSON,...)
+        401: Unauthorized (chưa xác thực do chưa login hoặc token hết hạn)
+        403: Forrbidden (Đã xác thực nnhưngkhoong có quyền truy cập)
+        404: Not Found (Lỗi thường gặp nhất, không tìm thấy tài nguyên(API,ID) )
+        405: Method Not Allowed (sai method(Get/POST/PUT/DELETE))
+        409: Confilict (xung đột dữ liệu)
+        422: Unprocessable Entity (Dữ liệu đúng forrmat nhưng sai logic / không hợp lệ)
+    
+    [4] các lỗi phía sever (5xx)
+        500: Internal Sever Error (Lỗi sever, code bug, crash,...)
+        502: Bad Gateway (Sever trung gian nhận phản hồi Lỗi)
+        503: Service Unavaliable (Sever quá tải hoặc đang bảo trì)
+
+
+
+==============================================================================================================================================================================================================================
