@@ -171,33 +171,148 @@ CÂU HỎI SỐ 4: flask_jwt_extended , create_access_token, jwt_required, get_j
         Token hết hạn -> 401 Unauthorized (Token đã hết hạn)
         Token đúng -> vào trang web
 
-KIẾN THỨC THÊM
-    [1] Nhóm status code trong web
-        1xx Thông tin (ít dùng)
-        2xx Thành công
-        3xx chuyển hướng 
-        4xx Lỗi phía client
-        5xx lỗi phía server
+        KIẾN THỨC THÊM
+            [1] Nhóm status code trong web
+                1xx Thông tin (ít dùng)
+                2xx Thành công
+                3xx chuyển hướng 
+                4xx Lỗi phía client
+                5xx lỗi phía server
 
-    [2] các mã thành công (2xx)
-        200: ok (Request thành công, Server trả dữ liệu bình thường)
-        201: Created (Tạo dữ liệu thành công)
-        204: No Content (Thành công nhưng không trả dữ liệu)
+            [2] các mã thành công (2xx)
+                200: ok (Request thành công, Server trả dữ liệu bình thường)
+                201: Created (Tạo dữ liệu thành công)
+                204: No Content (Thành công nhưng không trả dữ liệu)
 
-    [3] các lỗi phía client (4xx)
-        400: Bad Request (request sai do thiểu file,sai format JSON,...)
-        401: Unauthorized (chưa xác thực do chưa login hoặc token hết hạn)
-        403: Forrbidden (Đã xác thực nnhưngkhoong có quyền truy cập)
-        404: Not Found (Lỗi thường gặp nhất, không tìm thấy tài nguyên(API,ID) )
-        405: Method Not Allowed (sai method(Get/POST/PUT/DELETE))
-        409: Confilict (xung đột dữ liệu)
-        422: Unprocessable Entity (Dữ liệu đúng forrmat nhưng sai logic / không hợp lệ)
+            [3] các lỗi phía client (4xx)
+                400: Bad Request (request sai do thiểu file,sai format JSON,...)
+                401: Unauthorized (chưa xác thực do chưa login hoặc token hết hạn)
+                403: Forrbidden (Đã xác thực nnhưngkhoong có quyền truy cập)
+                404: Not Found (Lỗi thường gặp nhất, không tìm thấy tài nguyên(API,ID) )
+                405: Method Not Allowed (sai method(Get/POST/PUT/DELETE))
+                409: Confilict (xung đột dữ liệu)
+                422: Unprocessable Entity (Dữ liệu đúng forrmat nhưng sai logic / không hợp lệ)
+            
+            [4] các lỗi phía sever (5xx)
+                500: Internal Sever Error (Lỗi sever, code bug, crash,...)
+                502: Bad Gateway (Sever trung gian nhận phản hồi Lỗi)
+                503: Service Unavaliable (Sever quá tải hoặc đang bảo trì)
+
     
-    [4] các lỗi phía sever (5xx)
-        500: Internal Sever Error (Lỗi sever, code bug, crash,...)
-        502: Bad Gateway (Sever trung gian nhận phản hồi Lỗi)
-        503: Service Unavaliable (Sever quá tải hoặc đang bảo trì)
+    - get_jwt_identity
+        + Hàm đọc thông tin người dùng dùng được nhúng bên trong token - giúp sever biết ai đang 
+        gửi yêu cầu
+        + Nguyên lí hoạt động:
+
+            from flask_jwt_extended import jwt_required, get_jwt_identity
+
+            @app.route('/api/my-farm', methods=['GET'])
+            @jwt_required()
+            def get_my_farm():
+                
+                # Đọc thông tin từ token
+                current_user = get_jwt_identity()
+                # current_user = "admin" (lấy từ identity khi tạo token)
+
+                # Dùng thông tin đó để truy vấn đúng dữ liệu
+                farm_data = Farm.query.filter_by(owner=current_user).all()
+                
+                return jsonify(farm_data)
+        
+        Sơ đồ quy trình 
+
+            BƯỚC 1 — Đăng nhập:
+                    [ Người dùng gửi username + password ]
+                                ↓
+                    [ Server kiểm tra đúng/sai ]
+                                ↓ đúng
+                    [ create_access_token → tạo token ]
+                                ↓
+                    [ Trả token về cho người dùng lưu lại ]
 
 
-
+            BƯỚC 2 — Truy cập trang bảo mật:
+                    [ Người dùng gửi yêu cầu + kèm token ]
+                                ↓
+                    [ jwt_required → kiểm tra token hợp lệ không ]
+                                ↓ hợp lệ
+                    [ get_jwt_identity → đọc "đây là user nào" ]
+                                ↓
+                    [ Trả đúng dữ liệu của user đó ]
 ==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 5: werkeug.security, generate_password_hash, check_password_hash là gì ?, Lí do ra đời?, Nguyên lí hoạt động?
+    - werbeug.security:
+        + là một phần thư viện của werkzeug - bộ công cụ nền tẳng của Flask chuyên xử lí các vấn
+        đề bảo mật, mật khẩu 
+        + lí do ra đời:
+            > Ngày xưa lưu mật khẩu thẳng vào Database dẫn tới việc nếu hacker truy cập được vào database thì việc lấy mật khẩu
+            rất dễ 
+            > werkeug.security ra đời, hệ thông sẽ mã hóa password khiến cho hacker không đọc được mật khẩu
+    
+    - generate_password_hash:
+        + Hàm mã hóa mật khẩu 
+            > Biến mội thứ thành một chuỗi ngẫu nhiên không thể đọc được
+            > Nguyên lí hoạt động:
+
+            from werkzeug.security import generate_password_hash
+
+            mat_khau_that = "1234abcd"
+            mat_khau_da_bam = generate_password_hash(mat_khau_that)
+
+            print(mat_khau_da_bam)
+            # $pbkdf2-sha256$29000$randomSalt$chuoiKyTuNgauNhien...
+            # ↑ Không ai đọc được kể cả chính bạn!
+    
+    - check_password_hash:
+        + Hàm kiểm tra mật khẩu (đối chiếu với mật khẩu người dùng nhập ) bằng việc giải mã ngược
+        + Nguyên lí hoạt động 
+
+            from werkzeug.security import check_password_hash
+
+            ket_qua = check_password_hash(hash_trong_db, mat_khau_nhap)
+            # Hàm này biết cách "giải mã ngược" để so sánh đúng cách
+==============================================================================================================================================================================================================================
+CÂU HỎI SÔ 6: flask_sqlalchemy là gì, lí do ra đời, nguyên lí hoạt động
+    - flask_sqlalchemy: là một thư viện giúp bạn làm việc với database bằng code Python thay vị chạy trên SQL thuần
+    - Lí do ra đời:
+        > Lúc chưa có SQLALchemy:
+
+            # Muốn lấy danh sách vật nuôi phải viết SQL thuần
+            cursor.execute("SELECT * FROM livestock 
+                            WHERE farm_id = 1 
+                            AND status = 'healthy'
+                            ORDER BY created_at DESC")
+            
+            # Muốn thêm vật nuôi mới
+            cursor.execute("INSERT INTO livestock 
+                            (name, species, weight, farm_id) 
+                            VALUES (?, ?, ?, ?)", 
+                            ("Bò 01", "Bò", 150, 1))
+  
+            # Muốn cập nhật
+            cursor.execute("UPDATE livestock 
+                            SET weight = 160 
+                            WHERE id = 1")
+
+            → Dài dòng, dễ sai cú pháp, dễ bị tấn công SQL Injection
+
+        > Lúc có SQLALchemy:
+
+            # Lấy danh sách vật nuôi
+            Livestock.query.filter_by(farm_id=1, status='healthy')\
+                           .order_by(Livestock.created_at.desc()).all()
+
+            # Thêm vật nuôi mới  
+            con_bo = Livestock(name="Bò 01", species="Bò", weight=150)
+            db.session.add(con_bo)
+
+            # Cập nhật
+            con_bo.weight = 160
+            db.session.commit()
+
+            * lí do nên sử dụng
+                _ KHó bị hack vì không bị lộ câu lệnh SQL 
+                _ Có thể lưu biến và sử dụng liên tục thay vì code lại câu lệnh
+                _ Không cần nhớ cú pháp SQL
+                _ Đổi database không cần phải fix lại code
+==============================================================================================================================================================================================================================            
