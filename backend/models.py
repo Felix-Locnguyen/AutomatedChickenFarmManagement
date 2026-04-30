@@ -1,0 +1,406 @@
+"""
+Database Models cho Hệ thống Quản lý Trang trại Gà
+
+Sử dụng Flask-SQLAlchemy với SQLite.
+Định nghĩa các models và relationships.
+"""
+
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
+
+db = SQLAlchemy()
+
+
+class User(db.Model):
+    """
+    Model người dùng hệ thống.
+    
+    Attributes:
+        id: Primary key tự tăng
+        username: Tên đăng nhập (unique)
+        email: Email (unique)
+        password_hash: Mật khẩu đã băm
+        full_name: Họ tên đầy đủ
+        role: Vai trò (admin/worker)
+        created_at: Thời gian tạo tài khoản
+        updated_at: Thời gian cập nhật cuối
+    """
+    __tablename__ = 'users'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
+    full_name = db.Column(db.String(120))
+    role = db.Column(db.String(20), default='worker')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def set_password(self, password):
+        """Băm mật khẩu và lưu vào password_hash."""
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Kiểm tra mật khẩu."""
+        return check_password_hash(self.password_hash, password)
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'full_name': self.full_name,
+            'role': self.role,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def __repr__(self):
+        return f'<User {self.username}>'
+
+
+class Coop(db.Model):
+    """
+    Model chuồng gà.
+    
+    Attributes:
+        id: Primary key tự tăng
+        name: Tên chuồng (VD: Chuồng A, Chuồng B)
+        location: Vị trí chuồng
+        capacity: Sức chứa tối đa (số gà)
+        current_count: Số lượng gà hiện tại
+        area: Diện tích chuồng (m²)
+        
+        Ngưỡng cảnh báo:
+        temp_min, temp_max: Nhiệt độ (°C)
+        humidity_min, humidity_max: Độ ẩm (%)
+        feed_threshold: Ngưỡng thức ăn (%)
+        water_threshold: Ngưỡng nước (%)
+        
+        Lịch trình cho ăn:
+        feed_time_1, feed_time_2, feed_time_3: Giờ cho ăn
+        
+        Chế độ tự động:
+        auto_fan: Tự động bật quạt
+        auto_light: Tự động bật đèn
+        auto_feed: Tự động cho ăn
+        auto_water: Tự động cấp nước
+        
+        Trạng thái:
+        emergency_alert: Bật cảnh báo khẩn cấp
+        status: Trạng thái chuồng (active/cleaning/empty)
+    """
+    __tablename__ = 'coops'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    location = db.Column(db.String(100))
+    capacity = db.Column(db.Integer, default=500)
+    current_count = db.Column(db.Integer, default=0)
+    area = db.Column(db.Float, default=50.0)
+    
+    temp_min = db.Column(db.Float, default=18.0)
+    temp_max = db.Column(db.Float, default=28.0)
+    humidity_min = db.Column(db.Float, default=40.0)
+    humidity_max = db.Column(db.Float, default=70.0)
+    feed_threshold = db.Column(db.Float, default=20.0)
+    water_threshold = db.Column(db.Float, default=20.0)
+    
+    feed_time_1 = db.Column(db.Time, default=datetime.strptime('06:00', '%H:%M').time())
+    feed_time_2 = db.Column(db.Time, default=datetime.strptime('12:00', '%H:%M').time())
+    feed_time_3 = db.Column(db.Time, default=datetime.strptime('18:00', '%H:%M').time())
+    
+    auto_fan = db.Column(db.Boolean, default=True)
+    auto_light = db.Column(db.Boolean, default=True)
+    auto_feed = db.Column(db.Boolean, default=True)
+    auto_water = db.Column(db.Boolean, default=True)
+    
+    emergency_alert = db.Column(db.Boolean, default=False)
+    status = db.Column(db.String(20), default='active')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    devices = db.relationship('Device', secondary='coop_devices', back_populates='coops')
+    environments = db.relationship('Environment', backref='coop', lazy='dynamic')
+    feed_schedules = db.relationship('FeedSchedule', backref='coop', lazy='dynamic')
+    alerts = db.relationship('Alert', backref='coop', lazy='dynamic')
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'location': self.location,
+            'capacity': self.capacity,
+            'current_count': self.current_count,
+            'area': self.area,
+            'temp_min': self.temp_min,
+            'temp_max': self.temp_max,
+            'humidity_min': self.humidity_min,
+            'humidity_max': self.humidity_max,
+            'feed_threshold': self.feed_threshold,
+            'water_threshold': self.water_threshold,
+            'feed_time_1': self.feed_time_1.isoformat() if self.feed_time_1 else None,
+            'feed_time_2': self.feed_time_2.isoformat() if self.feed_time_2 else None,
+            'feed_time_3': self.feed_time_3.isoformat() if self.feed_time_3 else None,
+            'auto_fan': self.auto_fan,
+            'auto_light': self.auto_light,
+            'auto_feed': self.auto_feed,
+            'auto_water': self.auto_water,
+            'emergency_alert': self.emergency_alert,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def __repr__(self):
+        return f'<Coop {self.name}>'
+
+
+class Device(db.Model):
+    """
+    Model thiết bị IoT.
+    
+    Attributes:
+        id: Primary key tự tăng
+        name: Tên thiết bị
+        type: Loại thiết bị
+            - temperature: Cảm biến nhiệt độ
+            - humidity: Cảm biến độ ẩm
+            - fan: Quạt thông gió
+            - light: Đèn chiếu sáng
+            - feeder: Máy cho ăn
+            - camera: Camera giám sát
+        mac_address: Địa chỉ MAC (unique)
+        status: Trạng thái kết nối (online/offline/connecting)
+        is_active: Thiết bị đang bật/tắt
+        battery: Mức pin (%)
+        created_at: Thời gian thêm thiết bị
+    """
+    __tablename__ = 'devices'
+    
+    DEVICE_TYPES = [
+        'temperature',
+        'humidity',
+        'fan',
+        'light',
+        'feeder',
+        'camera'
+    ]
+    
+    DEVICE_STATUS = [
+        'online',
+        'offline',
+        'connecting'
+    ]
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    type = db.Column(db.String(20), nullable=False)
+    mac_address = db.Column(db.String(50), unique=True, nullable=False)
+    status = db.Column(db.String(20), default='offline')
+    is_active = db.Column(db.Boolean, default=False)
+    battery = db.Column(db.Integer, default=100)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    coops = db.relationship('Coop', secondary='coop_devices', back_populates='devices')
+    alerts = db.relationship('Alert', backref='device', lazy='dynamic')
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'mac_address': self.mac_address,
+            'status': self.status,
+            'is_active': self.is_active,
+            'battery': self.battery,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def __repr__(self):
+        return f'<Device {self.name}>'
+
+
+class CoopDevice(db.Model):
+    """
+    Model bảng trung gian cho quan hệ Many-to-Many giữa Coop và Device.
+    
+    Thiết lập quan hệ Nhiều-Coop-Nhiều-Device.
+    Một thiết bị có thể được gán vào nhiều chuồng.
+    Một chuồng có thể có nhiều thiết bị.
+    
+    Attributes:
+        id: Primary key tự tăng
+        coop_id: Foreign key đến Coop
+        device_id: Foreign key đến Device
+        is_active: Thiết bị có đang hoạt động trong chuồng này không
+    """
+    __tablename__ = 'coop_devices'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=False)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'coop_id': self.coop_id,
+            'device_id': self.device_id,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+    
+    def __repr__(self):
+        return f'<CoopDevice coop={self.coop_id} device={self.device_id}>'
+
+
+class Environment(db.Model):
+    """
+    Model dữ liệu môi trường chuồng.
+    
+    Lưu trữ dữ liệu cảm biến theo thời gian.
+    Mỗi bản ghi represents một lần đo.
+    
+    Attributes:
+        id: Primary key tự tăng
+        coop_id: Foreign key đến Coop
+        temperature: Nhiệt độ (°C)
+        humidity: Độ ẩm (%)
+        feed_level: Mức thức ăn (%)
+        water_level: Mức nước (%)
+        recorded_at: Thời gian ghi nhận
+    """
+    __tablename__ = 'environments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=False)
+    temperature = db.Column(db.Float)
+    humidity = db.Column(db.Float)
+    feed_level = db.Column(db.Float)
+    water_level = db.Column(db.Float)
+    recorded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'coop_id': self.coop_id,
+            'temperature': self.temperature,
+            'humidity': self.humidity,
+            'feed_level': self.feed_level,
+            'water_level': self.water_level,
+            'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None
+        }
+    
+    def __repr__(self):
+        return f'<Environment coop={self.coop_id} time={self.recorded_at}>'
+
+
+class FeedSchedule(db.Model):
+    """
+    Model lịch cho ăn tự động.
+    
+    Lưu trữ lịch trình cho ăn tự động cho mỗi chuồng.
+    Một chuồng có thể có nhiều lịch cho ăn.
+    
+    Attributes:
+        id: Primary key tự tăng
+        coop_id: Foreign key đến Coop
+        time: Giờ cho ăn
+        amount: Lượng thức ăn (kg)
+        enabled: Bật/tắt lịch cho ăn
+    """
+    __tablename__ = 'feed_schedules'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=False)
+    time = db.Column(db.Time, nullable=False)
+    amount = db.Column(db.Float, default=10.0)
+    enabled = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'coop_id': self.coop_id,
+            'time': self.time.isoformat() if self.time else None,
+            'amount': self.amount,
+            'enabled': self.enabled,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+    
+    def __repr__(self):
+        return f'<FeedSchedule coop={self.coop_id} time={self.time}>'
+
+
+class Alert(db.Model):
+    """
+    Model cảnh báo hệ thống.
+    
+    Lưu trữ các cảnh báo về nhiệt độ, độ ẩm, thiết bị...
+    
+    Attributes:
+        id: Primary key tự tăng
+        coop_id: Foreign key đến Coop (nullable vì có thể cảnh báo chung)
+        device_id: Foreign key đến Device (optional)
+        type: Loại cảnh báo (temperature/humidity/feed/water/device)
+        level: Mức độ
+            - info: Thông tin
+            - warning: Cảnh báo
+            - critical: Nghiêm trọng
+        message: Nội dung cảnh báo
+        is_resolved: Đã xử lý chưa
+        created_at: Thời gian tạo cảnh báo
+    """
+    __tablename__ = 'alerts'
+    
+    ALERT_TYPES = [
+        'temperature',
+        'humidity',
+        'feed',
+        'water',
+        'device'
+    ]
+    
+    ALERT_LEVELS = [
+        'info',
+        'warning',
+        'critical'
+    ]
+    
+    id = db.Column(db.Integer, primary_key=True)
+    coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=True)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=True)
+    type = db.Column(db.String(20), nullable=False)
+    level = db.Column(db.String(20), default='info')
+    message = db.Column(db.Text, nullable=False)
+    is_resolved = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    resolved_at = db.Column(db.DateTime)
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'coop_id': self.coop_id,
+            'device_id': self.device_id,
+            'type': self.type,
+            'level': self.level,
+            'message': self.message,
+            'is_resolved': self.is_resolved,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'resolved_at': self.resolved_at.isoformat() if self.resolved_at else None
+        }
+    
+    def __repr__(self):
+        return f'<Alert {self.level}:{self.type}>'
