@@ -1,77 +1,109 @@
 """
-Auth Routes - API xác thực người dùng
+Auth Routes - API Xác thực Người dùng
 
-Module này cung cấp các endpoint cho việc:
-- Đăng ký tài khoản mới
-- Đăng nhập và lấy JWT token
-- Lấy thông tin người dùng hiện tại
-- Đăng xuất
+Module này cung cấp các endpoint cho hệ thống xác thực người dùng:
+- POST /api/auth/login: Đăng nhập, nhận JWT token
+- POST /api/auth/register: Đăng ký tài khoản mới
+- POST /api/auth/logout: Đăng xuất
+- GET /api/auth/me: Lấy thông tin user hiện tại
 
-Cơ chế xác thực:
-- Sử dụng JWT (JSON Web Token) cho stateless authentication
-- Mật khẩu được hash bằng werkzeug.security (PBKDF2+SHA256)
+Cơ chế bảo mật:
+- JWT (JSON Web Token) cho xác thực stateless
+- Werkzeug security cho hash/băm mật khẩu (PBKDF2+SHA256)
+- Flask-JWT-Extended để quản lý token
 """
 
+# =============================================================================
+# IMPORT THƯ VIỆN
+# =============================================================================
+
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import (
+    create_access_token,  # Tạo JWT token mới
+    jwt_required,        # Decorator yêu cầu JWT hợp lệ
+    get_jwt_identity    # Lấy user ID từ JWT token
+)
+from werkzeug.security import (
+    generate_password_hash,  # Băm mật khẩu (mã hóa một chiều)
+    check_password_hash     # Kiểm tra mật khẩu với hash
+)
 from datetime import datetime
 import sys
 import os
 
-# Thêm đường dẫn parent vào sys.path để có thể import models
+# Thêm đường dẫn parent vào sys.path để import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from models import User
 
-# Tạo Blueprint với tên 'auth'
-# URL prefix sẽ là /api/auth (được thêm từ api_bp trong __init__.py)
+# =============================================================================
+# TẠO BLUEPRINT
+# =============================================================================
+
 auth_bp = Blueprint('auth', __name__)
 
+# =============================================================================
+# ENDPOINT 1: ĐĂNG NHẬP (LOGIN)
+# =============================================================================
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     """
     Đăng nhập người dùng.
-    
-    Xác thực username và password, trả về JWT token nếu thành công.
-    
-    Args:
-        Request Body (JSON):
-            - username (str): Tên đăng nhập
-            - password (str): Mật khẩu
-        
-    Returns:
-        200: {
-            "access_token": "jwt_token_string",
+
+    Luồng xử lý:
+    1. Nhận username và password từ request body
+    2. Validate dữ liệu đầu vào (không được rỗng)
+    3. Tìm user trong database theo username
+    4. Kiểm tra mật khẩu với hash lưu trong DB
+    5. Nếu thành công, tạo JWT token và trả về cho client
+
+    Request Body (JSON):
+        {
+            "username": "admin",       // Tên đăng nhập (bắt buộc)
+            "password": "admin123"     // Mật khẩu (bắt buộc)
+        }
+
+    Response thành công (200):
+        {
+            "access_token": "eyJ0eHAiOiJKV1Q...",  // JWT token
             "user": {
                 "id": 1,
                 "username": "admin",
-                "full_name": "Administrator",
+                "full_name": "Quản trị viên",
                 "role": "admin"
             }
         }
-        400: Thiếu username hoặc password
-        401: Sai username hoặc password
+
+    Response lỗi (400): Thiếu username hoặc password
+    Response lỗi (401): Sai username hoặc password
     """
+    # Bước 1: Lấy dữ liệu từ request body (JSON)
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
-    
-    # Validate input
+
+    # Bước 2: Validate - kiểm tra dữ liệu không được rỗng
     if not username or not password:
-        return jsonify({'error': 'Username and password required'}), 400
-    
-    # Tìm user trong database
+        return jsonify({
+            'error': 'Vui lòng nhập username và password'
+        }), 400
+
+    # Bước 3: Tìm user trong database theo username
     user = User.query.filter_by(username=username).first()
-    
-    # Verify password (sử dụng check_password_hash để so sánh với hash lưu trong DB)
+
+    # Bước 4: Kiểm tra mật khẩu
+    # check_password_hash() giải mã hash trong DB và so sánh với password gửi lên
+    # Nếu sai: trả lỗi 401
     if not user or not check_password_hash(user.password_hash, password):
-        return jsonify({'error': 'Invalid credentials'}), 401
-    
-    # Tạo JWT token với user.id làm identity
+        return jsonify({
+            'error': 'Username hoặc password không đúng'
+        }), 401
+
+    # Bước 5: Tạo JWT token với user.id làm identity (định danh)
+    # Identity được lưu trong token để sau này trích xuất user từ DB
     access_token = create_access_token(identity=user.id)
-    
-    # Trả về token và thông tin user
+
+    # Bước 6: Trả về token và thông tin user (không bao gồm password)
     return jsonify({
         'access_token': access_token,
         'user': {
@@ -82,96 +114,177 @@ def login():
         }
     }), 200
 
+# =============================================================================
+# ENDPOINT 2: ĐĂNG KÝ (REGISTER)
+# =============================================================================
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
     """
     Đăng ký tài khoản người dùng mới.
-    
-    Tạo tài khoản mới với username và email unique.
-    Mật khẩu được hash trước khi lưu vào database.
-    
-    Args:
-        Request Body (JSON):
-            - username (str): Tên đăng nhập (bắt buộc, unique)
-            - email (str): Email (bắt buộc, unique)
-            - password (str): Mật khẩu (bắt buộc)
-            - full_name (str): Họ tên (tùy chọn)
-        
-    Returns:
-        201: {
-            "message": "User registered successfully",
-            "user_id": 1
+
+    Luồng xử lý:
+    1. Nhận thông tin từ request body
+    2. Validate các trường bắt buộc (username, email, password)
+    3. Kiểm tra username đã tồn tại chưa
+    4. Kiểm tra email đã tồn tại chưa
+    5. Hash mật khẩu trước khi lưu vào DB
+    6. Tạo user mới và lưu vào database
+
+    Request Body (JSON):
+        {
+            "username": "user1",          // Tên đăng nhập (bắt buộc, unique)
+            "email": "user1@farm.com",    // Email (bắt buộc, unique)
+            "password": "pass123",         // Mật khẩu (bắt buộc)
+            "full_name": "Nguyễn Văn A"   // Họ tên (tùy chọn)
         }
-        400: Thiếu thông tin bắt buộc hoặc username/email đã tồn tại
+
+    Response thành công (201):
+        {
+            "message": "Đăng ký thành công",
+            "user_id": 2
+        }
+
+    Response lỗi (400):
+        - Thiếu thông tin bắt buộc
+        - Username đã tồn tại
+        - Email đã tồn tại
     """
+    # Bước 1: Lấy dữ liệu từ request body
     data = request.get_json()
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
-    full_name = data.get('full_name', '')
-    
-    # Validate required fields
+    full_name = data.get('full_name', '')  # Mặc định rỗng nếu không có
+
+    # Bước 2: Validate các trường bắt buộc
     if not username or not email or not password:
-        return jsonify({'error': 'Username, email, password required'}), 400
-    
-    # Kiểm tra username đã tồn tại chưa
+        return jsonify({
+            'error': 'Vui lòng nhập đầy đủ username, email và password'
+        }), 400
+
+    # Bước 3: Kiểm tra username đã tồn tại chưa
     if User.query.filter_by(username=username).first():
-        return jsonify({'error': 'Username already exists'}), 400
-    
-    # Kiểm tra email đã tồn tại chưa
+        return jsonify({
+            'error': 'Username đã được sử dụng'
+        }), 400
+
+    # Bước 4: Kiểm tra email đã tồn tại chưa
     if User.query.filter_by(email=email).first():
-        return jsonify({'error': 'Email already exists'}), 400
-    
-    # Hash password trước khi lưu (bảo mật)
-    # sử dụng PBKDF2-SHA256 mặc định của werkzeug
+        return jsonify({
+            'error': 'Email đã được sử dụng'
+        }), 400
+
+    # Bước 5: Hash mật khẩu trước khi lưu
+    # generate_password_hash() sử dụng thuật toán PBKDF2-SHA256
+    # Đây là phương pháp mã hóa một chiều, không thể giải mã ngược
+    password_hash = generate_password_hash(password)
+
+    # Bước 6: Tạo user mới
     user = User(
         username=username,
         email=email,
-        password_hash=generate_password_hash(password),
+        password_hash=password_hash,
         full_name=full_name,
-        role='user'  # Mặc định là user, có thể nâng cấp lên admin
+        role='worker'  # Mặc định là worker, admin set thủ công
     )
-    
-    # Lưu vào database
+
+    # Bước 7: Lưu vào database
     from api import db
     db.session.add(user)
     db.session.commit()
-    
-    return jsonify({'message': 'User registered successfully', 'user_id': user.id}), 201
 
+    return jsonify({
+        'message': 'Đăng ký thành công',
+        'user_id': user.id
+    }), 201
+
+# =============================================================================
+# ENDPOINT 3: ĐĂNG XUẤT (LOGOUT)
+# =============================================================================
+
+@auth_bp.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    """
+    Đăng xuất người dùng.
+
+    Luồng xử lý:
+    1. Yêu cầu JWT token hợp lệ từ header
+    2. Thông báo đăng xuất thành công
+    3. Client tự xóa token khỏi local storage
+
+    Ghi chú về JWT Stateless:
+    - JWT là stateless: server không lưu trạng thái session
+    - Khi logout, server chỉ cần thông báo thành công
+    - Client có trách nhiệm xóa token
+    - Token vẫn còn hạn sử dụng cho đến khi hết hạn
+
+    Nâng cao bảo mật (Optional):
+    - Có thể lưu token vào Redis blacklist
+    - Kiểm tra token trong blacklist trước khi xử lý request
+    - Phù hợp cho ứng dụng cần logout thực sự vô hiệu hóa token
+
+    Headers: Authorization: Bearer <jwt_token>
+
+    Response thành công (200):
+        {
+            "message": "Đăng xuất thành công"
+        }
+
+    Response lỗi (401): Token không hợp lệ hoặc hết hạn
+    """
+    # JWT hợp lệ, thông báo đăng xuất thành công
+    return jsonify({
+        'message': 'Đăng xuất thành công'
+    }), 200
+
+# =============================================================================
+# ENDPOINT 4: LẤY THÔNG TIN USER HIỆN TẠI (ME)
+# =============================================================================
 
 @auth_bp.route('/me', methods=['GET'])
-@jwt_required()  # Decorator yêu cầu JWT token hợp lệ
+@jwt_required()
 def get_current_user():
     """
     Lấy thông tin người dùng hiện tại.
-    
-    Sử dụng JWT token từ header Authorization để xác định user.
-    Trả về thông tin profile của user đang đăng nhập.
-    
-    Headers:
-        Authorization: Bearer <jwt_token>
-    
-    Returns:
-        200: {
+
+    Luồng xử lý:
+    1. Yêu cầu JWT token hợp lệ từ header
+    2. Trích xuất user_id từ JWT token
+    3. Truy vấn user từ database
+    4. Trả về thông tin user (dạng JSON)
+
+    Headers: Authorization: Bearer <jwt_token>
+
+    Response thành công (200):
+        {
             "id": 1,
             "username": "admin",
-            "email": "admin@example.com",
-            "full_name": "Administrator",
+            "email": "admin@chickenfarm.com",
+            "full_name": "Quản trị viên",
             "role": "admin",
-            "created_at": "2025-01-01T00:00:00"
+            "created_at": "2026-04-29T10:00:00"
         }
-        401: Token không hợp lệ hoặc hết hạn
-        404: User không tồn tại
+
+    Response lỗi (401): Token không hợp lệ hoặc hết hạn
+    Response lỗi (404): User không tồn tại (đã bị xóa)
     """
-    # Lấy user_id từ JWT token (đã được giải mã bởi @jwt_required)
+    # Bước 1: Trích xuất user_id từ JWT token
+    # get_jwt_identity() trả về giá trị đã truyền vào create_access_token()
     user_id = get_jwt_identity()
+
+    # Bước 2: Truy vấn user từ database theo ID
     user = User.query.get(user_id)
-    
+
+    # Bước 3: Kiểm tra user có tồn tại không
     if not user:
-        return jsonify({'error': 'User not found'}), 404
-    
+        return jsonify({
+            'error': 'Người dùng không tồn tại'
+        }), 404
+
+    # Bước 4: Trả về thông tin user (JSON)
+    # Không bao gồm password_hash vì lý do bảo mật
     return jsonify({
         'id': user.id,
         'username': user.username,
@@ -180,26 +293,3 @@ def get_current_user():
         'role': user.role,
         'created_at': user.created_at.isoformat() if user.created_at else None
     }), 200
-
-
-@auth_bp.route('/logout', methods=['POST'])
-@jwt_required()
-def logout():
-    """
-    Đăng xuất người dùng.
-    
-    Với JWT stateless, server không cần làm gì đặc biệt.
-    Client cần xóa token khỏi storage.
-    (Có thể thêm token vào blacklist để chặn token đã logout)
-    
-    Headers:
-        Authorization: Bearer <jwt_token>
-    
-    Returns:
-        200: {"message": "Logged out successfully"}
-        401: Token không hợp lệ
-    """
-    # Với JWT stateless, logout chỉ cần thông báo thành công
-    # Client sẽ tự xóa token
-    # Để tăng bảo mật, có thể thêm token vào Redis blacklist
-    return jsonify({'message': 'Logged out successfully'}), 200

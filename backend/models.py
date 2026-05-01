@@ -57,7 +57,7 @@ class User(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
     
-    def __repr__(self):
+    def __repr__(self): #cung cấp thông tin chi tiết hơn cho lập trình viên, hữu ích khi debug
         return f'<User {self.username}>'
 
 
