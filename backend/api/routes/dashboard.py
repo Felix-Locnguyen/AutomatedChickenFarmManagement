@@ -12,12 +12,13 @@ Dữ liệu được tổng hợp từ nhiều bảng: Coop, Device, Environment
 
 from flask import Blueprint, jsonify
 from flask_jwt_extended import jwt_required
+from sqlalchemy import func
 from datetime import datetime
 import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from models import Coop, Device, CoopDevice, Environment, Alert
+from models import Coop, Device, CoopDevice, Environment, Alert, db
 
 # Tạo Blueprint cho routes dashboard
 # URL: /api/dashboard
@@ -112,45 +113,42 @@ def get_stats():
     Lấy thống kê chi tiết.
     
     Bao gồm:
-    - Tổng số gà và sức chứa
-    - Tỷ lệ sử dụng sức chứa
-    - Số lượng chuồng theo trạng thái (normal/warning/error)
-    - Số lượng thiết bị theo loại
+    - Tổng số chuồng, thiết bị
+    - Tổng số gà, sức chứa tổng
+    - Số thiết bị đang online
+    - Số cảnh báo chưa xử lý
+    - Thống kê trạng thái chuồng
     
     Returns:
         200: {
+            "total_coops": 5,
+            "total_devices": 20,
             "total_chickens": 2500,
             "total_capacity": 2500,
-            "capacity_usage": 100.0,
-            "coop_status": {"normal": 3, "warning": 1, "error": 1},
-            "device_type_count": {"sensor": 10, "fan": 5, "light": 3, "camera": 2}
+            "online_devices": 15,
+            "unresolved_alerts": 3,
+            "coop_status": {"active": 3, "cleaning": 1, "empty": 1}
         }
     """
-    coops = Coop.query.all()
-    devices = Device.query.all()
+    chicken_count = db.session.query(func.sum(Coop.current_count)).scalar() or 0
+    total_capacity = db.session.query(func.sum(Coop.capacity)).scalar() or 0
+    online_devices = Device.query.filter(Device.status == 'online').count()
+    unresolved_alerts = Alert.query.filter(Alert.is_resolved == False).count()
     
-    # Tổng số gà và sức chứa
-    chicken_count = sum(c.current_count for c in coops)
-    total_capacity = sum(c.capacity for c in coops)
-    
-    # Thống kê trạng thái chuồng
     coop_status = {
-        'normal': len([c for c in coops if c.status == 'normal']),
-        'warning': len([c for c in coops if c.status == 'warning']),
-        'error': len([c for c in coops if c.status == 'error'])
+        'active': Coop.query.filter(Coop.status == 'active').count(),
+        'cleaning': Coop.query.filter(Coop.status == 'cleaning').count(),
+        'empty': Coop.query.filter(Coop.status == 'empty').count()
     }
     
-    # Thống kê thiết bị theo loại
-    device_type_count = {}
-    for device in devices:
-        device_type_count[device.type] = device_type_count.get(device.type, 0) + 1
-    
     return jsonify({
+        'total_coops': Coop.query.count(),
+        'total_devices': Device.query.count(),
         'total_chickens': chicken_count,
         'total_capacity': total_capacity,
-        'capacity_usage': round(chicken_count / total_capacity * 100, 1) if total_capacity > 0 else 0,
-        'coop_status': coop_status,
-        'device_type_count': device_type_count
+        'online_devices': online_devices,
+        'unresolved_alerts': unresolved_alerts,
+        'coop_status': coop_status
     }), 200
 
 
@@ -158,10 +156,12 @@ def get_stats():
 @jwt_required()
 def get_alerts():
     """
-    Lấy danh sách cảnh báo chưa xử lý.
+    Lấy danh sách cảnh báo mới nhất (mức độ Critical/Warning).
     
-    Chỉ lấy các cảnh báo có is_resolved = False,
-    sắp xếp theo thời gian giảm dần (mới nhất trước).
+    Chỉ lấy các cảnh báo:
+    - is_resolved = False
+    - level IN ('critical', 'warning')
+    - sắp xếp theo thời gian giảm dần (mới nhất trước)
     
     Query params:
         limit (int): Số lượng cảnh báo (mặc định: 10)
@@ -170,7 +170,10 @@ def get_alerts():
         200: Array of alert objects
     """
     limit = 10
-    alerts = Alert.query.filter_by(is_resolved=False).order_by(Alert.created_at.desc()).limit(limit).all()
+    alerts = Alert.query.filter(
+        Alert.is_resolved == False,
+        Alert.level.in_(['critical', 'warning'])
+    ).order_by(Alert.created_at.desc()).limit(limit).all()
     
     return jsonify([alert.to_dict() for alert in alerts]), 200
 
