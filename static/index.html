@@ -425,7 +425,7 @@
 
             <!-- Nav Item - Quản lý Chuồng -->
             <li class="nav-item">
-                <a class="nav-link" href="coop-list.html">
+                <a class="nav-link" href="/coops">
                     <i class="fas fa-fw fa-home"></i>
                     <span>Quản lý chuồng</span></a>
             </li>
@@ -948,7 +948,7 @@
                                             <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
                                         </div>
                                     </div>
-                                    <a href="coop-list.html" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
+                                    <a href="/coops" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
                                 </div>
                             </div>
 
@@ -1046,6 +1046,91 @@
     </div>
     <!-- End of Page Wrapper -->
 
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
+
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+        // Dashboard - Hiển thị dữ liệu động
+        (function() {
+            'use strict';
+
+            // Kiểm tra đăng nhập
+            if (!isAuthenticated()) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Hàm tải dữ liệu dashboard
+            async function loadDashboard() {
+                try {
+                    const data = await dashboardAPI.getOverview();
+
+                    // Cập nhật số liệu thống kê
+                    if (data.total_coops !== undefined) {
+                        const totalCoopsEl = document.querySelector('.col-xl-3:first-child .h5');
+                        if (totalCoopsEl) totalCoopsEl.textContent = data.total_coops;
+                    }
+
+                    if (data.total_devices !== undefined) {
+                        const totalDevicesEl = document.querySelector('.col-xl-3:nth-child(2) .h5');
+                        if (totalDevicesEl) totalDevicesEl.textContent = data.total_devices;
+                    }
+
+                    if (data.online_devices !== undefined) {
+                        const onlineDevicesEl = document.querySelector('.col-xl-3:nth-child(3) .h5');
+                        if (onlineDevicesEl) onlineDevicesEl.textContent = data.online_devices;
+                    }
+
+                    if (data.coops && Array.isArray(data.coops)) {
+                        // Cập nhật nhiệt độ và độ ẩm trung bình
+                        if (data.avg_temperature !== undefined) {
+                            const tempEl = document.querySelector('.coop-temp-value');
+                            if (tempEl) tempEl.textContent = Math.round(data.avg_temperature) + '°C';
+                        }
+
+                        if (data.avg_humidity !== undefined) {
+                            const humidEl = document.querySelector('.coop-humid-value');
+                            if (humidEl) humidEl.textContent = Math.round(data.avg_humidity) + '%';
+                        }
+
+                        // Cập nhật danh sách chuồng
+                        updateCoopsList(data.coops);
+                    }
+
+                } catch (error) {
+                    console.error('Dashboard error:', error);
+                }
+            }
+
+            // Hàm cập nhật danh sách chuồng
+            function updateCoopsList(coops) {
+                // Đây là phần đơn giản hóa - thực tế cần tạo HTML động cho từng chuồng
+                console.log('Coops loaded:', coops.length);
+            }
+
+            // Tải dữ liệu khi trang load
+            loadDashboard();
+
+            // Xử lý logout
+            const logoutBtn = document.querySelector('a[href*="logout"]');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    authAPI.logout();
+                });
+            }
+        })();
+    </script>
+
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
@@ -1142,7 +1227,7 @@
     <!-- FAB Bottom Navigation -->
     <nav class="fab-nav">
         <div class="fab-nav-container">
-            <a class="fab-nav-item" href="coop-list.html" data-index="0">
+            <a class="fab-nav-item" href="/coops" data-index="0">
                 <i class="fas fa-home"></i>
                 <span>Chuồng</span>
             </a>

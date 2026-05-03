@@ -101,7 +101,8 @@ def login():
 
     # Bước 5: Tạo JWT token với user.id làm identity (định danh)
     # Identity được lưu trong token để sau này trích xuất user từ DB
-    access_token = create_access_token(identity=user.id)
+    # Chuyển đổi sang string vì Flask-JWT-Extended yêu cầu identity là string
+    access_token = create_access_token(identity=str(user.id))
 
     # Bước 6: Trả về token và thông tin user (không bao gồm password)
     return jsonify({

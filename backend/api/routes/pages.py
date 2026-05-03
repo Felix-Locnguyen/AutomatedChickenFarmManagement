@@ -73,6 +73,24 @@ def coops_list():
     return render_template('coop-list.html')
 
 
+@pages_bp.route('/coop-list')
+def coop_list_redirect():
+    """Redirect legacy /coop-list URL to the correct /coops route"""
+    return redirect(url_for('pages.coops_list'))
+
+
+@pages_bp.route('/device-list')
+def device_list_redirect():
+    """Redirect legacy /device-list URL to the correct /devices route"""
+    return redirect(url_for('pages.devices_list'))
+
+
+@pages_bp.route('/camera')
+def camera_redirect():
+    """Redirect legacy /camera URL to the correct /cameras route"""
+    return redirect(url_for('pages.cameras_list'))
+
+
 @pages_bp.route('/coops/<int:coop_id>')
 def coop_detail(coop_id):
     """

@@ -41,11 +41,11 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
                                     </div>
-                                    <form class="user">
+                                    <form class="user" id="loginForm">
                                         <div class="form-group">
-                                            <input type="email" class="form-control form-control-user"
-                                                id="exampleInputEmail" aria-describedby="emailHelp"
-                                                placeholder="Enter Email Address...">
+                                            <input type="text" class="form-control form-control-user"
+                                                id="exampleInputUsername" aria-describedby="usernameHelp"
+                                                placeholder="Enter Username...">
                                         </div>
                                         <div class="form-group">
                                             <input type="password" class="form-control form-control-user"
@@ -58,9 +58,9 @@
                                                     Me</label>
                                             </div>
                                         </div>
-                                        <a href="index.html" class="btn btn-primary btn-user btn-block">
+                                        <button type="submit" class="btn btn-primary btn-user btn-block" id="loginBtn">
                                             Login
-                                        </a>
+                                        </button>
                                         <hr>
                                         <a href="index.html" class="btn btn-google btn-user btn-block">
                                             <i class="fab fa-google fa-fw"></i> Login with Google
@@ -101,59 +101,60 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script>
-    // Login - Xử lý đăng nhập
-    (function() {
-        'use strict';
+        // Login - Xử lý đăng nhập
+        (function() {
+            'use strict';
 
-        // Nếu đã đăng nhập thì chuyển về trang chủ
-        if (isAuthenticated()) {
-            window.location.href = '/';
-            return;
-        }
+            // Nếu đã đăng nhập thì chuyển về trang chủ
+            if (isAuthenticated()) {
+                window.location.href = '/';
+                return;
+            }
 
-        // Tìm nút login (thẻ a)
-        const loginBtn = document.querySelector('a.btn-primary.btn-user.btn-block');
-        
-        if (loginBtn) {
-            loginBtn.addEventListener('click', async function(e) {
-                e.preventDefault();
-                
-                const username = document.getElementById('exampleInputEmail').value.trim();
-                const password = document.getElementById('exampleInputPassword').value;
-                const remember = document.getElementById('customCheck')?.checked || false;
-
-                // Validate
-                if (!username || !password) {
-                    alert('Vui lòng nhập tên đăng nhập và mật khẩu');
-                    return;
-                }
-
-                try {
-                    loginBtn.textContent = 'Đang đăng nhập...';
-                    loginBtn.style.pointerEvents = 'none';
+            // Xử lý form submission
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            if (loginForm && loginBtn) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
                     
-                    const data = await authAPI.login(username, password);
+                    const username = document.getElementById('exampleInputUsername').value.trim();
+                    const password = document.getElementById('exampleInputPassword').value;
+                    const remember = document.getElementById('customCheck')?.checked || false;
                     
-                    if (data.access_token) {
-                        setAuthToken(data.access_token, remember);
-                        loginBtn.textContent = 'Thành công!';
-setTimeout(() => {
-                             window.location.href = '/';
-                         }, 500);
-                    } else {
-                        alert(data.message || 'Đăng nhập thất bại');
-                        loginBtn.textContent = 'Login';
-                        loginBtn.style.pointerEvents = 'auto';
+                    // Validate
+                    if (!username || !password) {
+                        alert('Vui lòng nhập tên đăng nhập và mật khẩu');
+                        return;
                     }
-                } catch (error) {
-                    console.error('Login error:', error);
-                    alert('Tên đăng nhập hoặc mật khẩu không đúng');
-                    loginBtn.textContent = 'Login';
-                    loginBtn.style.pointerEvents = 'auto';
-                }
-            });
-        }
-    })();
+                    
+                    try {
+                        loginBtn.textContent = 'Đang đăng nhập...';
+                        loginBtn.disabled = true;
+                        
+                        const data = await authAPI.login(username, password);
+                        
+                        if (data.access_token) {
+                            setAuthToken(data.access_token, remember);
+                            loginBtn.textContent = 'Thành công!';
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 500);
+                        } else {
+                            alert(data.message || 'Đăng nhập thất bại');
+                            loginBtn.textContent = 'Login';
+                            loginBtn.disabled = false;
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        alert('Tên đăng nhập hoặc mật khẩu không đúng');
+                        loginBtn.textContent = 'Login';
+                        loginBtn.disabled = false;
+                    }
+                });
+            }
+        })();
     </script>
 
 </body>
