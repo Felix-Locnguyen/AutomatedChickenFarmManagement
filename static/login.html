@@ -118,7 +118,7 @@
             loginBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
                 
-                const username = document.getElementById('exampleInputEmail').value;
+                const username = document.getElementById('exampleInputEmail').value.trim();
                 const password = document.getElementById('exampleInputPassword').value;
                 const remember = document.getElementById('customCheck')?.checked || false;
 
@@ -137,9 +137,9 @@
                     if (data.access_token) {
                         setAuthToken(data.access_token, remember);
                         loginBtn.textContent = 'Thành công!';
-                        setTimeout(() => {
-                            window.location.href = 'index.html';
-                        }, 500);
+setTimeout(() => {
+                             window.location.href = '/';
+                         }, 500);
                     } else {
                         alert(data.message || 'Đăng nhập thất bại');
                         loginBtn.textContent = 'Login';

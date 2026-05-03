@@ -50,7 +50,7 @@ def create_environment():
     if not coop_id:
         return jsonify({'error': 'coop_id required'}), 400
 
-    coop = Coop. query.get(coop_id)
+    coop = Coop.query.get(coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
 

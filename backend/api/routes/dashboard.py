@@ -169,7 +169,7 @@ def get_alerts():
     Returns:
         200: Array of alert objects
     """
-    limit = 10
+    limit = request.args.get('limit', 10, type=int)
     alerts = Alert.query.filter(
         Alert.is_resolved == False,
         Alert.level.in_(['critical', 'warning'])

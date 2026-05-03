@@ -70,7 +70,7 @@ def create_app(config_name='development'):
     # --- CORS (Cross-Origin Resource Sharing) ---
     # Cho phép frontend (static folder) gọi API
     # resources={r"/api/*": {"origins": "*"}} chỉ áp dụng cho /api/*
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    CORS(app, resources={r"/api/*": {"origins": "*", "allow_headers": ["Authorization", "Content-Type"]}})
     
     # --- JWT Manager ---
     # Quản lý xác thực người dùng bằng JWT token

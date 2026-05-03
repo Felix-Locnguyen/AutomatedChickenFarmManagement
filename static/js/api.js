@@ -101,12 +101,13 @@
             
             // Xử lý 401 (Unauthorized) hoặc 422 (Unprocessable Entity - Token hỏng)
             if (response.status === 401 || response.status === 422) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Auth error:', response.status, errorData);
                 window.removeAuthToken();
                 // Chuyển về trang login nếu không phải đang ở trang login/register
                 if (!window.location.pathname.includes('/login') && !window.location.pathname.includes('/register')) {
                     window.location.href = '/login';
                 }
-                const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Phiên đăng nhập hết hạn hoặc không hợp lệ');
             }
 

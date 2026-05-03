@@ -27,9 +27,9 @@ def get_alerts():
     Returns:
         200: Array of alert objects với thông tin chi tiết
     """
-    is_resolved = request.args.get('is_ resolved', type=bool)
+    is_resolved = request.args.get('is_resolved', type=bool)
     level = request.args.get('level')
-    coop_id = request.args.get('coop_ id', type=int)
+    coop_id = request.args.get('coop_id', type=int)
     query = Alert. query
     if is_resolved is not None:
         query = query.filter(Alert.is_resolved == is_resolved)
@@ -67,7 +67,7 @@ def resolve_alert(alert_id):
     if not alert:
         return jsonify({'error': 'Alert not found'}), 404
     alert.is_resolved = True
-    alert.resolved_at = datetime. utcnow()
+    alert.resolved_at = datetime.utcnow()
     from models import db
     db.session.commit()
     return jsonify(alert.to_dict()), 200
