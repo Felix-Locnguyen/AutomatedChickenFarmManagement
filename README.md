@@ -70,6 +70,164 @@ backend/
 | `feed_schedules` | Lịch cho ăn | N-1 → coops |
 | `alerts` | Cảnh báo | N-1 → coops, devices |
 
+### ERD Sơ Đồ
+
+       +-------------------+             +-----------------------+
+       |       USER        |             |         ALERT         |
+       +-------------------+             +-----------------------+
+       | id (PK)           |             | id (PK)               |
+       | username          |             | level (info/warn/crit)|
+       | email             |             | message               |
+       | password_hash     |             | is_resolved (bool)    |
+       | role (admin/worker)             | resolved_at           |
+       | full_name         |       +---->| coop_id (FK)          |
+       | created_at        |       |     | device_id (FK)        |
+       +-------------------+       |     +-----------------------+
+                                   |
+                                   |             
+       +-------------------+       |     +-----------------------+
+       |       COOP        |-------+     |      ENVIRONMENT      |
+       +-------------------+             +-----------------------+
+       | id (PK)           |             | id (PK)               |
+       | name              |             | temperature           |
+       | location          |             | humidity              |
+       | capacity          |       +---->| feed_level            |
+       | current_count     |       |     | water_level           |
+       | status            |       |     | recorded_at           |
+       | [Thresholds...]   |       |     | coop_id (FK)          |
+       +---------+---------+       |     +-----------------------+
+                 |                 |
+                 | (1)             | (1)
+                 |                 |
+                 | (n)             | (n)
+       +---------+---------+       |     +-----------------------+
+       |    COOP_DEVICE    |-------+     |        DEVICE         |
+       +-------------------+             +-----------------------+
+       | id (PK)           |             | id (PK)               |
+       | coop_id (FK)      |------------>| name                  |
+       | device_id (FK)    |        (1)  | type (camera/sensor..)|
+       +-------------------+             | status                |
+                                         | mac_address           |
+                                         | is_active (bool)      |
+                                         +-----------------------+
+
+### Relationships Summary
+
+```
+USERS ──────────────► ALERTS
+   │                    ▲
+   │                    │
+   ▼                    │
+COOPS ◄───────────────► DEVICES
+   │                    │
+   ├──► ENVIRONMENTS
+   │
+   ├──► FEED_SCHEDULES
+   │
+   └─► COOP_DEVICES ◄─┘
+```
+
+### Mermaid ERD Diagram
+
+```mermaid
+erDiagram
+    USERS ||--o{ ALERTS : creates
+    COOPS ||--o{ ALERTS : generates
+    DEVICES ||--o{ ALERTS : triggers
+    COOPS }o--o{ DEVICES : monitors
+    
+    COOPS {
+        int id PK
+        string name
+        string location
+        int capacity
+        int current_count
+        float area
+        float temp_min
+        float temp_max
+        float humidity_min
+        float humidity_max
+        float feed_threshold
+        float water_threshold
+        time feed_time_1
+        time feed_time_2
+        time feed_time_3
+        bool auto_fan
+        bool auto_light
+        bool auto_feed
+        bool auto_water
+        bool emergency_alert
+        string status
+        datetime created_at
+        datetime updated_at
+    }
+    
+    DEVICES {
+        int id PK
+        string name
+        string type
+        string mac_address UK
+        string status
+        bool is_active
+        int battery
+        datetime created_at
+        datetime updated_at
+    }
+    
+    COOP_DEVICES {
+        int id PK
+        int coop_id FK
+        int device_id FK
+        bool is_active
+        datetime created_at
+    }
+    
+    ENVIRONMENTS {
+        int id PK
+        int coop_id FK
+        float temperature
+        float humidity
+        float feed_level
+        float water_level
+        datetime recorded_at
+    }
+    
+    FEED_SCHEDULES {
+        int id PK
+        int coop_id FK
+        time time
+        float amount
+        bool enabled
+        datetime created_at
+    }
+    
+    ALERTS {
+        int id PK
+        int coop_id FK
+        int device_id FK
+        string type
+        string level
+        string message
+        bool is_resolved
+        datetime created_at
+        datetime resolved_at
+    }
+    
+    USERS {
+        int id PK
+        string username UK
+        string email UK
+        string password_hash
+        string full_name
+        string role
+        datetime created_at
+        datetime updated_at
+    }
+    
+    COOPS ||--o{ ENVIRONMENTS : records
+    COOPS ||--o{ FEED_SCHEDULES : has
+```
+
 ### Chi tiết Tables
 
 ```

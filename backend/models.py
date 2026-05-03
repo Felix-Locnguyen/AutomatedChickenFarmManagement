@@ -5,7 +5,7 @@ Sử dụng Flask-SQLAlchemy với SQLite.
 Định nghĩa các models và relationships.
 """
 
-from datetime import datetime
+from datetime import datetime, UTC
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -34,8 +34,8 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     full_name = db.Column(db.String(120))
     role = db.Column(db.String(20), default='worker')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     
     def set_password(self, password):
         """Băm mật khẩu và lưu vào password_hash."""
@@ -119,8 +119,8 @@ class Coop(db.Model):
     
     emergency_alert = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(20), default='active')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     
     devices = db.relationship('Device', secondary='coop_devices', back_populates='coops')
     environments = db.relationship('Environment', backref='coop', lazy='dynamic')
@@ -203,8 +203,8 @@ class Device(db.Model):
     status = db.Column(db.String(20), default='offline')
     is_active = db.Column(db.Boolean, default=False)
     battery = db.Column(db.Integer, default=100)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     
     coops = db.relationship('Coop', secondary='coop_devices', back_populates='devices')
     alerts = db.relationship('Alert', backref='device', lazy='dynamic')
@@ -247,15 +247,16 @@ class CoopDevice(db.Model):
     coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=False)
     device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=False)
     is_active = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
         return {
             'id': self.id,
             'coop_id': self.coop_id,
-            'device_id': self.device_id,
-            'is_active': self.is_active,
+            'time': self.time.isoformat() if self.time else None,
+            'amount': self.amount,
+            'enabled': self.enabled,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
     
@@ -287,7 +288,7 @@ class Environment(db.Model):
     humidity = db.Column(db.Float)
     feed_level = db.Column(db.Float)
     water_level = db.Column(db.Float)
-    recorded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    recorded_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
@@ -326,7 +327,7 @@ class FeedSchedule(db.Model):
     time = db.Column(db.Time, nullable=False)
     amount = db.Column(db.Float, default=10.0)
     enabled = db.Column(db.Boolean, default=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
@@ -385,7 +386,7 @@ class Alert(db.Model):
     level = db.Column(db.String(20), default='info')
     message = db.Column(db.Text, nullable=False)
     is_resolved = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     resolved_at = db.Column(db.DateTime)
     
     def to_dict(self):

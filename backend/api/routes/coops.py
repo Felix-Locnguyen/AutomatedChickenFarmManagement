@@ -13,13 +13,13 @@ Các thông số cảnh báo (ngưỡng nhiệt độ, độ ẩm,...) được 
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, UTC
 import sys
 import os
 
 # Thêm đường dẫn parent vào sys.path để có thể import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from models import Coop, CoopDevice, Device, Environment
+from models import db, Coop, CoopDevice, Device, Environment
 
 # Tạo Blueprint cho routes liên quan đến chuồng
 # URL: /api/coops
@@ -66,6 +66,17 @@ def create_coop():
     """
     data = request.get_json()
     
+    # Convert time strings to time objects
+    def parse_time(time_str, default):
+        if not time_str:
+            return default
+        try:
+            from datetime import datetime
+            return datetime.strptime(time_str, '%H:%M').time()
+        except ValueError:
+            return default
+    
+    from datetime import time as time_obj
     coop = Coop(
         name=data.get('name'),
         location=data.get('location', ''),
@@ -82,9 +93,9 @@ def create_coop():
         feed_threshold=data.get('feed_threshold', 30),
         water_threshold=data.get('water_threshold', 30),
         # Lịch cho ăn tự động
-        feed_time_1=data.get('feed_time_1', '06:00'),
-        feed_time_2=data.get('feed_time_2', '12:00'),
-        feed_time_3=data.get('feed_time_3', '18:00'),
+        feed_time_1=parse_time(data.get('feed_time_1'), time_obj(6, 0)),
+        feed_time_2=parse_time(data.get('feed_time_2'), time_obj(12, 0)),
+        feed_time_3=parse_time(data.get('feed_time_3'), time_obj(18, 0)),
         # Cấu hình tự động hóa
         auto_fan=data.get('auto_fan', True),
         auto_light=data.get('auto_light', True),
@@ -113,7 +124,7 @@ def get_coop(coop_id):
         200: Coop object
         404: Không tìm thấy chuồng
     """
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     return jsonify(coop.to_dict()), 200
@@ -133,7 +144,7 @@ def update_coop(coop_id):
         200: Coop object đã cập nhật
         404: Không tìm thấy chuồng
     """
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
@@ -156,7 +167,6 @@ def update_coop(coop_id):
     coop.auto_feed = data.get('auto_feed', coop.auto_feed)
     coop.auto_water = data.get('auto_water', coop.auto_water)
     
-    from models import db
     db.session.commit()
     
     return jsonify(coop.to_dict()), 200
@@ -178,11 +188,10 @@ def delete_coop(coop_id):
         200: Thông báo thành công
         404: Không tìm thấy chuồng
     """
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
-    from models import db
     db.session.delete(coop)
     db.session.commit()
     
@@ -205,7 +214,7 @@ def get_coop_devices(coop_id):
         200: Array of device objects
         404: Không tìm thấy chuồng
     """
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
@@ -213,7 +222,7 @@ def get_coop_devices(coop_id):
     coop_devices = CoopDevice.query.filter_by(coop_id=coop_id).all()
     devices = []
     for cd in coop_devices:
-        device = Device.query.get(cd.device_id)
+        device = db.session.get(Device, cd.device_id)
         if device:
             devices.append(device.to_dict())
     
@@ -240,7 +249,7 @@ def get_coop_environment(coop_id):
         200: Environment object mới nhất
         404: Không tìm thấy chuồng hoặc chưa có dữ liệu
     """
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
@@ -267,7 +276,7 @@ def get_coop_history(coop_id):
         200: Array of environment objects
         404: Không tìm thấy chuồng
     """
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     

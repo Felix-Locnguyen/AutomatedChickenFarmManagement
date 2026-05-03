@@ -106,3 +106,30 @@ KẾ HOẠCH KỸ THUẬT: HỆ THỐNG QUẢN LÝ TRANG TRẠI GÀ THÔNG MINH
      bại hoặc thiết bị mất kết nối.
 
   ---
+
+
+  > Nhiệm vụ 1: Cập nhật trang coop-detail.html — Đồng bộ dữ liệu từ API & xử lý logic tương tác.
+  >
+  > 1. Các trường dữ liệu cần lấy từ API (Sử dụng coopsAPI và environmentAPI trong api.js):
+  > - Thông tin chuồng: name, current_count, area, location, status.
+  > - Thông tin ngưỡng: temp_min, temp_max, humidity_min, humidity_max.
+  > - Dữ liệu môi trường (mới nhất): temperature, humidity, feed_level, water_level.
+  > - Thiết bị: Danh sách devices (tên, loại, trạng thái is_active).
+  >
+  > 2. Logic xử lý dữ liệu:
+  > - Lấy ID từ URL: Sử dụng JavaScript để trích xuất id từ query string hoặc path.
+  > - Khởi tạo: Gọi coopsAPI.getOne(id) và coopsAPI.getEnvironment(id) khi trang load.
+  > - Render: Viết một hàm renderCoopDetail(data) để đổ dữ liệu vào các thẻ HTML (Info cards, tiêu đề).
+  >
+  > 3. Logic tương tác (Cập nhật Dataset):
+  > - Đổi tên/Vị trí/Số lượng: Khi người dùng nhấn Save, gọi coopsAPI.update(id, updatedData). Nếu thành công, cập nhật
+  lại tiêu đề trang Chi tiết <name> và các thẻ thông tin mà không reload trang.
+  > - Điều khiển thiết bị: Khi nhấn Toggle thiết bị, gọi devicesAPI.toggle(deviceId). Cập nhật icon/màu sắc trạng thái
+  ngay khi API trả về kết quả thành công.
+  >
+  > 4. Yêu cầu kỹ thuật:
+  > - Sử dụng đúng các hàm đã định nghĩa trong static/js/api.js.
+  Tại sao bản này tốt hơn?
+   1. Đúng tên hàm: Nhắc đích danh coopsAPI.getOne hay devicesAPI.toggle giúp code không bị sai lệch.
+   2. Đúng kiến trúc: Phù hợp với cách Flask đang chạy và jQuery đang xử lý.
+   3. Thực tế: Tập trung vào việc gọi API và thay đổi DOM (đúng sở trường của jQuery).

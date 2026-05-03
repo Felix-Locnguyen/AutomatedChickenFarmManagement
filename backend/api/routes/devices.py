@@ -23,13 +23,13 @@ Trạng thái thiết bị:
 
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+from datetime import datetime, UTC
 import sys
 import os
 
 # Thêm đường dẫn parent vào sys.path để có thể import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from models import Device, CoopDevice
+from models import db, Device, CoopDevice
 
 # Tạo Blueprint cho routes liên quan đến thiết bị
 # URL: /api/devices
@@ -173,7 +173,7 @@ def get_device(device_id):
         200: Device object
         404: Không tìm thấy thiết bị
     """
-    device = Device.query.get(device_id)
+    device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     return jsonify(device.to_dict()), 200
@@ -193,7 +193,7 @@ def update_device(device_id):
         200: Device object đã cập nhật
         404: Không tìm thấy thiết bị
     """
-    device = Device.query.get(device_id)
+    device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
@@ -206,7 +206,6 @@ def update_device(device_id):
     device.is_active = data.get('is_active', device.is_active)
     device.battery = data.get('battery', device.battery)
     
-    from models import db
     db.session.commit()
     
     return jsonify(device.to_dict()), 200
@@ -227,11 +226,9 @@ def delete_device(device_id):
         200: Thông báo thành công
         404: Không tìm thấy thiết bị
     """
-    device = Device.query.get(device_id)
+    device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
-    
-    from models import db
     
     # Xóa các liên kết với chuồng trước
     CoopDevice.query.filter_by(device_id=device_id).delete()
@@ -261,14 +258,13 @@ def toggle_device(device_id):
         }
         404: Không tìm thấy thiết bị
     """
-    device = Device.query.get(device_id)
+    device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
     # Toggle is_active
     device.is_active = not device.is_active
     
-    from models import db
     db.session.commit()
     
     return jsonify({
@@ -297,7 +293,7 @@ def assign_device_to_coop(device_id):
         400: Thiếu coop_id hoặc đã gán rồi
         404: Không tìm thấy thiết bị/chuồng
     """
-    device = Device.query.get(device_id)
+    device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
@@ -307,11 +303,10 @@ def assign_device_to_coop(device_id):
     if not coop_id:
         return jsonify({'error': 'coop_id required'}), 400
     
-    from models import db
     from models import Coop
     
     # Kiểm tra chuồng tồn tại
-    coop = Coop.query.get(coop_id)
+    coop = db.session.get(Coop, coop_id)
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
@@ -353,7 +348,7 @@ def update_device_name(device_id):
         400: Thiếu name
         404: Không tìm thấy thiết bị
     """
-    device = Device.query.get(device_id)
+    device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
@@ -367,7 +362,6 @@ def update_device_name(device_id):
     device.name = name
     device.status = 'online'
     
-    from models import db
     db.session.commit()
     
     return jsonify({

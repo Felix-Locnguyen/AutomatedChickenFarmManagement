@@ -27,13 +27,13 @@ from werkzeug.security import (
     generate_password_hash,  # Băm mật khẩu (mã hóa một chiều)
     check_password_hash     # Kiểm tra mật khẩu với hash
 )
-from datetime import datetime
+from datetime import datetime, UTC
 import sys
 import os
 
 # Thêm đường dẫn parent vào sys.path để import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from models import User, db
+from models import db, User
 
 # =============================================================================
 # TẠO BLUEPRINT
@@ -273,9 +273,9 @@ def get_current_user():
     # Bước 1: Trích xuất user_id từ JWT token
     # get_jwt_identity() trả về giá trị đã truyền vào create_access_token()
     user_id = get_jwt_identity()
-
+    
     # Bước 2: Truy vấn user từ database theo ID
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
 
     # Bước 3: Kiểm tra user có tồn tại không
     if not user:
