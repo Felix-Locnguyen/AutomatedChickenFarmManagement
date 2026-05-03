@@ -98,6 +98,64 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Login - Xử lý đăng nhập
+    (function() {
+        'use strict';
+
+        // Nếu đã đăng nhập thì chuyển về trang chủ
+        if (isAuthenticated()) {
+            window.location.href = '/';
+            return;
+        }
+
+        // Tìm nút login (thẻ a)
+        const loginBtn = document.querySelector('a.btn-primary.btn-user.btn-block');
+        
+        if (loginBtn) {
+            loginBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('exampleInputEmail').value;
+                const password = document.getElementById('exampleInputPassword').value;
+                const remember = document.getElementById('customCheck')?.checked || false;
+
+                // Validate
+                if (!username || !password) {
+                    alert('Vui lòng nhập tên đăng nhập và mật khẩu');
+                    return;
+                }
+
+                try {
+                    loginBtn.textContent = 'Đang đăng nhập...';
+                    loginBtn.style.pointerEvents = 'none';
+                    
+                    const data = await authAPI.login(username, password);
+                    
+                    if (data.access_token) {
+                        setAuthToken(data.access_token, remember);
+                        loginBtn.textContent = 'Thành công!';
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 500);
+                    } else {
+                        alert(data.message || 'Đăng nhập thất bại');
+                        loginBtn.textContent = 'Login';
+                        loginBtn.style.pointerEvents = 'auto';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('Tên đăng nhập hoặc mật khẩu không đúng');
+                    loginBtn.textContent = 'Login';
+                    loginBtn.style.pointerEvents = 'auto';
+                }
+            });
+        }
+    })();
+    </script>
+
 </body>
 
 </html>

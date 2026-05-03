@@ -36,10 +36,8 @@ class Config:
     # Database Configuration
     # SQLALCHEMY_DATABASE_URI: Chuỗi kết nối database
     # Mặc định dùng SQLite trong thư mục hiện tại
-    # Các format khác:
-    #   - MySQL: mysql://username:password@localhost/dbname
-    #   - PostgreSQL: postgresql://username:password@localhost/dbname
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///chicken_farm.db'
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or f'sqlite:///{os.path.join(BASE_DIR, "chicken_farm.db")}'
     
     # SQLALCHEMY_TRACK_MODIFICATIONS: Tắt warning về modifications
     SQLALCHEMY_TRACK_MODIFICATIONS = False

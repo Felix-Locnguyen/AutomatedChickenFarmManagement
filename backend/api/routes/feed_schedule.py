@@ -80,7 +80,7 @@ def create_feed_schedule():
     except ValueError:
         return jsonify({'error': 'Invalid time format. Use HH:MM'}), 400
 
-    from api import db
+    from models import db
     schedule = FeedSchedule(
         coop_id=coop_id,
         time=time_obj,
@@ -128,7 +128,7 @@ def update_feed_schedule(schedule_id):
     if 'enabled' in data:
         schedule.enabled = data['enabled']
 
-    from api import db
+    from models import db
     db.session.commit()
 
     return jsonify(schedule.to_dict()), 200
@@ -151,7 +151,7 @@ def delete_feed_schedule(schedule_id):
     if not schedule:
         return jsonify({'error': 'Feed schedule not found'}), 404
 
-    from api import db
+    from models import db
     db.session.delete(schedule)
     db.session.commit()
 

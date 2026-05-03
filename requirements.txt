@@ -1,0 +1,24 @@
+# ============================================================
+# Automated Chicken Farm Management - Python Dependencies
+# ============================================================
+
+# Core Flask
+flask==3.0.0
+flask-sqlalchemy==3.1.1
+flask-jwt-extended==4.6.0
+flask-cors==4.0.0
+
+# Utilities
+werkzeug==3.0.1
+python-dotenv==1.0.0
+
+# Database (included in flask-sqlalchemy, but listed for clarity)
+# Uses SQLite by default (built-in with Python)
+
+# Optional packages for production:
+# --------------------------
+# psycopg2-binary==2.9.9    # PostgreSQL driver (uncomment for production)
+# gunicorn==21.2.0          # Production server
+# celery==5.3.4             # Background tasks (uncomment if needed)
+# redis==5.0.1              # Cache (uncomment if needed)
+# flask-mail==0.9.1         # Email (uncomment if needed)

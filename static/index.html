@@ -1185,6 +1185,111 @@
     })();
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Dashboard - Gọi API và cập nhật dữ liệu
+    (function() {
+        'use strict';
+
+        // Kiểm tra đăng nhập
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // Elements cần cập nhật
+        const elements = {
+            totalChickens: document.getElementById('total-chickens'),
+            totalCoops: document.getElementById('total-coops'),
+            totalDevices: document.getElementById('total-devices'),
+            onlineDevices: document.getElementById('online-devices'),
+            recentCoops: document.getElementById('recent-coops-list'),
+            recentDevices: document.getElementById('recent-devices-list')
+        };
+
+        // Hiển thị loading
+        function showLoading() {
+            document.querySelector('.content-wrapper').style.opacity = '0.5';
+        }
+
+        function hideLoading() {
+            document.querySelector('.content-wrapper').style.opacity = '1';
+        }
+
+        // Cập nhật dashboard
+        async function loadDashboard() {
+            try {
+                showLoading();
+                
+                // Gọi API dashboard
+                const data = await dashboardAPI.getOverview();
+                
+                // Cập nhật các giá trị
+                if (data.stats) {
+                    if (elements.totalChickens) {
+                        elements.totalChickens.textContent = data.stats.total_chickens || 0;
+                    }
+                    if (elements.totalCoops) {
+                        elements.totalCoops.textContent = data.stats.total_coops || 0;
+                    }
+                    if (elements.totalDevices) {
+                        elements.totalDevices.textContent = data.stats.total_devices || 0;
+                    }
+                    if (elements.onlineDevices) {
+                        elements.onlineDevices.textContent = data.stats.online_devices || 0;
+                    }
+                }
+
+                // Render danh sách chuồng gần đây
+                if (elements.recentCoops && data.coops) {
+                    elements.recentCoops.innerHTML = data.coops.slice(0, 5).map(coop => `
+                        <div class="coop-summary-card">
+                            <div class="coop-summary-header">
+                                <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
+                                <span class="coop-status ${coop.status || 'active'}">${coop.status === 'active' ? 'Hoạt động' : coop.status}</span>
+                            </div>
+                            <div class="coop-summary-info">
+                                <span><i class="fas fa-egg"></i> ${coop.current_count || 0} gà</span>
+                                <span><i class="fas fa-ruler-combined"></i> ${coop.area || 0} m²</span>
+                            </div>
+                            <a href="coop-detail.html?id=${coop.id}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                        </div>
+                    `).join('');
+                }
+
+                // Render danh sách thiết bị gần đây
+                if (elements.recentDevices && data.devices) {
+                    elements.recentDevices.innerHTML = data.devices.slice(0, 5).map(device => `
+                        <div class="device-recent-card ${device.status || 'offline'}">
+                            <div class="device-recent-header">
+                                <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
+                                <span class="device-recent-coop">${device.coop_name || ''}</span>
+                            </div>
+                            <div class="device-recent-status">
+                                <span class="status-dot ${device.status || 'offline'}"></span>
+                                <span class="status-text ${device.status || 'offline'}">
+                                    ${device.status === 'online' ? 'Hoạt động' : device.status === 'waiting' ? 'Chờ' : 'Offline'}
+                                </span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                hideLoading();
+            } catch (error) {
+                console.error('Lỗi load dashboard:', error);
+                hideLoading();
+                showToast('Không thể tải dữ liệu dashboard', 'error');
+            }
+        }
+
+        // Chạy khi trang tải xong
+        loadDashboard();
+
+    })();
+    </script>
+
 </body>
 
 </html>

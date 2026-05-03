@@ -63,7 +63,7 @@ def create_environment():
     else:
         recorded_at = datetime.utcnow()
 
-    from api import db
+    from models import db
     env = Environment(
         coop_id=coop_id,
         temperature=data.get('temperature'),

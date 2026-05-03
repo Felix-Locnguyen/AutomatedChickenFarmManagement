@@ -33,7 +33,7 @@ import os
 
 # Thêm đường dẫn parent vào sys.path để import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from models import User
+from models import User, db
 
 # =============================================================================
 # TẠO BLUEPRINT
@@ -190,7 +190,6 @@ def register():
     )
 
     # Bước 7: Lưu vào database
-    from api import db
     db.session.add(user)
     db.session.commit()
 

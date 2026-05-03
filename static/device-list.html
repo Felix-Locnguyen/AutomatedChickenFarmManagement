@@ -2565,6 +2565,90 @@
     })();
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Device List - Danh sách thiết bị
+    (function() {
+        'use strict';
+
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const deviceContainer = document.getElementById('device-list-container');
+
+        // Toggle device
+        async function toggleDevice(deviceId, btn) {
+            try {
+                const result = await devicesAPI.toggle(deviceId);
+                const isOn = btn.classList.contains('status-on');
+                btn.classList.toggle('status-on');
+                btn.classList.toggle('status-off');
+                btn.textContent = isOn ? 'Tắt' : 'Bật';
+                showToast(result.message || (isOn ? 'Đã tắt thiết bị' : 'Đã bật thiết bị'), 'success');
+            } catch (error) {
+                console.error('Lỗi toggle device:', error);
+                showToast('Không thể bật/tắt thiết bị', 'error');
+            }
+        }
+
+        // Xóa thiết bị
+        async function deleteDevice(deviceId) {
+            if (!confirm('Bạn có chắc muốn xóa thiết bị này?')) return;
+            try {
+                await devicesAPI.delete(deviceId);
+                showToast('Đã xóa thiết bị', 'success');
+                loadDevices(); // Reload list
+            } catch (error) {
+                console.error('Lỗi delete device:', error);
+                showToast('Không thể xóa thiết bị', 'error');
+            }
+        }
+
+        async function loadDevices() {
+            try {
+                const devices = await devicesAPI.getAll();
+                
+                if (deviceContainer && devices) {
+                    deviceContainer.innerHTML = devices.map(device => `
+                        <div class="device-card status-${device.status || 'offline'}" 
+                             data-device-id="${device.id}" 
+                             data-device-name="${device.name || 'Thiết bị ' + device.id}">
+                            <div class="device-card-row device-card-header">
+                                <span class="status-dot ${device.status || 'offline'}"></span>
+                                <span class="device-name">${device.name || 'Thiết bị ' + device.id}</span>
+                            </div>
+                            <div class="device-card-row device-card-info">
+                                <span><i class="fas fa-battery-full"></i> ${device.battery || 0}%</span>
+                                <span><i class="fas fa-wifi"></i> ${device.status === 'online' ? 'Đã kết nối' : device.status === 'waiting' ? 'Chờ kết nối' : 'Offline'}</span>
+                            </div>
+                            <div class="device-card-row device-card-actions">
+                                <button class="btn btn-sm ${device.is_active ? 'status-btn status-on' : 'status-btn status-off'} device-toggle-btn"
+                                        onclick="toggleDevice(${device.id}, this)">
+                                    ${device.is_active ? 'Bật' : 'Tắt'}
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger btn-delete-device" 
+                                        onclick="deleteDevice(${device.id})">Xóa</button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Lỗi load devices:', error);
+                showToast('Không thể tải danh sách thiết bị', 'error');
+            }
+        }
+
+        // Expose functions to global scope for onclick
+        window.toggleDevice = toggleDevice;
+        window.deleteDevice = deleteDevice;
+
+        loadDevices();
+    })();
+    </script>
+
 </body>
 
 </html>

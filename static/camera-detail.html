@@ -801,6 +801,33 @@
         });
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Camera Detail - Xem camera theo chuồng
+    (function() {
+        'use strict';
+
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // Lấy coop từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const coop = urlParams.get('coop') || 'A';
+
+        // Cập nhật tiêu đề
+        const cameraTitle = document.querySelector('.camera-title');
+        if (cameraTitle) {
+            cameraTitle.textContent = 'Camera Chuồng ' + coop;
+        }
+
+        console.log('Đang xem camera chuồng:', coop);
+
+    })();
+    </script>
+
 </body>
 
 </html>

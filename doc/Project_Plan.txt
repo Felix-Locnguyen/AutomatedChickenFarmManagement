@@ -1,332 +1,108 @@
-===============================================================================================
-KẾ HOẠCH BACKEND (Flask + SQLite)
-# Giai đoạn 1: Setup & Cơ bản
-## 1.1 Tạo requirements.txt
-- flask==3.0.0
-- flask-sqlalchemy==3.1.1
-- flask-jwt-extended==4.6.0
-- flask-cors==4.0.0
-- python-dotenv==1.0.0
-- werkzeug==3.0.1
+KẾ HOẠCH KỸ THUẬT: HỆ THỐNG QUẢN LÝ TRANG TRẠI GÀ THÔNG MINH
+  (BACKEND)
 
-## 1.2 Tạo config.py
-- class Config:
-  - SECRET_KEY
-  - SQLALCHEMY_DATABASE_URI
-  - JWT_SECRET_KEY
-  - JWT_ACCESS_TOKEN_EXPIRES
+  1. KIẾN TRÚC HỆ THỐNG (SYSTEM ARCHITECTURE)
+  Dự án được xây dựng theo kiến trúc Modular Monolith sử dụng mô
+  hình Application Factory:
+   * Application Factory (create_app): Giúp tách biệt việc khởi tạo
+     ứng dụng khỏi việc chạy ứng dụng. Điều này cho phép dễ dàng
+     thay đổi cấu hình (Dev/Test/Prod) và tránh lỗi vòng lặp phụ
+     thuộc (circular imports).
+   * Flask Blueprints: Chia nhỏ hệ thống thành các module độc lập
+     (Auth, Coop, Device, Dashboard). Mỗi module quản lý một nhóm
+     tính năng riêng, giúp code sạch và dễ bảo trì.
 
-## 1.3 Tạo thư mục api/routes/
-- api/__init__.py
-- api/routes/__init__.py
-- api/routes/auth.py
-- api/routes/coops.py
-- api/routes/devices.py
-- api/routes/dashboard.py
-- api/routes/camera.py
+  2. LỰA CHỌN CÔNG NGHỆ & GIẢI PHÁP (TECH STACK & RATIONALE)
 
-## 1.4 Tạo app.py
-- Flask app factory
-- SQLAlchemy init
-- Blueprint registration
+  ┌────────────┬────────────┬─────────────────────────────────┐
+  │ Thành phần │ Công nghệ  │ Lý do lựa chọn (Giải pháp)      │
+  ├────────────┼────────────┼─────────────────────────────────┤
+  │ Framework  │ Flask      │ Linh hoạt & Nhẹ: Flask không áp │
+  │            │            │ đặt cấu trúc cứng nhắc, phù hợp │
+  │            │            │ cho các hệ thống IOT cần xử lý  │
+  │            │            │ nhanh và tùy biến cao.          │
+  │ ORM        │ SQLAlchemy │ Bảo mật & Trừu tượng hóa: Ngăn  │
+  │            │            │ chặn tấn công SQL Injection.    │
+  │            │            │ Cho phép đổi Database (từ       │
+  │            │            │ SQLite sang PostgreSQL) mà      │
+  │            │            │ không cần viết lại code.        │
+  │ Database   │ SQLite     │ Tối ưu giai đoạn đầu: Không cần │
+  │            │            │ cài đặt server phức tạp, lưu    │
+  │            │            │ trữ dạng file giúp dễ dàng      │
+  │            │            │ backup và di chuyển trong quá   │
+  │            │            │ trình phát triển.               │
+  │ Xác thực   │ JWT (JSON  │ Stateless Auth: Server không    │
+  │            │ Web Token) │ cần lưu phiên đăng nhập vào     │
+  │            │            │ RAM, giúp hệ thống nhẹ và dễ    │
+  │            │            │ dàng mở rộng cho các ứng dụng   │
+  │            │            │ Mobile sau này.                 │
+  │ Bảo mật    │ Werkzeug   │ Hashing mật khẩu: Sử dụng thuật │
+  │            │ Security   │ toán PBKDF2 với muối (salt) để  │
+  │            │            │ đảm bảo ngay cả khi lộ          │
+  │            │            │ database, mật khẩu người dùng   │
+  │            │            │ vẫn an toàn.                    │
+  │ Middleware │ Flask-CORS │ Giao tiếp an toàn: Cho phép     │
+  │            │            │ Frontend (từ các domain/port    │
+  │            │            │ khác nhau) truy cập API một     │
+  │            │            │ cách có kiểm soát.              │
+  └────────────┴────────────┴─────────────────────────────────┘
 
-# Giai đoạn 2: Database Models
-## 2.1 User model
-- id, username, email, password_hash, full_name, role, created_at, updated_at
+  3. THIẾT KẾ CƠ SỞ DỮ LIỆU (DATABASE SCHEMA)
+  Hệ thống quản lý 4 nhóm dữ liệu chính:
+   1. Identity (User): Lưu trữ định danh và phân quyền
+      (Admin/Worker).
+   2. Infrastructure (Coop & Device): Quản lý chuồng trại và các
+      thiết bị IOT (Cảm biến, máy bơm, quạt).
+   3. Operation (Environment & FeedSchedule): Lưu trữ dữ liệu thực
+      tế từ cảm biến và lịch trình vận hành.
+   4. Monitoring (Alert): Nhật ký cảnh báo khi hệ thống phát hiện
+      bất thường.
 
-## 2.2 Coop model
-- id, name, location, capacity, current_count, area
-- temp_min, temp_max, humidity_min, humidity_max
-- feed_threshold, water_threshold
-- feed_time_1, feed_time_2, feed_time_3
-- auto_fan, auto_light, auto_feed, auto_water
-- emergency_alert, status
+  4. LỘ TRÌNH TRIỂN KHAI (ROADMAP)
 
-## 2.3 Device model
-- id, name, type (temperature/humidity/fan/light/feed/camera)
-- mac_address, status (online/offline/connecting)
-- is_active, battery
+  Giai đoạn 1: Thiết lập hạ tầng cốt lõi (Foundation)
+   * Mục tiêu: Tạo "trái tim" cho ứng dụng.
+   * Công việc:
+       * Hoàn thiện app.py theo mô hình Application Factory.
+       * Cấu hình kết nối Database và các Extensions (db, jwt,
+         cors).
+       * Đăng ký hệ thống Blueprint tổng cho toàn bộ các route API.
 
-## 2.4 CoopDevice model (many-to-many)
-- id, coop_id, device_id, is_active
+  Giai đoạn 2: Xác thực và Bảo mật (Security First)
+   * Mục tiêu: Đảm bảo chỉ người dùng hợp lệ mới có thể xem dữ liệu
+     và điều khiển trang trại.
+   * Công việc: Triển khai các Endpoint: /api/auth/register,
+     /api/auth/login, /api/auth/me.
 
-## 2.5 Environment model
-- id, coop_id, temperature, humidity
-- feed_level, water_level, recorded_at
+  Giai đoạn 3: Nghiệp vụ Quản lý IOT (Business Logic)
+   * Mục tiêu: Quản lý chuồng trại và thiết bị.
+   * Công việc:
+       * Xây dựng API CRUD cho Chuồng (Coops) và Thiết bị
+         (Devices).
+       * Triển khai tính năng Toggle Device (Bật/Tắt thiết bị từ xa
+         qua API).
 
-## 2.6 FeedSchedule model
-- id, coop_id, time, amount, enabled
+  Giai đoạn 4: Dữ liệu lớn và Cảnh báo (Data & Monitoring)
+   * Mục tiêu: Thu thập dữ liệu cảm biến và tự động cảnh báo.
+   * Công việc:
+       * Xây dựng API nhận dữ liệu từ cảm biến (/api/environment).
+       * Xây dựng Logic kiểm tra ngưỡng (Threshold) để tự động tạo
+         Alert.
+       * API lấy dữ liệu lịch sử để vẽ biểu đồ Dashboard.
 
-## 2.7 Alert model
-- id, coop_id, device_id, type, level, message, is_resolved, created_at
+  Giai đoạn 5: Tích hợp và Hoàn thiện (Integration)
+   * Mục tiêu: Kết nối hoàn chỉnh Backend với Frontend.
+   * Công việc:
+       * Nạp dữ liệu mẫu bằng seed.py.
+       * Kiểm tra tính tương thích với các trang HTML trong thư mục
+         static/.
 
-# Giai đoạn 3: Seed Data
-## 3.1 Seed 5 chuồng
-- Chuồng A: 480 gà, capacity 500, area 50m²
-- Chuồng B: 450 gà, capacity 500, area 50m²
-- Chuồng C: 420 gà, capacity 500, area 50m²
-- Chuồng D: 500 gà, capacity 500, area 50m²
-- Chuồng E: 380 gà, capacity 500, area 50m²
+  5. TIÊU CHUẨN VẬN HÀNH (STANDARDS)
+   * API Response: Luôn trả về định dạng { "status":
+     "success/error", "data": ..., "message": ... }.
+   * Status Codes: Sử dụng đúng mã lỗi (200: OK, 201: Created, 401:
+     Unauthorized, 404: Not Found, 500: Server Error).
+   * Logging: Ghi lại các hoạt động quan trọng như đăng nhập thất
+     bại hoặc thiết bị mất kết nối.
 
-## 3.2 Seed ~15 thiết bị
-- Mỗi chuồng: Cảm biến nhiệt, Cảm biến ẩm, Quạt/Đèn
-- Trạng thái: online/offline/connecting
-
-## 3.3 Seed environment data
-- Nhiệt độ: 22-28°C
-- Độ ẩm: 55-75%
-- Feed level: 30-90%
-- Water level: 40-95%
-
-## 3.4 Seed feed schedule
-- 6:00, 12:00, 18:00
-
-## 3.5 Tạo user mặc định
-- admin / admin123
-
-# Giai đoạn 4: API Endpoints
-## 4.1 Auth API
-- POST /api/auth/login
-- POST /api/auth/register
-- POST /api/auth/logout
-- GET /api/auth/me
-
-## 4.2 Dashboard API
-- GET /api/dashboard
-- GET /api/dashboard/stats
-- GET /api/dashboard/alerts
-
-## 4.3 Coop CRUD API
-- GET /api/coops
-- POST /api/coops
-- GET /api/coops/<id>
-- PUT /api/coops/<id>
-- DELETE /api/coops/<id>
-- GET /api/coops/<id>/devices
-- GET /api/coops/<id>/environment
-- GET /api/coops/<id>/history
-
-## 4.4 Device CRUD API
-- GET /api/devices
-- POST /api/devices
-- GET /api/devices/<id>
-- PUT /api/devices/<id>
-- DELETE /api/devices/<id>
-- POST /api/devices/<id>/toggle
-- POST /api/devices/<id>/assign
-
-## 4.5 Feed Schedule API
-- GET /api/feed-schedule
-- POST /api/feed-schedule
-- PUT /api/feed-schedule/<id>
-- DELETE /api/feed-schedule/<id>
-
-## 4.6 Environment API
-- POST /api/environment
-- GET /api/environment/<coop_id>
-- GET /api/environment/<coop_id>/history
-
-## 4.7 Alert API
-- GET /api/alerts
-- PUT /api/alerts/<id>/resolve
-
-# Giai đoạn 5: Pages (Jinja2 Routes)
-- GET / -> render index.html
-- GET /coops -> render coop-list.html
-- GET /coops/<id> -> render coop-detail.html
-- GET /devices -> render device-list.html
-- GET /devices/<id> -> render device-detail.html
-- GET /cameras -> render camera.html
-- GET /cameras/<coop> -> render camera-detail.html
-- GET /other -> render other.html
-- GET /login -> render login.html
-
-# Giai đoạn 6: Frontend Integration
-## 6.1 Tạo api.js
-- Helper functions gọi API
-- fetch() với JWT token
-
-## 6.2 Cập nhật index.html
-- Load dữ liệu từ /api/dashboard
-
-## 6.3 Cập nhật coop-list.html
-- Load dữ liệu từ /api/coops
-
-## 6.4 Cập nhật device-list.html
-- Load dữ liệu từ /api/devices
-
-## 6.5 Cập nhật camera.html
-- Load dữ liệu từ /api/cameras
-
-# Giai đoạn 7: Authentication
-- Login/Logout logic
-- JWT token management
-- Bảo vệ các route cần đăng nhập
-- Redirect về login nếu chưa auth
-
-===============================================================================================
-
-
-
-
-
-
-================================================================================================================================================================================================================================================
-Kế hoạch 
-# trang camera-detail
-- Thiết lập trang camra detail
-	+ Khi ấn vào kiểm tra sẽ hiện ra trang mới với giao diện 
-		> 1 ô lớn (khu vực show camera)
-		> 1 ô là hiển thị thông tin tổng quan của chuồng đó
-- lên plan logic và xây bộ data ảo để vận hành thử (Backend)
-	+ Cho Minimax tra và đưa ra cấu trúc web, tạo một file nói về các mối quan hệ giữa các trang với nhau
-	+ Đưa khung xương cho gemini để xây dựng logic
-	+ Cài đặt và đưa cho copilot đánh giá tính khả thi 
-	+ Cho claude AI quét và kiểm duyệt lưới đợt 2
-- Tổng kết lại thành task 
-	+ đưa cho AI notion để sắp xếp plan cho dự án
-	+ cập nhật lên file project_plan.txt
-
-================================================================================================================================================================================================================================================
-Kế hoạch cho ngày 28/04
-
-# Thanh công cụ
--Thêm logic cho thanh Fixed botton navigation
-	+ Làm cho nút hôm trở nên đặc biệt hơn 
-	+ Thêm hiệu ứng khi ấn vào mục trong thành công cụ, phần được ấn sẽ được tô đậm và khi
-	di chuyển ( ấn ô khác thì ô màu đó sẽ trượt qua ô được vừa được chọn mới)
-
-# Trang quản lí thiết bị 
-- Chỉnh sửa bố cục trang 
-	+ Xóa nút thêm thiết bị mới 
-	+ Thêm chức năng thêm thiết bị mới nằm bên phải tiêu đề Danh sách thiết bị IOT
-	+ Chuyển bố cục Danh sách thiết bị IOT từ dạng table sang dạng card
-	+ thiết kế mỗi thẻ
-		> dấu chấm xanh/vàng/đỏ ( xanh: online, chờ, lỗi ) nằm phía bên trái của thẻ
-		> tên thiết bị ví dụ nhiệt kế A1
-		> dưới tên thiết bị là pin và sóng
-		> bên phải sẽ có 2 nút cài đặt và xóa ( khi ấn xóa hỏi xác nhận)
-		> thêm nút tắt/ bật ( kiểu thiết kế [ ON/OFF toggle ], khi thực hiện tắt bật thì hiện ra 1 ô nhỏ
-		  thông báo đã tắt, bật )
-	+ Logic:
-		 > trường hợp thiết bị lỗi thì sẽ thay pin và sóng kết nói sẽ đổi thành chữ mất kết nối
-		 > trường hợp thiết bị ở trạng thái chờ sẽ giữ pin nhưng sóng sẽ đổi thành chờ kết nối
-	   	 > trường hợp tắt thì thông báo sẽ là tên "đã tắt {thiết bị}" với ô màu xám chữ trắng
-		 > trường hợp bật thì thông báo sẽ là tên "đã bật {thiết bị}" với ô màu xanh lá chữ trắng
-		 > Khi ấn nút icon bánh răn sẽ hiện ra thông tin chỉnh sửa thiết bị có nút lưu và quay lại 
-		 khi ấn nút lưu thì thông báo lưu thành công và khi bấm nút quay lại thì sẽ quay lại giá trị đã
-		 được thiết lập trước đó
-	+ Xóa biểu đồ nhiệt đồ trung bình các chuồng 
-	+ Cập nhật bản mới (lấy từ trang chuồng)
-
-# Trang camera
-- Khởi tạo bố cục 
-	+ Tạo ô với tiêu đề là Danh sách các chuồng
-	+ Tạo chức năng tìm kiếm
-	+ Mỗi chuồng được biểu diễn dưới dạng thẻ
-	+ Mỗi thẻ chứa:
-		> Thông tin tên chuồng, trạng thái camera, trạng thái chuồng
-		> Có nút kiểm tra
-		> Nút Xóa 
-	+ Thêm tính roll list cho ô Danh sách các chuồng (Trường hợp quá nhiều chuồng cần quả lí để
-	người dùng có thể kéo lên xuống)
-
-- Logic:
-	+ Khi ấn nút kiểm tra sẽ hiện ra 1 trang mới  	+++++( SẼ PHÁT TRIÊN THÊM VÀO 29/4 )+++++
-	+ Khi nút xóa hỏi xác nhận
-		> Trường hợp hủy thì sẽ out 
-		> Trường hợp ấn nút xóa sẽ đánh dấu tick màu xanh toàn màn hình 
-		> Nếu lỗi khác thì sẽ hiện ra thông báo lỗi xin vui lòng thử lại 
-
-
-# Trang khác
-- Khởi tạo 4 chức năng 
-	+ Báo cáo
-	+ Cài đặt
-	+ Xuất file báo cáo
-	+ Hỗ trợ 
-	+ Góp ý với nhà phát hành 
-	
-
-# kiểm tra và cập nhật lại cấu trúc và tiến độ
-- Cập nhật file readme 
-- Cập nhật coop-page-structure
-- Push code lên github 
-
-================================================================================================================================================================================================================================================
-Kế hoạch cho ngày 27/04 
-
-# Thiết kê lại trang chi tiết chuồng ( phần thiết bị)		[xong]
-- xóa phần cập nhật thiết bị		[xong]
-- rename lại tiêu đê Quản lý thiết bị IOT 		[xong]
-- xóa chức năng thêm mới ở phần tiêu đề quản lí thiết bị IOT		[xong]
-- Thêm chức thêm thiết bị mới ( nằm bên phải tiêu đề )		[xong]
-	+ hiện ra bảng với tiêu đề là các thiết bị trong danh sách			[xong]
-		-----------------------------------
-		|     Thêm thiết bị vào chuồng     |
-		-----------------------------------
-		
-		[Tìm thiết bị 🔍..................]
-		
-		☐ Cảm biến nhiệt độ 1
-		☐ Cảm biến độ ẩm 2
-		☐ Máy nước 1
-		☐ Quạt thông gió 3
-		☐ Đèn sưởi 1
-
-		-----------------------------------
-		Đã chọn: 0 thiết bị
-
-		[ Hủy ]        [ Thêm thiết bị ]
-		-----------------------------------
-
-- Thiết kế lại cách trình bài cho danh sách thiết bị			[xong]
-	+ mỗi thiết bị sẽ là một thẻ 
-	+ thiết kế mỗi thẻ
-		> dấu chấm xanh/vàng/đỏ ( xanh: online, chờ, lỗi ) nằm phía bên trái của thẻ
-		> tên thiết bị ví dụ nhiệt kế A1
-		> dưới tên thiết bị là pin và sóng
-		> bên phải sẽ có 2 nút cài đặt và xóa ( khi ấn xóa hỏi xác nhận)
-		> thêm nút tắt/ bật ( kiểu thiết kế [ ON/OFF toggle ], khi thực hiện tắt bật thì hiện ra 1 ô nhỏ
-		  thông báo đã tắt, bật )
-	+ Logic: > trường hợp thiết bị lỗi thì sẽ thay pin và sóng kết nói sẽ đổi thành chữ mất kết nối
-		 > trường hợp thiết bị ở trạng thái chờ sẽ giữ pin nhưng sóng sẽ đổi thành chờ kết nối
-	   	 > trường hợp tắt thì thông báo sẽ là tên "đã tắt {thiết bị}" với ô màu xám chữ trắng
-		 > trường hợp bật thì thông báo sẽ là tên "đã bật {thiết bị}" với ô màu xanh lá chữ trắng
-- Xóa bỏ nhiệt độ trung bình các chuồng 
-- Chỉnh chỉnh phần trạng thái thiết bị [xong]
-	+ thiết kế sơ đồ tròn rỗng ở giữ, hiển bị % ở rìa vành tròn, khi ấn phần trên sơ đồ tròn thì hiện ra phần 	trăm, tên mục của biểu đồ ( ví dụ Hoạt động) và số lượng thiết bị, khi ấn thì cho phần chọn phòng to ra cho 	dễ nhìn 
-
-# trang xem chi tiết chuồng [xong]
-- Thêm sơ đồ tròn trạng thái các thiết bị trong chuồng (lấy cảm hứng trong phần thiết bị )
-
-# trang xem thông các chuồng [xong]
-- Chỉnh lại sơ đồ nhiệt độ  (sơ đồ sẽ được lấy cảm hứng từ phần xem chi tiết) [xong]
-- chỉnh lại sơ đồ trạng thái thiết bị ( lấy cảm hứng trong phần thiết bị ) [xong]
-
-[=================================================================================================================]
-@ Thanh tiện ích
-- thay đổi cấu thanh tiện tích từ sidebar sang các dạng sau 
- 	========================================================|
-	+ Fixed Bottom Navigation								|
-	+ Sticky Bottom Navigation								|
-	+ Hide on Scroll Bottom Navigation						|
-	+ Tab Bar (iOS style)									|
-	+ Bottom Navigation + Floating Button (FAB)				|
-	========================================================|
-=> Tối ưu nhất lúc này là nên dùng Fixed Bottom Navigation 			[Xong]
- 	+ Các thông tin hiển thị
-		> Quản lí chuồng
-		> Quản lí thiết bị 
-		> ( Ở GIỮA ) Trang chủ
-		> Kiểm tra camera
-		> Khác ( báo cáo, xuất file)
-
-@ Thay đổi toàn bộ 
-- Thay đổi lại bố cục trình bài thiết bị gần đây 
-	+ Danh sách các thiết bị dưới dạng thẻ
-	+ mỗi thẻ chứa tên thiết bị ( tên chuồng chứa thiết bị ) và phần trạng thái [(hoạt động / đang chờ / ngắt 	kết nối) dấu chấm ( xanh/ vàng/ đỏ tương với 3 trạng thái)]
-- Thay đổi lại bố cục trình bài danh sách các chuồng gần đây
-	+ Danh sách các thiết bị dưới dạng thẻ
-	+ mỗi thẻ chứa tên chuồng, số lượng gà và số lượng thiết bị và góc bên phải sẽ chứa trạng thái ( bình 	thường, cảnh báo, lỗi ) giao diện phù hợp với điện thoại
-
+  ---

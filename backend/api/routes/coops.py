@@ -93,7 +93,7 @@ def create_coop():
         status='normal'  # Trạng thái mặc định
     )
     
-    from api import db
+    from models import db
     db.session.add(coop)
     db.session.commit()
     
@@ -156,7 +156,7 @@ def update_coop(coop_id):
     coop.auto_feed = data.get('auto_feed', coop.auto_feed)
     coop.auto_water = data.get('auto_water', coop.auto_water)
     
-    from api import db
+    from models import db
     db.session.commit()
     
     return jsonify(coop.to_dict()), 200
@@ -182,7 +182,7 @@ def delete_coop(coop_id):
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
-    from api import db
+    from models import db
     db.session.delete(coop)
     db.session.commit()
     

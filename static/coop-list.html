@@ -1462,6 +1462,51 @@
     })();
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Coop List - Danh sách chuồng
+    (function() {
+        'use strict';
+
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const coopContainer = document.getElementById('coop-list-container');
+
+        async function loadCoops() {
+            try {
+                const coops = await coopsAPI.getAll();
+                
+                if (coopContainer && coops) {
+                    coopContainer.innerHTML = coops.map(coop => `
+                        <div class="coop-summary-card">
+                            <div class="coop-summary-header">
+                                <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
+                                <span class="coop-status ${coop.status || 'active'}">${coop.status === 'active' ? 'Hoạt động' : coop.status}</span>
+                            </div>
+                            <div class="coop-summary-info">
+                                <span><i class="fas fa-egg"></i> ${coop.current_count || 0} gà</span>
+                                <span><i class="fas fa-ruler-combined"></i> ${coop.area || 0} m²</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <a href="coop-detail.html?id=${coop.id}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Lỗi load coops:', error);
+                showToast('Không thể tải danh sách chuồng', 'error');
+            }
+        }
+
+        loadCoops();
+    })();
+    </script>
+
 </body>
 
 </html>

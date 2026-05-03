@@ -636,6 +636,78 @@
     })();
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Camera List - Danh sách camera
+    (function() {
+        'use strict';
+
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        const cameraContainer = document.getElementById('camera-list-container');
+
+        async function loadCameras() {
+            try {
+                const cameras = await cameraAPI.getAll();
+                
+                if (cameraContainer && cameras && cameras.length > 0) {
+                    cameraContainer.innerHTML = cameras.map(camera => `
+                        <div class="coop-summary-card">
+                            <div class="coop-summary-header">
+                                <span class="coop-summary-name">${camera.name || 'Camera ' + camera.id}</span>
+                                <span class="coop-status ${camera.status || 'active'}">${camera.status === 'active' ? 'Hoạt động' : 'Offline'}</span>
+                            </div>
+                            <div class="coop-summary-info">
+                                <span><i class="fas fa-video"></i> ${camera.coop_name || 'Chưa gán chuồng'}</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <a href="camera-detail.html?coop=${camera.coop_id || 'A'}" class="btn btn-sm btn-outline-primary">Kiểm tra</a>
+                            </div>
+                        </div>
+                    `).join('');
+                } else if (cameraContainer) {
+                    // Mock data nếu API chưa có data
+                    cameraContainer.innerHTML = `
+                        <div class="coop-summary-card">
+                            <div class="coop-summary-header">
+                                <span class="coop-summary-name">Camera Chuồng A</span>
+                                <span class="coop-status active">Hoạt động</span>
+                            </div>
+                            <div class="coop-summary-info">
+                                <span><i class="fas fa-video"></i> Chuồng A</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <a href="camera-detail.html?coop=A" class="btn btn-sm btn-outline-primary">Kiểm tra</a>
+                            </div>
+                        </div>
+                        <div class="coop-summary-card">
+                            <div class="coop-summary-header">
+                                <span class="coop-summary-name">Camera Chuồng B</span>
+                                <span class="coop-status active">Hoạt động</span>
+                            </div>
+                            <div class="coop-summary-info">
+                                <span><i class="fas fa-video"></i> Chuồng B</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <a href="camera-detail.html?coop=B" class="btn btn-sm btn-outline-primary">Kiểm tra</a>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Lỗi load cameras:', error);
+                showToast('Không thể tải danh sách camera', 'error');
+            }
+        }
+
+        loadCameras();
+    })();
+    </script>
+
 </body>
 
 </html>

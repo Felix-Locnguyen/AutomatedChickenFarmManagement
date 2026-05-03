@@ -82,7 +82,7 @@ def create_device():
         battery=data.get('battery', 100)
     )
     
-    from api import db
+    from models import db
     db.session.add(device)
     db.session.commit()
     
@@ -135,7 +135,7 @@ def connect_device():
             is_active=True,
             battery=100
         )
-        from api import db
+        from models import db
         db.session.add(device)
         db.session.commit()
         return jsonify({
@@ -150,7 +150,7 @@ def connect_device():
     
     # Cập nhật trạng thái sang connecting
     device.status = 'connecting'
-    from api import db
+    from models import db
     db.session.commit()
     
     return jsonify({
@@ -206,7 +206,7 @@ def update_device(device_id):
     device.is_active = data.get('is_active', device.is_active)
     device.battery = data.get('battery', device.battery)
     
-    from api import db
+    from models import db
     db.session.commit()
     
     return jsonify(device.to_dict()), 200
@@ -231,7 +231,7 @@ def delete_device(device_id):
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
-    from api import db
+    from models import db
     
     # Xóa các liên kết với chuồng trước
     CoopDevice.query.filter_by(device_id=device_id).delete()
@@ -268,7 +268,7 @@ def toggle_device(device_id):
     # Toggle is_active
     device.is_active = not device.is_active
     
-    from api import db
+    from models import db
     db.session.commit()
     
     return jsonify({
@@ -307,7 +307,7 @@ def assign_device_to_coop(device_id):
     if not coop_id:
         return jsonify({'error': 'coop_id required'}), 400
     
-    from api import db
+    from models import db
     from models import Coop
     
     # Kiểm tra chuồng tồn tại
@@ -367,7 +367,7 @@ def update_device_name(device_id):
     device.name = name
     device.status = 'online'
     
-    from api import db
+    from models import db
     db.session.commit()
     
     return jsonify({

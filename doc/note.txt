@@ -316,3 +316,76 @@ CÂU HỎI SÔ 6: flask_sqlalchemy là gì, lí do ra đời, nguyên lí hoạt
                 _ Không cần nhớ cú pháp SQL
                 _ Đổi database không cần phải fix lại code
 ==============================================================================================================================================================================================================================            
+CÂU HỎI SỐ 7: Tại sao lại có models trong dự án:
+    - Models là bản thiết kế mô tả dữ liệu dự án trong như thế nào 
+    - Nếu không có models thì sẽ không rỏ được và không hiểu được:
+        + Dữ liệu nằm ở đâu 
+        + Bảng có những cột gì
+        + Kiểu dữ liệu là gì
+        + Quan hệ giữa các bảng 
+    - Khi có file models.py có thể kiểm tra và hiểu được các thông tin
+        => Rõ ràng, dễ hiểu và dễ bảo trì
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 8: Tại sao lại có file seed.py, tác dụng là gì?
+    - Là file dùng để tạo dữ liệu mẫu vào database - giúp test và phát triễn mà không cần nhập tay từng cái một
+    - Nếu không có file seed.py
+        + Muốn test tính năng của ứng dụng thì phải tự nhập đi rồi xóa (nhiều lần)
+    - Có seed.py
+        + Chạy 1 lệnh là có được bộ data
+        + Nếu muốn thay đổi thì có thể chỉnh sửa giá trị
+        => giảm thời gian tạo và nhập lại 
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 9: Tại sao lại phải phân chia tài khoản admin và user:
+    - Vấn đề là một thứ trong dự án người dùng không có quyền truy cập và thay đổi nên phải phân chi admin và user
+    - Các lí do:
+        + Phân quyền (Authorization):
+            > Admin: có quyền thiết lập dữ liệu, xem và xóa các thông số kỉ thuật
+            > User: chỉ có quyền thao tác các tính năng có trong ứng dụng , "mỗi người dùng chỉ có quyền truy cập và thay đổi
+            trong phạm vi được cho phép
+        + Bảo mật:
+            > Nếu ai cũng có quyền như nhau thì có thể người dùng sẽ xóa nhầm dữ liệu, làm thay đổi cấu trúc cảnh báo, đo
+            lường, đầu ra của hàm dẫn tới kết quả lỗi hoặc không như ý định làm thiệt hại tài chính, thời gian, công sức
+            > Nếu hacker chỉ chiếm được tài khoản user thì thiệt hại sẽ nhỏ hơn
+            > Nếu hacker chiểm được tài khoản admin thì thiệt hại cực lớn chính vì vậy tài khoản admin càng ít càng tốt
+        + Quản lí trách nhiệmL
+            > Khi có lỗi xảy ra (ví dụ thay đổi các thức thông báo cho ăn sai giờ), hệ thống có thể truy vết được ai là người đã
+            thực hiện thay đổi đó trên tài khoản
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 10: API Endpoints là gì và tại sao lại phải tạo ?
+    - API Endpoints được định nghĩa các cửa ra vào của hệ thống để fontend, mobile app hoặc bên thứ 3 có thể giao tiếp với
+    server
+    - API (Application Progamming Interface) giao diện để 2 hệ thống nói chuyện với nhau 
+    - Endpoint là 1 địa chỉ URL cụ thể được thực hiện 1 chức năng
+        ví dụ 
+            API chuyên đăng nhập
+            API chuyên đăng xuất
+            API ...
+    - Lí do dùng:
+        + Bảo vệ toàn bộ hệ thống 
+            > Không có Auth API : ai cũng có thể truy cập được các endpoint và xóa được
+            > nếu có Auth API: Phải đăng nhập, lấy token, mới dùng được các endpoint khác
+        + Trách nhiệm trong công việc 
+            > Mỗi api sẽ được phân chia cho một nhóm/ cá nhân kiểm tra và phát triễn khi có sự cố sẽ dễ truy xuất
+            và biết ai là người thay đổi
+        + Dùng nhiều cho nhiều nền tảng 
+            > web browser, app mobile đều post và get từ api để nhận token
+            > không cần viết lại logic cho từng nền tẳng
+    - Sơ đồ hoạt động tổng quan:
+        [ NGƯỜI DÙNG ]
+            ↓ POST /api/auth/login
+        [ KIỂM TRA username + password ]
+            ↓ đúng
+        [ TẠO TOKEN — create_access_token ]
+            ↓
+        [ TRẢ TOKEN VỀ CHO NGƯỜI DÙNG ]
+            ↓
+        [ NGƯỜI DÙNG GỬI TOKEN KÈM MỌI REQUEST SAU ]
+            ↓
+        [ jwt_required KIỂM TRA TOKEN ]
+            ↓ hợp lệ
+        [ CHO PHÉP TRUY CẬP CÁC ENDPOINT KHÁC ]
+
+    - Tưởng tượng:  Hình dung đơn giản: Auth API giống như quầy lễ tân của tòa nhà — bạn phải check-in ở đây trước, nhận thẻ từ,
+     rồi mới dùng thẻ đó để vào các phòng khác trong tòa nhà.
+==============================================================================================================================================================================================================================
+CÂU HỎI SỐ 11: 

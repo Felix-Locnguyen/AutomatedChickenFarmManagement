@@ -1830,6 +1830,68 @@
     })();
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Coop Detail - Chi tiết chuồng
+    (function() {
+        'use strict';
+
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // Lấy coop_id từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const coopId = urlParams.get('id') || 1;
+
+        async function loadCoopDetail() {
+            try {
+                // Lấy thông tin chuồng
+                const coop = await coopsAPI.getOne(coopId);
+                
+                // Cập nhật tên chuồng
+                const coopNameEl = document.getElementById('coop-name');
+                if (coopNameEl) coopNameEl.textContent = coop.name || 'Chuồng ' + coopId;
+
+                // Cập nhật các thông tin khác nếu có element tương ứng
+                const coopStats = document.querySelector('.coop-stats');
+                if (coopStats) {
+                    coopStats.innerHTML = `
+                        <div class="stat-item">
+                            <span class="stat-label">Số gà:</span>
+                            <span class="stat-value">${coop.current_count || 0}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Sức chứa:</span>
+                            <span class="stat-value">${coop.capacity || 0}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Diện tích:</span>
+                            <span class="stat-value">${coop.area || 0} m²</span>
+                        </div>
+                    `;
+                }
+
+                // Lấy dữ liệu môi trường
+                try {
+                    const env = await coopsAPI.getEnvironment(coopId);
+                    // Cập nhật temperature, humidity nếu có elements
+                    console.log('Environment:', env);
+                } catch(e) {
+                    console.log('Chưa có dữ liệu môi trường');
+                }
+
+            } catch (error) {
+                console.error('Lỗi load coop detail:', error);
+            }
+        }
+
+        loadCoopDetail();
+    })();
+    </script>
+
 </body>
 
 </html>

@@ -17,8 +17,8 @@ import os
 import random
 from datetime import datetime, timedelta
 
-# Thêm thư mục cha vào path để import được config và models
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Thêm thư mục hiện tại vào path để import được config và models
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import ứng dụng Flask và cấu hình
 from flask import Flask

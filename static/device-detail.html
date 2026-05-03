@@ -1718,6 +1718,42 @@
     })();
     </script>
 
+    <!-- API Integration -->
+    <script src="js/api.js"></script>
+    <script>
+    // Device Detail - Chi tiết thiết bị
+    (function() {
+        'use strict';
+
+        if (!isAuthenticated()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        // Lấy device_id từ URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const deviceId = urlParams.get('id') || 1;
+
+        async function loadDeviceDetail() {
+            try {
+                const device = await devicesAPI.getOne(deviceId);
+                
+                // Cập nhật tên thiết bị
+                const deviceNameEl = document.querySelector('.device-detail-name');
+                if (deviceNameEl) deviceNameEl.textContent = device.name || 'Thiết bị ' + deviceId;
+
+                // Cập nhật thông tin khác nếu có
+                console.log('Device:', device);
+
+            } catch (error) {
+                console.error('Lỗi load device detail:', error);
+            }
+        }
+
+        loadDeviceDetail();
+    })();
+    </script>
+
 </body>
 
 </html>
