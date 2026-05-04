@@ -405,3 +405,49 @@ class Alert(db.Model):
     
     def __repr__(self):
         return f'<Alert {self.level}:{self.type}>'
+
+
+class UnconnectedDevice(db.Model):
+    """
+    Model thiết bị chưa kết nối (unconnected devices).
+    
+    Lưu trữ các thiết bị chưa được gán vào bất kỳ chuồng nào.
+    Khi thêm thiết bị vào chuồng, bản ghi này sẽ bị xóa.
+    Khi gỡ thiết bị khỏi chuồng, bản ghi mới sẽ được tạo.
+    
+    Attributes:
+        id: Primary key tự tăng
+        name: Tên thiết bị
+        type: Loại thiết bị (temperature/humidity/fan/light/feeder/camera)
+        mac_address: Địa chỉ MAC
+        status: Trạng thái (online/offline/connecting)
+        is_active: Bật/tắt thiết bị
+        battery: Mức pin (%)
+        created_at: Thời gian thêm vào danh sách
+    """
+    __tablename__ = 'unconnected_devices'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    type = db.Column(db.String(20), nullable=False)
+    mac_address = db.Column(db.String(50))
+    status = db.Column(db.String(20), default='offline')
+    is_active = db.Column(db.Boolean, default=False)
+    battery = db.Column(db.Integer, default=100)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    
+    def to_dict(self):
+        """Chuyển đổi thành dictionary cho JSON response."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'mac_address': self.mac_address,
+            'status': self.status,
+            'is_active': self.is_active,
+            'battery': self.battery,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+    
+    def __repr__(self):
+        return f'<UnconnectedDevice {self.name}>'

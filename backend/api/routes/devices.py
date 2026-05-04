@@ -29,11 +29,240 @@ import os
 
 # Thêm đường dẫn parent vào sys.path để có thể import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from models import db, Device, CoopDevice
+from models import db, Device, CoopDevice, UnconnectedDevice
 
 # Tạo Blueprint cho routes liên quan đến thiết bị
 # URL: /api/devices
 devices_bp = Blueprint('devices', __name__)
+
+
+# ============================================================
+# PUBLIC ENDPOINTS (No Auth - for demo mode)
+# ============================================================
+
+@devices_bp.route('/public/unconnected', methods=['GET'])
+def get_unconnected_devices():
+    """
+    Lấy danh sách thiết bị chưa kết nối (Không cần auth - cho demo).
+    
+    Returns:
+        200: Array of unconnected device objects
+    """
+    devices = UnconnectedDevice.query.all()
+    return jsonify([device.to_dict() for device in devices]), 200
+
+
+@devices_bp.route('/public/unconnected', methods=['POST'])
+def add_unconnected_device():
+    """
+    Thêm thiết bị mới vào danh sách chưa kết nối (Không cần auth - cho demo).
+    
+    Args:
+        Request Body (JSON):
+            - name (str): Tên thiết bị
+            - type (str): Loại thiết bị
+            - mac_address (str): Địa chỉ MAC
+            - status (str): Trạng thái
+            - is_active (bool): Bật/tắt
+            - battery (int): % pin
+            
+    Returns:
+        201: UnconnectedDevice object đã tạo
+    """
+    data = request.get_json()
+    
+    device = UnconnectedDevice(
+        name=data.get('name'),
+        type=data.get('type', 'sensor'),
+        mac_address=data.get('mac_address', ''),
+        status=data.get('status', 'offline'),
+        is_active=data.get('is_active', False),
+        battery=data.get('battery', 100)
+    )
+    
+    db.session.add(device)
+    db.session.commit()
+    
+    return jsonify(device.to_dict()), 201
+
+
+@devices_bp.route('/public/unconnected/<int:device_id>', methods=['DELETE'])
+def delete_unconnected_device(device_id):
+    """
+    Xóa thiết bị khỏi danh sách chưa kết nối (Không cần auth - cho demo).
+    
+    Args:
+        device_id (int): ID của thiết bị
+        
+    Returns:
+        200: Thông báo thành công
+        404: Không tìm thấy thiết bị
+    """
+    device = db.session.get(UnconnectedDevice, device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+    
+    db.session.delete(device)
+    db.session.commit()
+    
+    return jsonify({'message': 'Device deleted from unconnected list'}), 200
+
+
+@devices_bp.route('/public/<int:device_id>', methods=['PUT'])
+def update_public_device(device_id):
+    """
+    Cập nhật thông tin thiết bị (Không cần auth - cho demo).
+    
+    Args:
+        device_id (int): ID của thiết bị
+        Request Body: Các trường cần cập nhật
+        
+    Returns:
+        200: Device object đã cập nhật
+        404: Không tìm thấy thiết bị
+    """
+    device = db.session.get(Device, device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+    
+    data = request.get_json()
+    
+    device.name = data.get('name', device.name)
+    device.type = data.get('type', device.type)
+    device.mac_address = data.get('mac_address', device.mac_address)
+    device.status = data.get('status', device.status)
+    device.is_active = data.get('is_active', device.is_active)
+    device.battery = data.get('battery', device.battery)
+    
+    db.session.commit()
+    
+    return jsonify(device.to_dict()), 200
+
+
+@devices_bp.route('/public/<int:device_id>/toggle', methods=['POST'])
+def toggle_public_device(device_id):
+    """
+    Bật/tắt thiết bị (Không cần auth - cho demo).
+    
+    Args:
+        device_id (int): ID của thiết bị
+        
+    Returns:
+        200: {
+            "message": "Device toggled",
+            "is_active": true/false,
+            "device": {...}
+        }
+        404: Không tìm thấy thiết bị
+    """
+    device = db.session.get(Device, device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+    
+    device.is_active = not device.is_active
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Device toggled',
+        'is_active': device.is_active,
+        'device': device.to_dict()
+    }), 200
+
+
+@devices_bp.route('/public/add-to-coop', methods=['POST'])
+def add_device_to_coop():
+    """
+    Thêm thiết bị (từ unconnected list) vào chuồng (Không cần auth - cho demo).
+    
+    Args:
+        Request Body (JSON):
+            - unconnected_device_id (int): ID thiết bị trong unconnected list
+            - coop_id (int): ID chuồng
+            
+    Returns:
+        201: Device object đã thêm vào coop
+        400: Thiếu thông tin
+        404: Không tìm thấy thiết bị/chuồng
+    """
+    data = request.get_json()
+    unconnected_device_id = data.get('unconnected_device_id')
+    coop_id = data.get('coop_id')
+    
+    if not unconnected_device_id or not coop_id:
+        return jsonify({'error': 'unconnected_device_id and coop_id required'}), 400
+    
+    # Tìm thiết bị trong unconnected list
+    unconnected = db.session.get(UnconnectedDevice, unconnected_device_id)
+    if not unconnected:
+        return jsonify({'error': 'Unconnected device not found'}), 404
+    
+    # Kiểm tra chuồng tồn tại
+    from models import Coop
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    # Tạo thiết bị mới trong bảng Device
+    device = Device(
+        name=unconnected.name,
+        type=unconnected.type,
+        mac_address=unconnected.mac_address,
+        status=unconnected.status,
+        is_active=unconnected.is_active,
+        battery=unconnected.battery
+    )
+    db.session.add(device)
+    db.session.commit()
+    
+    # Tạo liên kết với chuồng
+    coop_device = CoopDevice(coop_id=coop_id, device_id=device.id, is_active=True)
+    db.session.add(coop_device)
+    
+    # Xóa khỏi unconnected list
+    db.session.delete(unconnected)
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Device added to coop',
+        'device': device.to_dict()
+    }), 201
+
+
+@devices_bp.route('/public/remove-from-coop/<int:device_id>', methods=['DELETE'])
+def remove_device_from_coop(device_id):
+    """
+    Gỡ thiết bị khỏi chuồng và thêm vào unconnected list (Không cần auth - cho demo).
+    
+    Args:
+        device_id (int): ID của thiết bị
+        
+    Returns:
+        200: Thông báo thành công
+        404: Không tìm thấy thiết bị
+    """
+    device = db.session.get(Device, device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+    
+    # Gỡ liên kết với chuồng
+    CoopDevice.query.filter_by(device_id=device_id).delete()
+    
+    # Thêm vào unconnected list
+    unconnected = UnconnectedDevice(
+        name=device.name,
+        type=device.type,
+        mac_address=device.mac_address,
+        status=device.status,
+        is_active=device.is_active,
+        battery=device.battery
+    )
+    db.session.add(unconnected)
+    
+    # Xóa thiết bị
+    db.session.delete(device)
+    db.session.commit()
+    
+    return jsonify({'message': 'Device removed from coop and added to unconnected list'}), 200
 
 
 @devices_bp.route('', methods=['GET'])

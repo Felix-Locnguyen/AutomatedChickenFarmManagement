@@ -324,7 +324,8 @@
                                     <div class="coop-actions-wrapper d-flex align-items-center flex-wrap">
                                         <div class="coop-search-wrapper">
                                             <i class="fas fa-search coop-search-icon"></i>
-                                            <input type="text" class="form-control coop-search-input" placeholder="Ví dụ: Chuồng A">
+                                            <input type="text" class="form-control coop-search-input" id="coopSearchInput" placeholder="Tìm kiếm chuồng...">
+                                            <button type="button" class="coop-search-clear" id="coopSearchClear" title="Xóa">&times;</button>
                                         </div>
                                         <button type="button" class="btn btn-primary btn-add-coop ml-2" data-toggle="modal" data-target="#addCoopModal">
                                             <i class="fas fa-plus"></i> Thêm chuồng
@@ -359,6 +360,26 @@
                                         .coop-search-input:focus {
                                             border-color: #4a90d9;
                                             box-shadow: 0 0 0 0.2rem rgba(74, 144, 217, 0.25);
+                                        }
+                                        .coop-search-clear {
+                                            position: absolute;
+                                            right: 8px;
+                                            top: 50%;
+                                            transform: translateY(-50%);
+                                            background: none;
+                                            border: none;
+                                            cursor: pointer;
+                                            color: #999;
+                                            font-size: 18px;
+                                            display: none;
+                                            padding: 0;
+                                            line-height: 1;
+                                        }
+                                        .coop-search-clear.visible {
+                                            display: block;
+                                        }
+                                        .coop-search-clear:hover {
+                                            color: #666;
                                         }
                                         .btn-add-coop {
                                             white-space: nowrap;
@@ -414,6 +435,20 @@
                                         }
                                         .coop-card:hover {
                                             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                                        }
+                                        /* Viền cảnh báo thiết bị - vàng/cam tĩnh */
+                                        .coop-card.alert-warning {
+                                            border: 2px solid #ffc107;
+                                            box-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
+                                        }
+                                        /* Viền cảnh báo ngưỡng - đỏ nhấp nháy */
+                                        .coop-card.alert-danger {
+                                            border: 2px solid #dc3545;
+                                            animation: blink-border 1s infinite;
+                                        }
+                                        @keyframes blink-border {
+                                            0%, 100% { border-color: #dc3545; box-shadow: 0 0 8px rgba(220, 53, 69, 0.5); }
+                                            50% { border-color: #ff6b6b; box-shadow: 0 0 16px rgba(220, 53, 69, 0.8); }
                                         }
                                         .coop-card-header {
                                             display: flex;
@@ -854,209 +889,14 @@
                                             body { padding-bottom: 20px; }
                                         }
                                     </style>
-                                    <div class="coop-grid">
-                                        <!-- Chuồng 1 -->
-                                        <div class="coop-card">
-                                            <div class="coop-card-header">
-                                                <div class="coop-card-header-left">
-                                                    <h3 class="coop-card-title">Chuồng A</h3>
-                                                    <span class="coop-status online">Online</span>
-                                                </div>
-                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
-                                                    <i class="fas fa-trash-alt"></i> Xóa
-                                                </button>
-                                            </div>
-                                            <div class="coop-info">
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
-                                                    <span class="coop-info-value">450 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Sức chứa</span>
-                                                    <span class="coop-info-value">500 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Vị trí</span>
-                                                    <span class="coop-info-value">Khu vực A - Hàng 1</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-temp-humid">
-                                                <div class="coop-temp">
-                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                                    <div class="coop-temp-value">28°C</div>
-                                                    <div class="coop-temp-label">Nhiệt độ</div>
-                                                </div>
-                                                <div class="coop-humid">
-                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                                    <div class="coop-humid-value">65%</div>
-                                                    <div class="coop-humid-label">Độ ẩm</div>
-                                                </div>
-                                            </div>
-                                            <div class="coop-devices">
-                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
-                                                <div class="coop-device-list">
-                                                    <span class="coop-device-tag active"><i class="fas fa-wifi"></i>Cảm biến nhiệt</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-fan"></i>Quạt thông gió</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i>Đèn LED</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-weight"></i>Cân điện tử</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-actions">
-                                                <a href="coop-detail.html?id=1" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
-                                                <a href="device-detail.html?coop=1" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
+<div class="coop-grid" id="coopCardsContainer">
+                                        <!-- Dynamic coop cards will be rendered here -->
+                                        <div class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="sr-only">Đang tải...</span>
                                             </div>
                                         </div>
-
-                                        <!-- Chuồng 2 -->
-                                        <div class="coop-card">
-                                            <div class="coop-card-header">
-                                                <div class="coop-card-header-left">
-                                                    <h3 class="coop-card-title">Chuồng B</h3>
-                                                    <span class="coop-status online">Online</span>
-                                                </div>
-                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
-                                                    <i class="fas fa-trash-alt"></i> Xóa
-                                                </button>
-                                            </div>
-                                            <div class="coop-info">
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
-                                                    <span class="coop-info-value">280 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Sức chứa</span>
-                                                    <span class="coop-info-value">300 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Vị trí</span>
-                                                    <span class="coop-info-value">Khu vực A - Hàng 2</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-temp-humid">
-                                                <div class="coop-temp">
-                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                                    <div class="coop-temp-value">26°C</div>
-                                                    <div class="coop-temp-label">Nhiệt độ</div>
-                                                </div>
-                                                <div class="coop-humid">
-                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                                    <div class="coop-humid-value">70%</div>
-                                                    <div class="coop-humid-label">Độ ẩm</div>
-                                                </div>
-                                            </div>
-                                            <div class="coop-devices">
-                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
-                                                <div class="coop-device-list">
-                                                    <span class="coop-device-tag active"><i class="fas fa-wifi"></i>Cảm biến ẩm</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-fan"></i>Quạt hút</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-shower"></i>Hệ thống phun</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-actions">
-                                                <a href="coop-detail.html?id=2" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
-                                                <a href="device-detail.html?coop=2" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
-                                            </div>
-                                        </div>
-
-                                        <!-- Chuồng 3 -->
-                                        <div class="coop-card">
-                                            <div class="coop-card-header">
-                                                <div class="coop-card-header-left">
-                                                    <h3 class="coop-card-title">Chuồng C</h3>
-                                                    <span class="coop-status offline">Offline</span>
-                                                </div>
-                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
-                                                    <i class="fas fa-trash-alt"></i> Xóa
-                                                </button>
-                                            </div>
-                                            <div class="coop-info">
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
-                                                    <span class="coop-info-value">380 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Sức chứa</span>
-                                                    <span class="coop-info-value">400 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Vị trí</span>
-                                                    <span class="coop-info-value">Khu vực B - Hàng 1</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-temp-humid">
-                                                <div class="coop-temp">
-                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                                    <div class="coop-temp-value">32°C</div>
-                                                    <div class="coop-temp-label">Nhiệt độ</div>
-                                                </div>
-                                                <div class="coop-humid">
-                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                                    <div class="coop-humid-value">80%</div>
-                                                    <div class="coop-humid-label">Độ ẩm</div>
-                                                </div>
-                                            </div>
-                                            <div class="coop-devices">
-                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
-                                                <div class="coop-device-list">
-                                                    <span class="coop-device-tag"><i class="fas fa-wifi"></i>Cảm biến nhiệt</span>
-                                                    <span class="coop-device-tag"><i class="fas fa-exclamation-triangle"></i>Báo động</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-actions">
-                                                <a href="coop-detail.html?id=3" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
-                                                <a href="device-detail.html?coop=3" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
-                                            </div>
-                                        </div>
-
-                                        <!-- Chuồng 4 -->
-                                        <div class="coop-card">
-                                            <div class="coop-card-header">
-                                                <div class="coop-card-header-left">
-                                                    <h3 class="coop-card-title">Chuồng D</h3>
-                                                    <span class="coop-status online">Online</span>
-                                                </div>
-                                                <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
-                                                    <i class="fas fa-trash-alt"></i> Xóa
-                                                </button>
-                                            </div>
-                                            <div class="coop-info">
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Số lượng vật nuôi</span>
-                                                    <span class="coop-info-value">180 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Sức chứa</span>
-                                                    <span class="coop-info-value">200 con</span>
-                                                </div>
-                                                <div class="coop-info-item">
-                                                    <span class="coop-info-label">Vị trí</span>
-                                                    <span class="coop-info-value">Khu vực B - Hàng 2</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-temp-humid">
-                                                <div class="coop-temp">
-                                                    <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                                    <div class="coop-temp-value">25°C</div>
-                                                    <div class="coop-temp-label">Nhiệt độ</div>
-                                                </div>
-                                                <div class="coop-humid">
-                                                    <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                                    <div class="coop-humid-value">60%</div>
-                                                    <div class="coop-humid-label">Độ ẩm</div>
-                                                </div>
-                                            </div>
-                                            <div class="coop-devices">
-                                                <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
-                                                <div class="coop-device-list">
-                                                    <span class="coop-device-tag active"><i class="fas fa-wifi"></i>Cảm biến nhiệt</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-fan"></i>Quạt thông gió</span>
-                                                    <span class="coop-device-tag active"><i class="fas fa-camera"></i>Camera giám sát</span>
-                                                </div>
-                                            </div>
-                                            <div class="coop-actions">
-                                                <a href="coop-detail.html?id=4" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
-                                                <a href="device-detail.html?coop=4" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
-                                            </div>
+                                    </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1079,12 +919,12 @@
                                     <div class="coop-temp-humid">
                                         <div class="coop-temp">
                                             <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                            <div class="coop-temp-value">27°C</div>
+                                            <div class="coop-temp-value" id="avgTemperature">--°C</div>
                                             <div class="coop-temp-label">Nhiệt độ</div>
                                         </div>
                                         <div class="coop-humid">
                                             <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                            <div class="coop-humid-value">65%</div>
+                                            <div class="coop-humid-value" id="avgHumidity">--%</div>
                                             <div class="coop-humid-label">Độ ẩm</div>
                                         </div>
                                     </div>
@@ -1465,48 +1305,291 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script>
-    // Coop List - Danh sách chuồng
+    // Coop List - Danh sách chuồng with dynamic data
     (function() {
         'use strict';
 
-        if (!isAuthenticated()) {
-            window.location.href = '/login';
-            return;
+        const POLL_INTERVAL = 5000; // 5 seconds
+        let pollInterval = null;
+        const coopCardsContainer = document.getElementById('coopCardsContainer');
+        let allCoopData = []; // Store original data for filtering
+
+        // Helper function to get device icon based on type
+        function getDeviceIcon(type) {
+            const icons = {
+                'temperature': 'fa-thermometer-half',
+                'humidity': 'fa-tint',
+                'fan': 'fa-fan',
+                'light': 'fa-lightbulb',
+                'feeder': 'fa-utensils',
+                'camera': 'fa-video'
+            };
+            return icons[type] || 'fa-wifi';
         }
 
-        const coopContainer = document.getElementById('coop-list-container');
-
-        async function loadCoops() {
+        // Load all coop data including environment and devices
+        async function loadAllCoopsData() {
             try {
-                const coops = await coopsAPI.getAll();
-                
-                if (coopContainer && coops) {
-                    coopContainer.innerHTML = coops.map(coop => `
-                        <div class="coop-summary-card">
-                            <div class="coop-summary-header">
-                                <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
-                                <span class="coop-status ${coop.status || 'active'}">${coop.status === 'active' ? 'Hoạt động' : coop.status}</span>
-                            </div>
-                            <div class="coop-summary-info">
-                                <span><i class="fas fa-egg"></i> ${coop.current_count || 0} gà</span>
-                                <span><i class="fas fa-ruler-combined"></i> ${coop.area || 0} m²</span>
-                            </div>
-                            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                                <a href="coop-detail.html?id=${coop.id}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                            </div>
-                        </div>
-                    `).join('');
+                // 1. Get all coops
+                const coopsRes = await fetch('/api/coops/public');
+                if (!coopsRes.ok) throw new Error('Failed to load coops');
+                const coops = await coopsRes.json();
+
+                if (!coops || coops.length === 0) {
+                    renderEmptyState();
+                    return;
                 }
+
+                // 2. For each coop, get environment and devices (parallel)
+                const coopDataPromises = coops.map(async (coop) => {
+                    try {
+                        const [envRes, devicesRes] = await Promise.all([
+                            fetch('/api/coops/public/' + coop.id + '/environment'),
+                            fetch('/api/coops/public/' + coop.id + '/devices')
+                        ]);
+
+                        const environment = envRes.ok ? await envRes.json() : { temperature: 0, humidity: 0 };
+                        const devices = devicesRes.ok ? await devicesRes.json() : [];
+
+                        // Filter only active + online devices
+                        const activeDevices = devices.filter(d => d.is_active && d.status === 'online');
+
+                        return { ...coop, environment, devices, activeDevices };
+                    } catch (err) {
+                        console.error('Error loading coop ' + coop.id + ' data:', err);
+                        return { 
+                            ...coop, 
+                            environment: { temperature: 0, humidity: 0 }, 
+                            activeDevices: [] 
+                        };
+                    }
+                });
+
+                const coopData = await Promise.all(coopDataPromises);
+                allCoopData = coopData; // Store original data for filtering
+                filterCoops(coopData);
+
             } catch (error) {
-                console.error('Lỗi load coops:', error);
-                showToast('Không thể tải danh sách chuồng', 'error');
+                console.error('Lỗi tải dữ liệu chuồng:', error);
+                renderErrorState();
             }
         }
 
-        loadCoops();
+        // Render empty state
+        function renderEmptyState() {
+            if (coopCardsContainer) {
+                coopCardsContainer.innerHTML = '<div class="text-center py-4"><p class="text-muted">Chưa có chuồng nào</p></div>';
+            }
+        }
+
+        // Render error state
+        function renderErrorState() {
+            if (coopCardsContainer) {
+                coopCardsContainer.innerHTML = '<div class="text-center py-4"><p class="text-danger">Không thể tải dữ liệu</p></div>';
+            }
+        }
+
+        // Update average temperature and humidity
+        function updateAverages(coopData) {
+            const avgTempEl = document.getElementById('avgTemperature');
+            const avgHumidEl = document.getElementById('avgHumidity');
+            
+            if (!avgTempEl || !avgHumidEl) return;
+            
+            // Filter coops with valid data (temperature > 0)
+            const coopsWithData = coopData.filter(c => c.environment && c.environment.temperature > 0);
+            
+            if (coopsWithData.length === 0) {
+                avgTempEl.textContent = '--°C';
+                avgHumidEl.textContent = '--%';
+                return;
+            }
+            
+            // Calculate averages
+            const totalTemp = coopsWithData.reduce((sum, c) => sum + (c.environment?.temperature || 0), 0);
+            const totalHumid = coopsWithData.reduce((sum, c) => sum + (c.environment?.humidity || 0), 0);
+            
+            const avgTemp = (totalTemp / coopsWithData.length).toFixed(1);
+            const avgHumid = (totalHumid / coopsWithData.length).toFixed(1);
+            
+            avgTempEl.textContent = avgTemp + '°C';
+            avgHumidEl.textContent = avgHumid + '%';
+        }
+
+        // Filter coops based on search term
+        function filterCoops(dataToFilter) {
+            const searchInput = document.getElementById('coopSearchInput');
+            const searchTerm = (searchInput?.value || '').toLowerCase().trim();
+            
+            let filteredData = dataToFilter || allCoopData;
+            
+            if (searchTerm) {
+                filteredData = allCoopData.filter(coop => 
+                    (coop.name || '').toLowerCase().includes(searchTerm)
+                );
+                
+                // Show "no results" message when search returns empty
+                if (filteredData.length === 0 && allCoopData.length > 0) {
+                    if (coopCardsContainer) {
+                        coopCardsContainer.innerHTML = '<div class="text-center py-4"><p class="text-muted">Không tìm thấy chuồng phù hợp</p></div>';
+                    }
+                    updateAverages([]);
+                    return;
+                }
+            }
+            
+            renderCoopCards(filteredData);
+            updateAverages(filteredData);
+        }
+
+        // Get alert class based on environment thresholds and device status
+        function getCoopAlertClass(coop) {
+            // Check environment thresholds (priority 1 - red blinking)
+            const temp = coop.environment?.temperature || 0;
+            const humid = coop.environment?.humidity || 0;
+            const feedLevel = coop.environment?.feed_level || 0;
+            const waterLevel = coop.environment?.water_level || 0;
+            
+            const tempMin = coop.temp_min || 18;
+            const tempMax = coop.temp_max || 28;
+            const humidMin = coop.humidity_min || 40;
+            const humidMax = coop.humidity_max || 70;
+            const feedThreshold = coop.feed_threshold || 20;
+            const waterThreshold = coop.water_threshold || 20;
+            
+            const tempOutOfRange = (temp > 0) && (temp < tempMin || temp > tempMax);
+            const humidOutOfRange = (humid > 0) && (humid < humidMin || humid > humidMax);
+            const feedLow = (feedLevel > 0) && (feedLevel < feedThreshold);
+            const waterLow = (waterLevel > 0) && (waterLevel < waterThreshold);
+            
+            if (tempOutOfRange || humidOutOfRange || feedLow || waterLow) {
+                return 'alert-danger';
+            }
+            
+            // Check device status (priority 2 - yellow static)
+            const allDevices = coop.devices || [];
+            const hasConnectionIssue = allDevices.some(d => d.status === 'connecting' || d.status === 'offline');
+            
+            if (hasConnectionIssue) {
+                return 'alert-warning';
+            }
+            
+            return ''; // No alert
+        }
+
+        // Render coop cards dynamically
+        function renderCoopCards(coopData) {
+            if (!coopCardsContainer) return;
+
+            coopCardsContainer.innerHTML = coopData.map(coop => {
+                const statusClass = coop.status === 'active' ? 'online' : 'offline';
+                const statusText = coop.status === 'active' ? 'Hoạt động' : (coop.status || 'Không hoạt động');
+                const alertClass = getCoopAlertClass(coop);
+                
+                const temp = coop.environment?.temperature || 0;
+                const humid = coop.environment?.humidity || 0;
+                
+                const currentCount = coop.current_count || 0;
+                const capacity = coop.capacity || 0;
+                const location = coop.location || 'Chưa cập nhật';
+
+                return `
+                    <div class="coop-card ${alertClass}">
+                        <div class="coop-card-header">
+                            <div class="coop-card-header-left">
+                                <h3 class="coop-card-title">${coop.name || 'Chuồng ' + coop.id}</h3>
+                                <span class="coop-status ${statusClass}">${statusText}</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
+                                <i class="fas fa-trash-alt"></i> Xóa
+                            </button>
+                        </div>
+                        <div class="coop-info">
+                            <div class="coop-info-item">
+                                <span class="coop-info-label">Số lượng vật nuôi</span>
+                                <span class="coop-info-value">${currentCount} con</span>
+                            </div>
+                            <div class="coop-info-item">
+                                <span class="coop-info-label">Sức chứa</span>
+                                <span class="coop-info-value">${capacity} con</span>
+                            </div>
+                            <div class="coop-info-item">
+                                <span class="coop-info-label">Vị trí</span>
+                                <span class="coop-info-value">${location}</span>
+                            </div>
+                        </div>
+                        <div class="coop-temp-humid">
+                            <div class="coop-temp">
+                                <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
+                                <div class="coop-temp-value">${temp > 0 ? temp + '°C' : '--'}</div>
+                                <div class="coop-temp-label">Nhiệt độ</div>
+                            </div>
+                            <div class="coop-humid">
+                                <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
+                                <div class="coop-humid-value">${humid > 0 ? humid + '%' : '--'}</div>
+                                <div class="coop-humid-label">Độ ẩm</div>
+                            </div>
+                        </div>
+                        <div class="coop-devices">
+                            <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
+                            <div class="coop-device-list">
+                                ${coop.activeDevices && coop.activeDevices.length > 0 
+                                    ? coop.activeDevices.map(device => `
+                                        <span class="coop-device-tag active">
+                                            <i class="fas fa-${getDeviceIcon(device.type)}"></i>${device.name || 'Thiết bị ' + device.id}
+                                        </span>
+                                    `).join('')
+                                    : '<span class="text-muted">Không có thiết bị hoạt động</span>'
+                                }
+                            </div>
+                        </div>
+                        <div class="coop-actions">
+                            <a href="coop-detail.html?id=${coop.id}" class="btn btn-sm btn-primary" title="Xem chi tiết"><i class="fas fa-eye"></i> Xem chi tiết</a>
+                            <a href="device-detail.html?id=${coop.id}" class="btn btn-sm btn-info" title="Thiết bị"><i class="fas fa-wifi"></i> Thiết bị</a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize - load data and set up polling
+        loadAllCoopsData();
+        pollInterval = setInterval(loadAllCoopsData, POLL_INTERVAL);
+
+        // Search functionality
+        const searchInput = document.getElementById('coopSearchInput');
+        const searchClearBtn = document.getElementById('coopSearchClear');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                // Show/hide clear button
+                searchClearBtn?.classList.toggle('visible', this.value.length > 0);
+                // Filter coops
+                filterCoops(allCoopData);
+            });
+        }
+
+        if (searchClearBtn) {
+            searchClearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                this.classList.remove('visible');
+                filterCoops(allCoopData);
+            });
+        }
+
+        // Clean up on page unload
+        window.addEventListener('beforeunload', function() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+        });
     })();
     </script>
 
 </body>
 
 </html>
+
+                    </div>
+
+                    <!-- Content Row -->

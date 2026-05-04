@@ -6,6 +6,9 @@
  * Ví dụ:
  *   const token = await authAPI.login('admin', 'admin123');
  *   const coops = await coopsAPI.getAll();
+ * 
+ * Real-time: Sử dụng WebSocket (Socket.io) với fallback về REST API
+ *   window.wsManager.subscribe(WINDOW.WS_EVENTS.DASHBOARD_OVERVIEW, (data) => { ... });
  */
 
 (function() {
@@ -189,12 +192,30 @@
 
 
     // ============================================================
-    // 5. DASHBOARD API
+    // 5. DASHBOARD API (WebSocket + Fallback)
     // ============================================================
 
     window.dashboardAPI = {
         /**
-         * Lấy tổng quan dashboard
+         * Lấy tổng quan dashboard (WebSocket real-time hoặc fallback REST)
+         * @param {function} callback - Callback khi có dữ liệu mới từ WebSocket
+         * @returns {Promise|null} - Promise nếu dùng fallback, null nếu đăng ký WebSocket thành công
+         */
+        subscribeOverview: function(callback) {
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(window.WS_EVENTS.DASHBOARD_OVERVIEW, callback);
+                return null; // WebSocket mode
+            } else {
+                // Fallback to REST API
+                return window.dashboardAPI.getOverview().then(data => {
+                    callback(data);
+                    return data;
+                });
+            }
+        },
+
+        /**
+         * Lấy tổng quan dashboard (REST API với fallback)
          * @returns {object}
          */
         getOverview: async function() {
@@ -228,12 +249,63 @@
 
 
     // ============================================================
-    // 6. COOPS API
+    // 6. COOPS API (WebSocket + Fallback)
     // ============================================================
 
     window.coopsAPI = {
         /**
-         * Lấy danh sách tất cả chuồng
+         * Đăng ký nhận cập nhật trạng thái tất cả chuồng qua WebSocket
+         * @param {function} callback - Callback với dữ liệu chuồng
+         * @returns {function|null} - Hàm unsubscribe hoặc null
+         */
+        subscribeStatus: function(callback) {
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(window.WS_EVENTS.COOP_STATUS, callback);
+                return () => window.wsManager.unsubscribe(window.WS_EVENTS.COOP_STATUS, callback);
+            } else {
+                // Fallback: fetch once
+                window.coopsAPI.getAll().then(data => callback(data));
+                return null;
+            }
+        },
+
+        /**
+         * Đăng ký nhận cập nhật cho một chuồng cụ thể
+         * @param {number} id - ID chuồng
+         * @param {function} callback - Callback với dữ liệu chuồng
+         */
+        subscribeCoop: function(id, callback) {
+            const event = `${window.WS_EVENTS.COOP_UPDATE}:${id}`;
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(event, callback);
+                return () => window.wsManager.unsubscribe(event, callback);
+            } else {
+                window.coopsAPI.getOne(id).then(data => callback(data));
+                return null;
+            }
+        },
+
+        /**
+         * Đăng ký nhận cập nhật môi trường cho một chuồng
+         * @param {number} id - ID chuồng
+         * @param {function} callback - Callback với dữ liệu môi trường
+         */
+        subscribeEnvironment: function(id, callback) {
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(window.WS_EVENTS.ENVIRONMENT_UPDATE, (data) => {
+                    if (data.coop_id === id || data.coopId === id) {
+                        callback(data);
+                    }
+                });
+                return () => window.wsManager.unsubscribe(window.WS_EVENTS.ENVIRONMENT_UPDATE, callback);
+            } else {
+                window.coopsAPI.getEnvironment(id).then(data => callback(data));
+                return null;
+            }
+        },
+
+        /**
+         * Lấy danh sách tất cả chuồng (REST fallback)
          * @returns {array}
          */
         getAll: async function() {
@@ -241,7 +313,7 @@
         },
 
         /**
-         * Lấy thông tin một chuồng
+         * Lấy thông tin một chuồng (REST fallback)
          * @param {number} id - ID của chuồng
          * @returns {object}
          */
@@ -294,7 +366,7 @@
         },
 
         /**
-         * Lấy dữ liệu môi trường hiện tại
+         * Lấy dữ liệu môi trường hiện tại (REST fallback)
          * @param {number} id 
          * @returns {object}
          */
@@ -315,12 +387,44 @@
 
 
     // ============================================================
-    // 7. DEVICES API
+    // 7. DEVICES API (WebSocket + Fallback)
     // ============================================================
 
     window.devicesAPI = {
         /**
-         * Lấy danh sách thiết bị
+         * Đăng ký nhận cập nhật trạng thái thiết bị qua WebSocket
+         * @param {function} callback - Callback với dữ liệu thiết bị
+         * @returns {function|null} - Hàm unsubscribe hoặc null
+         */
+        subscribeStatus: function(callback) {
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(window.WS_EVENTS.DEVICE_STATUS, callback);
+                return () => window.wsManager.unsubscribe(window.WS_EVENTS.DEVICE_STATUS, callback);
+            } else {
+                // Fallback: fetch once
+                window.devicesAPI.getAll().then(data => callback(data));
+                return null;
+            }
+        },
+
+        /**
+         * Đăng ký nhận cập nhật cho một thiết bị cụ thể
+         * @param {number} id - ID thiết bị
+         * @param {function} callback - Callback với dữ liệu thiết bị
+         */
+        subscribeDevice: function(id, callback) {
+            const event = `${window.WS_EVENTS.DEVICE_UPDATE}:${id}`;
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(event, callback);
+                return () => window.wsManager.unsubscribe(event, callback);
+            } else {
+                window.devicesAPI.getOne(id).then(data => callback(data));
+                return null;
+            }
+        },
+
+        /**
+         * Lấy danh sách thiết bị (REST fallback)
          * @returns {array}
          */
         getAll: async function() {
@@ -328,7 +432,7 @@
         },
 
         /**
-         * Lấy thông tin một thiết bị
+         * Lấy thông tin một thiết bị (REST fallback)
          * @param {number} id 
          * @returns {object}
          */
@@ -431,12 +535,30 @@
 
 
     // ============================================================
-    // 9. ALERTS API
+    // 9. ALERTS API (WebSocket + Fallback)
     // ============================================================
 
     window.alertsAPI = {
         /**
-         * Lấy danh sách cảnh báo
+         * Đăng ký nhận cảnh báo mới qua WebSocket
+         * @param {function} callback - Callback với dữ liệu cảnh báo mới
+         * @returns {function|null} - Hàm unsubscribe hoặc null
+         */
+        subscribeNewAlerts: function(callback) {
+            if (window.wsManager && window.wsManager.connected) {
+                window.wsManager.subscribe(window.WS_EVENTS.ALERT_NEW, callback);
+                return () => window.wsManager.unsubscribe(window.WS_EVENTS.ALERT_NEW, callback);
+            } else {
+                // Fallback: poll every 30 seconds
+                const interval = setInterval(() => {
+                    window.alertsAPI.getAll().then(data => callback(data));
+                }, 30000);
+                return () => clearInterval(interval);
+            }
+        },
+
+        /**
+         * Lấy danh sách cảnh báo (REST fallback)
          * @param {object} filters - { is_resolved, level, coop_id }
          * @returns {array}
          */

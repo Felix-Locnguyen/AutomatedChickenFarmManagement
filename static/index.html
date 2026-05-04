@@ -1056,10 +1056,17 @@
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
 
+    <!-- Socket.io Client -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <!-- WebSocket Manager -->
+    <script src="js/ws-manager.js"></script>
+    
     <!-- API Integration -->
     <script src="js/api.js"></script>
+    
     <script>
-        // Dashboard - Hiển thị dữ liệu động
+        // Dashboard - Real-time Data with WebSocket + Fallback
         (function() {
             'use strict';
 
@@ -1069,56 +1076,265 @@
                 return;
             }
 
-            // Hàm tải dữ liệu dashboard
-            async function loadDashboard() {
-                try {
-                    const data = await dashboardAPI.getOverview();
+            // DOM Elements cache (avoid re-querying DOM)
+            const elements = {
+                totalCoops: document.querySelector('.col-xl-3:nth-child(1) .h5'),
+                totalDevices: document.querySelector('.col-xl-3:nth-child(2) .h5'),
+                onlineDevices: document.querySelector('.col-xl-3:nth-child(3) .h5 .mr-3'),
+                onlineDevicesProgress: document.querySelector('.col-xl-3:nth-child(3) .progress-bar'),
+                alertsCount: document.querySelector('.col-xl-3:nth-child(4) .h5'),
+                tempValue: document.querySelector('.coop-temp-value'),
+                humidValue: document.querySelector('.coop-humid-value'),
+                donutTotal: document.querySelector('.donut-total-coop'),
+                coopsList: document.querySelector('.col-lg-6:first-child .card-body'),
+                devicesList: document.querySelector('.col-lg-6:last-child .card-body')
+            };
 
-                    // Cập nhật số liệu thống kê
-                    if (data.total_coops !== undefined) {
-                        const totalCoopsEl = document.querySelector('.col-xl-3:first-child .h5');
-                        if (totalCoopsEl) totalCoopsEl.textContent = data.total_coops;
+            // Cache for data comparison (avoid unnecessary re-renders)
+            let lastCoopsData = null;
+            let lastDevicesData = null;
+
+            /**
+             * Update dashboard overview with performance optimization
+             */
+            function updateDashboardOverview(data) {
+                if (!data) return;
+
+                // Batch DOM updates using requestAnimationFrame
+                requestAnimationFrame(() => {
+                    // Update statistics
+                    if (data.total_coops !== undefined && elements.totalCoops) {
+                        elements.totalCoops.textContent = data.total_coops;
                     }
-
-                    if (data.total_devices !== undefined) {
-                        const totalDevicesEl = document.querySelector('.col-xl-3:nth-child(2) .h5');
-                        if (totalDevicesEl) totalDevicesEl.textContent = data.total_devices;
+                    if (data.total_devices !== undefined && elements.totalDevices) {
+                        elements.totalDevices.textContent = data.total_devices;
                     }
-
-                    if (data.online_devices !== undefined) {
-                        const onlineDevicesEl = document.querySelector('.col-xl-3:nth-child(3) .h5');
-                        if (onlineDevicesEl) onlineDevicesEl.textContent = data.online_devices;
-                    }
-
-                    if (data.coops && Array.isArray(data.coops)) {
-                        // Cập nhật nhiệt độ và độ ẩm trung bình
-                        if (data.avg_temperature !== undefined) {
-                            const tempEl = document.querySelector('.coop-temp-value');
-                            if (tempEl) tempEl.textContent = Math.round(data.avg_temperature) + '°C';
+                    if (data.online_devices !== undefined && elements.onlineDevices) {
+                        const count = data.online_devices;
+                        const total = data.total_devices || count;
+                        elements.onlineDevices.textContent = count;
+                        
+                        // Update progress bar
+                        if (elements.onlineDevicesProgress) {
+                            const percent = total > 0 ? Math.round((count / total) * 100) : 0;
+                            elements.onlineDevicesProgress.style.width = percent + '%';
+                            elements.onlineDevicesProgress.setAttribute('aria-valuenow', percent);
                         }
-
-                        if (data.avg_humidity !== undefined) {
-                            const humidEl = document.querySelector('.coop-humid-value');
-                            if (humidEl) humidEl.textContent = Math.round(data.avg_humidity) + '%';
-                        }
-
-                        // Cập nhật danh sách chuồng
-                        updateCoopsList(data.coops);
+                    }
+                    if (data.alerts_count !== undefined && elements.alertsCount) {
+                        elements.alertsCount.textContent = data.alerts_count;
                     }
 
-                } catch (error) {
-                    console.error('Dashboard error:', error);
+                    // Update environment data
+                    if (data.avg_temperature !== undefined && elements.tempValue) {
+                        elements.tempValue.textContent = Math.round(data.avg_temperature) + '°C';
+                    }
+                    if (data.avg_humidity !== undefined && elements.humidValue) {
+                        elements.humidValue.textContent = Math.round(data.avg_humidity) + '%';
+                    }
+
+                    // Update donut chart
+                    if (data.device_status_counts && elements.donutTotal) {
+                        updateDonutChart(data.device_status_counts);
+                    }
+                });
+            }
+
+            /**
+             * Update donut chart with new data
+             */
+            function updateDonutChart(statusCounts) {
+                const segments = document.querySelectorAll('.donut-segment-coop');
+                const total = Object.values(statusCounts).reduce((a, b) => a + b, 0);
+                
+                if (total === 0) return;
+
+                const circumference = 2 * Math.PI * 70; // r=70
+                let offset = 0;
+
+                segments.forEach(segment => {
+                    const segmentType = segment.getAttribute('data-segment');
+                    const count = statusCounts[segmentType] || 0;
+                    const dashArray = (count / total) * circumference;
+                    
+                    segment.style.strokeDasharray = `${dashArray} ${circumference}`;
+                    segment.style.strokeDashoffset = -offset;
+                    segment.setAttribute('data-count', count);
+                    segment.setAttribute('data-percent', Math.round((count / total) * 100));
+
+                    offset += dashArray;
+                });
+
+                // Update center total
+                if (elements.donutTotal) {
+                    elements.donutTotal.textContent = total;
+                }
+
+                // Update legend
+                const legendItems = document.querySelectorAll('.legend-item-coop');
+                legendItems.forEach(item => {
+                    const segmentType = item.getAttribute('data-segment');
+                    const count = statusCounts[segmentType] || 0;
+                    const textEl = item.querySelector('.legend-text-coop');
+                    if (textEl) {
+                        textEl.textContent = item.querySelector('.legend-dot-coop').style.background.includes('22c55e') 
+                            ? `Hoạt động (${count})`
+                            : item.querySelector('.legend-dot-coop').style.background.includes('ffc107')
+                            ? `Chờ (${count})`
+                            : `Lỗi (${count})`;
+                    }
+                });
+            }
+
+            /**
+             * Update coops list with data comparison
+             */
+            function updateCoopsList(coops) {
+                if (!elements.coopsList || !Array.isArray(coops)) return;
+
+                // Deep comparison to avoid unnecessary re-render
+                if (JSON.stringify(coops) === JSON.stringify(lastCoopsData)) {
+                    return;
+                }
+                lastCoopsData = JSON.parse(JSON.stringify(coops));
+
+                requestAnimationFrame(() => {
+                    const coopsHtml = coops.slice(0, 5).map(coop => {
+                        const statusClass = coop.status === 'online' ? 'online' : 
+                                          coop.status === 'warning' ? 'warning' : 'error';
+                        const statusText = coop.status === 'online' ? 'Bình thường' :
+                                         coop.status === 'warning' ? 'Cảnh báo' : 'Lỗi';
+
+                        return `
+                            <div class="coop-summary-card ${statusClass}">
+                                <div class="coop-summary-header">
+                                    <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
+                                    <span class="coop-summary-status ${statusClass}">${statusText}</span>
+                                </div>
+                                <div class="coop-summary-info">
+                                    <span><i class="fas fa-feather-alt"></i> ${coop.chicken_count || 0} gà</span>
+                                    <span><i class="fas fa-wifi"></i> ${coop.device_count || 0} thiết bị</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Replace only the coop cards, keep the "View all" button
+                    const viewAllBtn = elements.coopsList.querySelector('a');
+                    elements.coopsList.innerHTML = coopsHtml + (viewAllBtn ? viewAllBtn.outerHTML : '');
+                });
+            }
+
+            /**
+             * Update devices list with data comparison
+             */
+            function updateDevicesList(devices) {
+                if (!elements.devicesList || !Array.isArray(devices)) return;
+
+                // Deep comparison to avoid unnecessary re-render
+                if (JSON.stringify(devices) === JSON.stringify(lastDevicesData)) {
+                    return;
+                }
+                lastDevicesData = JSON.parse(JSON.stringify(devices));
+
+                requestAnimationFrame(() => {
+                    const devicesHtml = devices.slice(0, 5).map(device => {
+                        const statusClass = device.status || 'offline';
+                        const statusText = statusClass === 'online' ? 'Hoạt động' :
+                                         statusClass === 'waiting' ? 'Đang chờ' : 'Ngắt kết nối';
+
+                        return `
+                            <div class="device-recent-card ${statusClass}">
+                                <div class="device-recent-header">
+                                    <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
+                                    <span class="device-recent-coop">${device.coop_name || ''}</span>
+                                </div>
+                                <div class="device-recent-status">
+                                    <span class="status-dot ${statusClass}"></span>
+                                    <span class="status-text ${statusClass}">${statusText}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    // Replace only the device cards, keep the "View all" button
+                    const viewAllBtn = elements.devicesList.querySelector('a');
+                    elements.devicesList.innerHTML = devicesHtml + (viewAllBtn ? viewAllBtn.outerHTML : '');
+                });
+            }
+
+            /**
+             * Initialize real-time data with WebSocket + Fallback
+             */
+            function initDashboard() {
+                // Try WebSocket first
+                if (window.wsManager && window.wsManager.connected) {
+                    console.log('Using WebSocket for real-time updates');
+
+                    // Subscribe to dashboard overview updates
+                    window.wsManager.subscribe(window.WS_EVENTS.DASHBOARD_OVERVIEW, (data) => {
+                        updateDashboardOverview(data);
+                    });
+
+                    // Subscribe to coop status updates
+                    window.wsManager.subscribe(window.WS_EVENTS.COOP_STATUS, (coops) => {
+                        updateCoopsList(coops);
+                    });
+
+                    // Subscribe to device status updates
+                    window.wsManager.subscribe(window.WS_EVENTS.DEVICE_STATUS, (devices) => {
+                        updateDevicesList(devices);
+                    });
+
+                    // Handle connection status
+                    window.wsManager.subscribe(window.WS_EVENTS.WS_CONNECTED, () => {
+                        showToast('Đã kết nối real-time', 'success');
+                    });
+
+                    window.wsManager.subscribe(window.WS_EVENTS.WS_DISCONNECTED, () => {
+                        showToast('Mất kết nối, đang thử lại...', 'warning');
+                    });
+
+                } else {
+                    // Fallback to REST API
+                    console.log('WebSocket not available, using REST API fallback');
+                    loadDashboardFallback();
+                    
+                    // Retry WebSocket connection
+                    setTimeout(() => {
+                        if (window.wsManager && !window.wsManager.connected) {
+                            window.wsManager.connect();
+                        }
+                    }, 2000);
                 }
             }
 
-            // Hàm cập nhật danh sách chuồng
-            function updateCoopsList(coops) {
-                // Đây là phần đơn giản hóa - thực tế cần tạo HTML động cho từng chuồng
-                console.log('Coops loaded:', coops.length);
+            /**
+             * Fallback: Load data via REST API
+             */
+            async function loadDashboardFallback() {
+                try {
+                    const data = await dashboardAPI.getOverview();
+                    updateDashboardOverview(data);
+                    
+                    if (data.coops) {
+                        updateCoopsList(data.coops);
+                    }
+                    if (data.devices) {
+                        updateDevicesList(data.devices);
+                    }
+                } catch (error) {
+                    console.error('Dashboard fallback error:', error);
+                    showToast('Không thể tải dữ liệu', 'error');
+                }
             }
 
-            // Tải dữ liệu khi trang load
-            loadDashboard();
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initDashboard);
+            } else {
+                initDashboard();
+            }
 
             // Xử lý logout
             const logoutBtn = document.querySelector('a[href*="logout"]');
@@ -1150,79 +1366,11 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <a class="btn btn-primary" href="/login">Logout</a>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="vendor/jquery/jquery.min.js"></script>
-    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Core plugin JavaScript-->
-    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
-
-    <!-- Page level plugins -->
-    <script src="vendor/chart.js/Chart.min.js"></script>
-
-    <!-- Page level custom scripts -->
-    <script src="js/demo/chart-area-demo.js"></script>
-    <script src="js/demo/chart-pie-demo.js"></script>
-
-    <script>
-        // Donut Chart Interaction - index.html
-        (function() {
-            var segments = document.querySelectorAll('.donut-segment-coop');
-            var tooltip = document.getElementById('donutTooltipCoop');
-            var legendItems = document.querySelectorAll('.legend-item-coop');
-            
-            segments.forEach(function(segment) {
-                segment.addEventListener('mouseenter', function() {
-                    var name = this.getAttribute('data-name');
-                    var percent = this.getAttribute('data-percent');
-                    var count = this.getAttribute('data-count');
-                    var color = this.getAttribute('stroke');
-                    
-                    tooltip.querySelector('.tooltip-name-coop').textContent = name;
-                    tooltip.querySelector('.tooltip-percent-coop').textContent = percent + '% (' + count + ')';
-                    tooltip.querySelector('.tooltip-percent-coop').style.color = color;
-                    tooltip.classList.add('show');
-                });
-                
-                segment.addEventListener('mousemove', function(e) {
-                    tooltip.style.left = (e.clientX + 15) + 'px';
-                    tooltip.style.top = (e.clientY - 10) + 'px';
-                });
-                
-                segment.addEventListener('mouseleave', function() {
-                    tooltip.classList.remove('show');
-                });
-            });
-            
-            legendItems.forEach(function(item) {
-                item.addEventListener('mouseenter', function() {
-                    var segmentType = this.getAttribute('data-segment');
-                    segments.forEach(function(seg) {
-                        if (seg.getAttribute('data-segment') === segmentType) {
-                            seg.style.strokeWidth = '28';
-                            seg.style.filter = 'brightness(1.15)';
-                        }
-                    });
-                });
-                
-                item.addEventListener('mouseleave', function() {
-                    segments.forEach(function(seg) {
-                        seg.style.strokeWidth = '22';
-                        seg.style.filter = 'none';
-                    });
-                });
-            });
-        })();
-    </script>
 
     <!-- FAB Bottom Navigation -->
     <nav class="fab-nav">
@@ -1270,109 +1418,55 @@
     })();
     </script>
 
-    <!-- API Integration -->
-    <script src="js/api.js"></script>
+    <!-- Donut Chart Interaction -->
     <script>
-    // Dashboard - Gọi API và cập nhật dữ liệu
-    (function() {
-        'use strict';
-
-        // Kiểm tra đăng nhập
-        if (!isAuthenticated()) {
-            window.location.href = '/login';
-            return;
-        }
-
-        // Elements cần cập nhật
-        const elements = {
-            totalChickens: document.getElementById('total-chickens'),
-            totalCoops: document.getElementById('total-coops'),
-            totalDevices: document.getElementById('total-devices'),
-            onlineDevices: document.getElementById('online-devices'),
-            recentCoops: document.getElementById('recent-coops-list'),
-            recentDevices: document.getElementById('recent-devices-list')
-        };
-
-        // Hiển thị loading
-        function showLoading() {
-            document.querySelector('.content-wrapper').style.opacity = '0.5';
-        }
-
-        function hideLoading() {
-            document.querySelector('.content-wrapper').style.opacity = '1';
-        }
-
-        // Cập nhật dashboard
-        async function loadDashboard() {
-            try {
-                showLoading();
+        (function() {
+            var segments = document.querySelectorAll('.donut-segment-coop');
+            var tooltip = document.getElementById('donutTooltipCoop');
+            var legendItems = document.querySelectorAll('.legend-item-coop');
+            
+            segments.forEach(function(segment) {
+                segment.addEventListener('mouseenter', function() {
+                    var name = this.getAttribute('data-name');
+                    var percent = this.getAttribute('data-percent');
+                    var count = this.getAttribute('data-count');
+                    var color = this.getAttribute('stroke');
+                    
+                    tooltip.querySelector('.tooltip-name-coop').textContent = name;
+                    tooltip.querySelector('.tooltip-percent-coop').textContent = percent + '% (' + count + ')';
+                    tooltip.querySelector('.tooltip-percent-coop').style.color = color;
+                    tooltip.classList.add('show');
+                });
                 
-                // Gọi API dashboard
-                const data = await dashboardAPI.getOverview();
+                segment.addEventListener('mousemove', function(e) {
+                    tooltip.style.left = (e.clientX + 15) + 'px';
+                    tooltip.style.top = (e.clientY - 10) + 'px';
+                });
                 
-                // Cập nhật các giá trị
-                if (data.stats) {
-                    if (elements.totalChickens) {
-                        elements.totalChickens.textContent = data.stats.total_chickens || 0;
-                    }
-                    if (elements.totalCoops) {
-                        elements.totalCoops.textContent = data.stats.total_coops || 0;
-                    }
-                    if (elements.totalDevices) {
-                        elements.totalDevices.textContent = data.stats.total_devices || 0;
-                    }
-                    if (elements.onlineDevices) {
-                        elements.onlineDevices.textContent = data.stats.online_devices || 0;
-                    }
-                }
-
-                // Render danh sách chuồng gần đây
-                if (elements.recentCoops && data.coops) {
-                    elements.recentCoops.innerHTML = data.coops.slice(0, 5).map(coop => `
-                        <div class="coop-summary-card">
-                            <div class="coop-summary-header">
-                                <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
-                                <span class="coop-status ${coop.status || 'active'}">${coop.status === 'active' ? 'Hoạt động' : coop.status}</span>
-                            </div>
-                            <div class="coop-summary-info">
-                                <span><i class="fas fa-egg"></i> ${coop.current_count || 0} gà</span>
-                                <span><i class="fas fa-ruler-combined"></i> ${coop.area || 0} m²</span>
-                            </div>
-                            <a href="coop-detail.html?id=${coop.id}" class="btn btn-sm btn-outline-primary">Chi tiết</a>
-                        </div>
-                    `).join('');
-                }
-
-                // Render danh sách thiết bị gần đây
-                if (elements.recentDevices && data.devices) {
-                    elements.recentDevices.innerHTML = data.devices.slice(0, 5).map(device => `
-                        <div class="device-recent-card ${device.status || 'offline'}">
-                            <div class="device-recent-header">
-                                <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
-                                <span class="device-recent-coop">${device.coop_name || ''}</span>
-                            </div>
-                            <div class="device-recent-status">
-                                <span class="status-dot ${device.status || 'offline'}"></span>
-                                <span class="status-text ${device.status || 'offline'}">
-                                    ${device.status === 'online' ? 'Hoạt động' : device.status === 'waiting' ? 'Chờ' : 'Offline'}
-                                </span>
-                            </div>
-                        </div>
-                    `).join('');
-                }
-
-                hideLoading();
-            } catch (error) {
-                console.error('Lỗi load dashboard:', error);
-                hideLoading();
-                showToast('Không thể tải dữ liệu dashboard', 'error');
-            }
-        }
-
-        // Chạy khi trang tải xong
-        loadDashboard();
-
-    })();
+                segment.addEventListener('mouseleave', function() {
+                    tooltip.classList.remove('show');
+                });
+            });
+            
+            legendItems.forEach(function(item) {
+                item.addEventListener('mouseenter', function() {
+                    var segmentType = this.getAttribute('data-segment');
+                    segments.forEach(function(seg) {
+                        if (seg.getAttribute('data-segment') === segmentType) {
+                            seg.style.strokeWidth = '28';
+                            seg.style.filter = 'brightness(1.15)';
+                        }
+                    });
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    segments.forEach(function(seg) {
+                        seg.style.strokeWidth = '22';
+                        seg.style.filter = 'none';
+                    });
+                });
+            });
+        })();
     </script>
 
 </body>

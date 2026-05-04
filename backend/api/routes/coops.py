@@ -26,6 +26,204 @@ from models import db, Coop, CoopDevice, Device, Environment
 coops_bp = Blueprint('coops', __name__)
 
 
+@coops_bp.route('/public', methods=['GET'])
+def get_public_coops():
+    """
+    Lấy danh sách tất cả các chuồng (Không cần auth - cho demo).
+    
+    Returns:
+        200: Array of coop objects
+    """
+    coops = Coop.query.all()
+    return jsonify([coop.to_dict() for coop in coops]), 200
+
+
+@coops_bp.route('/public/<int:coop_id>', methods=['GET'])
+def get_public_coop(coop_id):
+    """
+    Lấy thông tin một chuồng cụ thể (Không cần auth - cho demo).
+    
+    Args:
+        coop_id (int): ID của chuồng
+        
+    Returns:
+        200: Coop object
+        404: Không tìm thấy chuồng
+    """
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    return jsonify(coop.to_dict()), 200
+
+
+@coops_bp.route('/public/<int:coop_id>', methods=['PUT'])
+def update_public_coop(coop_id):
+    """
+    Cập nhật thông tin chuồng (Không cần auth - cho demo).
+    
+    Args:
+        coop_id (int): ID của chuồng cần cập nhật
+        Request Body: Các trường cần cập nhật
+        
+    Returns:
+        200: Coop object đã cập nhật
+        404: Không tìm thấy chuồng
+    """
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    data = request.get_json()
+    
+    coop.name = data.get('name', coop.name)
+    coop.location = data.get('location', coop.location)
+    coop.capacity = data.get('capacity', coop.capacity)
+    coop.current_count = data.get('current_count', coop.current_count)
+    coop.area = data.get('area', coop.area)
+    coop.temp_min = data.get('temp_min', coop.temp_min)
+    coop.temp_max = data.get('temp_max', coop.temp_max)
+    coop.humidity_min = data.get('humidity_min', coop.humidity_min)
+    coop.humidity_max = data.get('humidity_max', coop.humidity_max)
+    coop.feed_threshold = data.get('feed_threshold', coop.feed_threshold)
+    coop.water_threshold = data.get('water_threshold', coop.water_threshold)
+    coop.auto_fan = data.get('auto_fan', coop.auto_fan)
+    coop.auto_light = data.get('auto_light', coop.auto_light)
+    coop.auto_feed = data.get('auto_feed', coop.auto_feed)
+    coop.auto_water = data.get('auto_water', coop.auto_water)
+    
+    db.session.commit()
+    
+    return jsonify(coop.to_dict()), 200
+
+
+@coops_bp.route('/public/<int:coop_id>/devices', methods=['GET'])
+def get_public_coop_devices(coop_id):
+    """
+    Lấy danh sách thiết bị trong một chuồng (Không cần auth - cho demo).
+    
+    Args:
+        coop_id (int): ID của chuồng
+        
+    Returns:
+        200: Array of device objects
+        404: Không tìm thấy chuồng
+    """
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id).all()
+    devices = []
+    for cd in coop_devices:
+        device = db.session.get(Device, cd.device_id)
+        if device:
+            devices.append(device.to_dict())
+    
+    return jsonify(devices), 200
+
+
+@coops_bp.route('/public/<int:coop_id>/devices/<int:device_id>', methods=['DELETE'])
+def remove_device_from_coop(coop_id, device_id):
+    """
+    Gỡ thiết bị khỏi chuồng (Không cần auth - cho demo).
+    
+    Args:
+        coop_id (int): ID của chuồng
+        device_id (int): ID của thiết bị
+        
+    Returns:
+        200: Thông báo thành công
+        404: Không tìm thấy chuồng hoặc thiết bị
+    """
+    from models import UnconnectedDevice
+    
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    device = db.session.get(Device, device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+    
+    # Kiểm tra xem thiết bị có trong chuồng không
+    coop_device = CoopDevice.query.filter_by(coop_id=coop_id, device_id=device_id).first()
+    if not coop_device:
+        return jsonify({'error': 'Device not in this coop'}), 404
+    
+    # Thêm vào unconnected list
+    unconnected = UnconnectedDevice(
+        name=device.name,
+        type=device.type,
+        mac_address=device.mac_address,
+        status=device.status,
+        is_active=device.is_active,
+        battery=device.battery
+    )
+    db.session.add(unconnected)
+    
+    # Gỡ liên kết với chuồng
+    db.session.delete(coop_device)
+    
+    # Xóa thiết bị
+    db.session.delete(device)
+    db.session.commit()
+    
+    return jsonify({'message': 'Device removed from coop'}), 200
+
+
+@coops_bp.route('/public/<int:coop_id>/environment', methods=['GET'])
+def get_public_coop_environment(coop_id):
+    """
+    Lấy dữ liệu môi trường mới nhất của chuồng (Không cần auth - cho demo).
+    
+    Args:
+        coop_id (int): ID của chuồng
+        
+    Returns:
+        200: Environment object mới nhất
+        404: Không tìm thấy chuồng hoặc chưa có dữ liệu
+    """
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    environment = Environment.query.filter_by(coop_id=coop_id).order_by(Environment.recorded_at.desc()).first()
+    
+    if not environment:
+        return jsonify({
+            'temperature': 0,
+            'humidity': 0,
+            'feed_level': 0,
+            'water_level': 0,
+            'recorded_at': None
+        }), 200
+    
+    return jsonify(environment.to_dict()), 200
+
+
+@coops_bp.route('/public/<int:coop_id>/history', methods=['GET'])
+def get_public_coop_history(coop_id):
+    """
+    Lấy lịch sử dữ liệu môi trường của chuồng (Không cần auth - cho demo).
+    
+    Args:
+        coop_id (int): ID của chuồng
+        limit (int, query param): Số lượng bản ghi (mặc định: 24)
+        
+    Returns:
+        200: Array of environment objects
+        404: Không tìm thấy chuồng
+    """
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    limit = request.args.get('limit', 24, type=int)
+    environments = Environment.query.filter_by(coop_id=coop_id).order_by(Environment.recorded_at.desc()).limit(limit).all()
+    
+    return jsonify([env.to_dict() for env in environments]), 200
+
+
 @coops_bp.route('', methods=['GET'])
 @jwt_required()
 def get_coops():

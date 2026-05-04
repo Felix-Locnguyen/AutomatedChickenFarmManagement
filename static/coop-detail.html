@@ -87,6 +87,10 @@
             background: #cce5ff;
             color: #004085;
         }
+        .coop-device-tag.inactive {
+            background: #e3e6f0;
+            color: #6c757d;
+        }
         .coop-device-tag i {
             margin-right: 5px;
         }
@@ -578,6 +582,7 @@
             #accordionSidebar { display: none !important; }
             body { padding-bottom: 20px; }
         }
+        .coop-summary-card {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -936,7 +941,7 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Chi tiết chuồng - Chuồng A</h1>
+                        <h1 class="h3 mb-0 text-gray-800" id="pageTitle">Chi tiết chuồng...</h1>
                         <div>
                             <a href="/coops" class="btn btn-secondary btn-sm shadow-sm">
                                 <i class="fas fa-arrow-left fa-sm"></i> Quay lại
@@ -963,43 +968,43 @@
                                             <div class="col-md-6">
                                                 <div class="coop-info-item">
                                                     <span class="coop-info-label">Số lượng gà</span>
-                                                    <span class="coop-info-value">450 con</span>
+                                                    <span class="coop-info-value" id="currentCount">-- con</span>
                                                 </div>
                                                 <div class="coop-info-item">
                                                     <span class="coop-info-label">Diện tích chuồng</span>
-                                                    <span class="coop-info-value">100 m²</span>
+                                                    <span class="coop-info-value" id="coopArea">-- m²</span>
                                                 </div>
                                                 <div class="coop-info-item">
                                                     <span class="coop-info-label">Vị trí chuồng</span>
-                                                    <span class="coop-info-value">Khu vực A - Hàng 1</span>
+                                                    <span class="coop-info-value" id="coopLocation">--</span>
                                                 </div>
                                                 <div class="coop-info-item">
                                                     <span class="coop-info-label">Trạng thái</span>
-                                                    <span class="badge badge-success">Bình thường</span>
+                                                    <span class="badge badge-success" id="coopStatus">--</span>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="coop-temp-humid">
                                                     <div class="coop-temp">
                                                         <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                                        <div class="coop-temp-value">28°C</div>
+                                                        <div class="coop-temp-value" id="tempValue">--°C</div>
                                                         <div class="coop-temp-label">Nhiệt độ</div>
                                                     </div>
                                                     <div class="coop-humid">
                                                         <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                                        <div class="coop-humid-value">65%</div>
+                                                        <div class="coop-humid-value" id="humidValue">--%</div>
                                                         <div class="coop-humid-label">Độ ẩm</div>
                                                     </div>
                                                 </div>
                                                 <div class="coop-temp-humid mt-2">
                                                     <div class="coop-temp">
                                                         <div class="coop-temp-icon"><i class="fas fa-drumstick-bite" style="color: #ffc107;"></i></div>
-                                                        <div class="coop-temp-value">80%</div>
+                                                        <div class="coop-temp-value" id="feedValue">--%</div>
                                                         <div class="coop-temp-label">Thức ăn</div>
                                                     </div>
                                                     <div class="coop-humid">
                                                         <div class="coop-humid-icon"><i class="fas fa-water" style="color: #007bff;"></i></div>
-                                                        <div class="coop-humid-value">75%</div>
+                                                        <div class="coop-humid-value" id="waterValue">--%</div>
                                                         <div class="coop-humid-label">Nước</div>
                                                     </div>
                                                 </div>
@@ -1009,11 +1014,8 @@
                                         <!-- Thiết bị đang hoạt động -->
                                         <div class="coop-devices mt-3">
                                             <div class="coop-devices-title">Thiết bị đang hoạt động:</div>
-                                            <div class="coop-device-list">
-                                                <span class="coop-device-tag active"><i class="fas fa-wifi"></i> Cảm biến nhiệt</span>
-                                                <span class="coop-device-tag active"><i class="fas fa-fan"></i> Quạt thông gió</span>
-                                                <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i> Đèn LED</span>
-                                                <span class="coop-device-tag active"><i class="fas fa-weight"></i> Cân điện tử</span>
+                                            <div class="coop-device-list" id="deviceList">
+                                                <span class="coop-device-tag"><i class="fas fa-spinner fa-spin"></i> Đang tải...</span>
                                             </div>
                                         </div>
                                     </div>
@@ -1068,53 +1070,23 @@
                                 <div class="card-body">
                                     <div class="donut-chart-container-detail">
                                         <div class="donut-chart-detail" id="donutChartDetail">
-                                            <svg viewBox="0 0 200 200">
-                                                <!-- Hoạt động (60%) - 3 thiết bị -->
-                                                <circle class="donut-segment-detail" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#22c55e" stroke-width="20"
-                                                    stroke-dasharray="264 440" stroke-dashoffset="0"
-                                                    data-segment="hoatdong" data-name="Hoạt động" data-count="3" data-percent="60">
-                                                </circle>
-                                                <!-- Chờ (20%) - 1 thiết bị -->
-                                                <circle class="donut-segment-detail" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#ffc107" stroke-width="20"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-264"
-                                                    data-segment="cho" data-name="Chờ" data-count="1" data-percent="20">
-                                                </circle>
-                                                <!-- Lỗi (20%) - 1 thiết bị -->
-                                                <circle class="donut-segment-detail" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#dc3545" stroke-width="20"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-352"
-                                                    data-segment="loi" data-name="Lỗi" data-count="1" data-percent="20">
-                                                </circle>
-                                                <!-- Center circle -->
-                                                <circle cx="100" cy="100" r="52" fill="white"></circle>
+                                            <svg viewBox="0 0 200 200" id="donutSvg">
+                                                <!-- Dynamic segments will be inserted here -->
                                             </svg>
                                             <div class="donut-center-detail">
-                                                <span class="donut-total-detail">5</span>
+                                                <span class="donut-total-detail" id="deviceCount">0</span>
                                                 <span class="donut-label-detail">thiết bị</span>
                                             </div>
                                         </div>
                                         <div class="donut-tooltip-detail" id="donutTooltipDetail">
                                             <div class="tooltip-content-detail">
-                                                <span class="tooltip-name-detail">Hoạt động</span>
-                                                <span class="tooltip-percent-detail">60%</span>
+                                                <span class="tooltip-name-detail">--</span>
+                                                <span class="tooltip-percent-detail">--%</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="donut-legend-detail">
-                                        <div class="legend-item-detail" data-segment="hoatdong">
-                                            <span class="legend-dot-detail" style="background: #22c55e;"></span>
-                                            <span class="legend-text-detail">Hoạt động (3)</span>
-                                        </div>
-                                        <div class="legend-item-detail" data-segment="cho">
-                                            <span class="legend-dot-detail" style="background: #ffc107;"></span>
-                                            <span class="legend-text-detail">Chờ (1)</span>
-                                        </div>
-                                        <div class="legend-item-detail" data-segment="loi">
-                                            <span class="legend-dot-detail" style="background: #dc3545;"></span>
-                                            <span class="legend-text-detail">Lỗi (1)</span>
-                                        </div>
+                                    <div class="donut-legend-detail" id="donutLegend">
+                                        <!-- Dynamic legend will be inserted here -->
                                     </div>
                                 </div>
                             </div>
@@ -1127,41 +1099,10 @@
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách thiết bị</h6>
                                 </div>
                                 <div class="card-body">
-                                    <div class="device-list-mini">
-                                        <div class="device-card-mini">
-                                            <div class="device-card-mini-info">
-                                                <span class="status-dot-mini" style="background: #22c55e;"></span>
-                                                <span class="device-card-mini-name">Cảm biến nhiệt độ A1</span>
-                                            </div>
-                                            <span class="badge badge-success device-card-mini-status">Hoạt động</span>
-                                        </div>
-                                        <div class="device-card-mini">
-                                            <div class="device-card-mini-info">
-                                                <span class="status-dot-mini" style="background: #22c55e;"></span>
-                                                <span class="device-card-mini-name">Cảm biến ẩm A1</span>
-                                            </div>
-                                            <span class="badge badge-success device-card-mini-status">Hoạt động</span>
-                                        </div>
-                                        <div class="device-card-mini">
-                                            <div class="device-card-mini-info">
-                                                <span class="status-dot-mini" style="background: #22c55e;"></span>
-                                                <span class="device-card-mini-name">Quạt thông gió A1</span>
-                                            </div>
-                                            <span class="badge badge-success device-card-mini-status">Hoạt động</span>
-                                        </div>
-                                        <div class="device-card-mini">
-                                            <div class="device-card-mini-info">
-                                                <span class="status-dot-mini" style="background: #ffc107;"></span>
-                                                <span class="device-card-mini-name">Đèn LED A1</span>
-                                            </div>
-                                            <span class="badge badge-warning device-card-mini-status">Chờ</span>
-                                        </div>
-                                        <div class="device-card-mini">
-                                            <div class="device-card-mini-info">
-                                                <span class="status-dot-mini" style="background: #dc3545;"></span>
-                                                <span class="device-card-mini-name">Hệ thống cho ăn B1</span>
-                                            </div>
-                                            <span class="badge badge-danger device-card-mini-status">Lỗi</span>
+                                    <div class="device-list-mini" id="deviceListMini">
+                                        <!-- Dynamic device cards will be inserted here -->
+                                        <div class="text-center text-muted py-3">
+                                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
                                         </div>
                                     </div>
                                 </div>
@@ -1182,63 +1123,11 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
                                 </div>
-                                <div class="card-body">
-                                    <!-- Chuồng A -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng A</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 480 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
+                                <div class="card-body" id="coopSummaryList">
+                                    <!-- Dynamic coop summary cards will be inserted here -->
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
                                     </div>
-                                    <!-- Chuồng B -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng B</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 280 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng C -->
-                                    <div class="coop-summary-card warning">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng C</span>
-                                            <span class="coop-summary-status warning">Cảnh báo</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 380 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng D -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng D</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 180 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng E -->
-                                    <div class="coop-summary-card error">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng E</span>
-                                            <span class="coop-summary-status error">Lỗi</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 320 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <a href="/coops" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
                                 </div>
                             </div>
 
@@ -1308,23 +1197,23 @@
                         <h6 class="text-muted mb-3">Thông tin chuồng</h6>
                         <div class="form-group">
                             <label for="coopNameModal">Tên chuồng</label>
-                            <input type="text" class="form-control" id="coopNameModal" value="Chuồng A">
+                            <input type="text" class="form-control" id="coopNameModal" value="">
                         </div>
                         <div class="form-group">
                             <label for="coopLocationModal">Vị trí</label>
-                            <input type="text" class="form-control" id="coopLocationModal" value="Khu vực A - Hàng 1">
+                            <input type="text" class="form-control" id="coopLocationModal" value="">
                         </div>
                         <div class="form-group">
                             <label for="coopCapacityModal">Sức chứa (con)</label>
-                            <input type="number" class="form-control" id="coopCapacityModal" value="500">
+                            <input type="number" class="form-control" id="coopCapacityModal" value="">
                         </div>
                         <div class="form-group">
                             <label for="coopCurrentModal">Số gà hiện tại</label>
-                            <input type="number" class="form-control" id="coopCurrentModal" value="450">
+                            <input type="number" class="form-control" id="coopCurrentModal" value="">
                         </div>
                         <div class="form-group">
                             <label for="coopAreaModal">Diện tích (m²)</label>
-                            <input type="number" class="form-control" id="coopAreaModal" value="100">
+                            <input type="number" class="form-control" id="coopAreaModal" value="">
                         </div>
                     </div>
                     <div class="col-lg-6">
@@ -1334,13 +1223,13 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="tempMinModal">Nhiệt độ tối thiểu (°C)</label>
-                                    <input type="number" class="form-control" id="tempMinModal" value="18">
+                                    <input type="number" class="form-control" id="tempMinModal" value="">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="tempMaxModal">Nhiệt độ tối đa (°C)</label>
-                                    <input type="number" class="form-control" id="tempMaxModal" value="28">
+                                    <input type="number" class="form-control" id="tempMaxModal" value="">
                                 </div>
                             </div>
                         </div>
@@ -1349,13 +1238,13 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="humidityMinModal">Độ ẩm tối thiểu (%)</label>
-                                    <input type="number" class="form-control" id="humidityMinModal" value="40">
+                                    <input type="number" class="form-control" id="humidityMinModal" value="">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="humidityMaxModal">Độ ẩm tối đa (%)</label>
-                                    <input type="number" class="form-control" id="humidityMaxModal" value="70">
+                                    <input type="number" class="form-control" id="humidityMaxModal" value="">
                                 </div>
                             </div>
                         </div>
@@ -1364,28 +1253,28 @@
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="feedThresholdModal">Thức ăn tối thiểu (%)</label>
-                                    <input type="number" class="form-control" id="feedThresholdModal" value="20">
+                                    <input type="number" class="form-control" id="feedThresholdModal" value="">
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="form-group">
                                     <label for="waterThresholdModal">Nước tối thiểu (%)</label>
-                                    <input type="number" class="form-control" id="waterThresholdModal" value="30">
+                                    <input type="number" class="form-control" id="waterThresholdModal" value="">
                                 </div>
                             </div>
                         </div>
                         <h6 class="text-muted mb-2 mt-3">Lịch cho ăn</h6>
                         <div class="form-group">
                             <label for="feedTime1Modal">Giờ cho ăn lần 1</label>
-                            <input type="time" class="form-control" id="feedTime1Modal" value="06:00">
+                            <input type="time" class="form-control" id="feedTime1Modal" value="">
                         </div>
                         <div class="form-group">
                             <label for="feedTime2Modal">Giờ cho ăn lần 2</label>
-                            <input type="time" class="form-control" id="feedTime2Modal" value="12:00">
+                            <input type="time" class="form-control" id="feedTime2Modal" value="">
                         </div>
                         <div class="form-group">
                             <label for="feedTime3Modal">Giờ cho ăn lần 3</label>
-                            <input type="time" class="form-control" id="feedTime3Modal" value="18:00">
+                            <input type="time" class="form-control" id="feedTime3Modal" value="">
                         </div>
                     </div>
                 </div>
@@ -1398,7 +1287,7 @@
                                 <div class="automation-desc">Bật quạt khi nhiệt độ vượt ngưỡng</div>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" id="autoFanModal" checked>
+                                <input type="checkbox" id="autoFanModal">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
@@ -1410,7 +1299,7 @@
                                 <div class="automation-desc">Bật đèn khi trời tối</div>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" id="autoLightModal" checked>
+                                <input type="checkbox" id="autoLightModal">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
@@ -1422,7 +1311,7 @@
                                 <div class="automation-desc">Cho ăn theo lịch đã thiết lập</div>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" id="autoFeedModal" checked>
+                                <input type="checkbox" id="autoFeedModal">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
@@ -1434,7 +1323,7 @@
                                 <div class="automation-desc">Cấp nước tự động khi cạn</div>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" id="autoWaterModal" checked>
+                                <input type="checkbox" id="autoWaterModal">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
@@ -1446,7 +1335,7 @@
                     <div class="emergency-description">Khi bật, hệ thống sẽ gửi cảnh báo ngay lập tức khi phát hiện sự cố nghiêm trọng (nhiệt độ quá cao/thấp, mất điện, thiết bị lỗi...)</div>
                     <div class="mt-2">
                         <label class="toggle-switch">
-                            <input type="checkbox" id="emergencyAlertModal" checked>
+                            <input type="checkbox" id="emergencyAlertModal">
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
@@ -1830,65 +1719,429 @@
     })();
     </script>
 
+    <!-- Socket.io Client -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <!-- WebSocket Manager -->
+    <script src="js/ws-manager.js"></script>
+    
     <!-- API Integration -->
     <script src="js/api.js"></script>
+    
     <script>
-    // Coop Detail - Chi tiết chuồng
+    // Coop Detail - Dynamic Data Loading với Polling (No Auth)
     (function() {
         'use strict';
 
-        if (!isAuthenticated()) {
-            window.location.href = '/login';
-            return;
+        const urlParams = new URLSearchParams(window.location.search);
+        const coopId = parseInt(urlParams.get('id')) || 1;
+        
+        const POLL_INTERVAL = 5000; // 5 seconds
+        let pollInterval = null;
+        let currentCoopData = null;
+
+        // Helper function to get device icon based on type
+        function getDeviceIcon(type) {
+            const icons = {
+                'temperature': 'fa-thermometer-half',
+                'humidity': 'fa-tint',
+                'fan': 'fa-fan',
+                'light': 'fa-lightbulb',
+                'feeder': 'fa-drumstick-bite',
+                'camera': 'fa-video'
+            };
+            return icons[type] || 'fa-wifi';
         }
 
-        // Lấy coop_id từ URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const coopId = urlParams.get('id') || 1;
+        // Helper to get status text
+        function getStatusText(status) {
+            const statusMap = {
+                'online': 'Bình thường',
+                'active': 'Bình thường',
+                'normal': 'Bình thường',
+                'warning': 'Cảnh báo',
+                'offline': 'Tắt',
+                'error': 'Lỗi',
+                'cleaning': 'Đang vệ sinh',
+                'empty': 'Trống'
+            };
+            return statusMap[status] || status;
+        }
 
-        async function loadCoopDetail() {
-            try {
-                // Lấy thông tin chuồng
-                const coop = await coopsAPI.getOne(coopId);
-                
-                // Cập nhật tên chuồng
-                const coopNameEl = document.getElementById('coop-name');
-                if (coopNameEl) coopNameEl.textContent = coop.name || 'Chuồng ' + coopId;
+        // Helper to get status class
+        function getStatusClass(status) {
+            const classMap = {
+                'online': 'success',
+                'active': 'success',
+                'normal': 'success',
+                'warning': 'warning',
+                'offline': 'secondary',
+                'error': 'danger',
+                'cleaning': 'info',
+                'empty': 'secondary'
+            };
+            return classMap[status] || 'secondary';
+        }
 
-                // Cập nhật các thông tin khác nếu có element tương ứng
-                const coopStats = document.querySelector('.coop-stats');
-                if (coopStats) {
-                    coopStats.innerHTML = `
-                        <div class="stat-item">
-                            <span class="stat-label">Số gà:</span>
-                            <span class="stat-value">${coop.current_count || 0}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Sức chứa:</span>
-                            <span class="stat-value">${coop.capacity || 0}</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Diện tích:</span>
-                            <span class="stat-value">${coop.area || 0} m²</span>
-                        </div>
-                    `;
-                }
+        // Update page title
+        function updatePageTitle(name) {
+            const titleEl = document.getElementById('pageTitle');
+            if (titleEl) {
+                titleEl.textContent = 'Chi tiết chuồng - ' + (name || 'Chuồng ' + coopId);
+            }
+            document.title = 'Chi tiết chuồng - ' + (name || 'Chuồng ' + coopId);
+        }
 
-                // Lấy dữ liệu môi trường
-                try {
-                    const env = await coopsAPI.getEnvironment(coopId);
-                    // Cập nhật temperature, humidity nếu có elements
-                    console.log('Environment:', env);
-                } catch(e) {
-                    console.log('Chưa có dữ liệu môi trường');
-                }
+        // Update coop basic info
+        function updateCoopInfo(coop) {
+            if (!coop) return;
+            currentCoopData = coop;
 
-            } catch (error) {
-                console.error('Lỗi load coop detail:', error);
+            updatePageTitle(coop.name);
+
+            document.getElementById('currentCount').textContent = (coop.current_count || 0) + ' con';
+            document.getElementById('coopArea').textContent = (coop.area || 0) + ' m²';
+            document.getElementById('coopLocation').textContent = coop.location || '--';
+
+            const statusEl = document.getElementById('coopStatus');
+            statusEl.textContent = getStatusText(coop.status);
+            statusEl.className = 'badge badge-' + getStatusClass(coop.status);
+        }
+
+        // Update environment data (temp, humidity, feed, water)
+        function updateEnvironment(env) {
+            if (!env) return;
+
+            if (env.temperature !== undefined && env.temperature !== null) {
+                document.getElementById('tempValue').textContent = Math.round(env.temperature) + '°C';
+            }
+            if (env.humidity !== undefined && env.humidity !== null) {
+                document.getElementById('humidValue').textContent = Math.round(env.humidity) + '%';
+            }
+            if (env.feed_level !== undefined && env.feed_level !== null) {
+                document.getElementById('feedValue').textContent = Math.round(env.feed_level) + '%';
+            }
+            if (env.water_level !== undefined && env.water_level !== null) {
+                document.getElementById('waterValue').textContent = Math.round(env.water_level) + '%';
             }
         }
 
-        loadCoopDetail();
+        // Update device list in the info section
+        function updateDeviceList(devices) {
+            const container = document.getElementById('deviceList');
+            if (!container) return;
+
+            if (!Array.isArray(devices) || devices.length === 0) {
+                container.innerHTML = '<span class="text-muted">Chưa có thiết bị</span>';
+                return;
+            }
+
+            container.innerHTML = devices.map(device => `
+                <span class="coop-device-tag ${device.is_active ? 'active' : 'inactive'}">
+                    <i class="fas fa-${getDeviceIcon(device.type)}"></i> ${device.name || 'Thiết bị ' + device.id}
+                </span>
+            `).join('');
+        }
+
+        // Update donut chart with device stats
+        function updateDonutChart(devices) {
+            const deviceCountEl = document.getElementById('deviceCount');
+            const donutSvg = document.getElementById('donutSvg');
+            const donutLegend = document.getElementById('donutLegend');
+
+            if (!Array.isArray(devices) || devices.length === 0) {
+                deviceCountEl.textContent = '0';
+                donutSvg.innerHTML = '<circle cx="100" cy="100" r="70" fill="none" stroke="#e3e6f0" stroke-width="20" stroke-dasharray="440 440"></circle><circle cx="100" cy="100" r="52" fill="white"></circle>';
+                donutLegend.innerHTML = '<span class="text-muted">Chưa có thiết bị</span>';
+                return;
+            }
+
+            deviceCountEl.textContent = devices.length;
+
+            const stats = {
+                online: devices.filter(d => d.status === 'online').length,
+                offline: devices.filter(d => d.status === 'offline').length,
+                warning: devices.filter(d => d.status === 'connecting' || d.status === 'warning').length
+            };
+
+            const total = devices.length;
+            const onlinePct = Math.round((stats.online / total) * 100);
+            const warningPct = Math.round((stats.warning / total) * 100);
+            const offlinePct = Math.round((stats.offline / total) * 100);
+
+            const circumference = 2 * Math.PI * 70;
+            let offset = 0;
+
+            let segments = '';
+            if (stats.online > 0) {
+                const dashArray = (stats.online / total) * circumference;
+                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#22c55e" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="online" data-name="Hoạt động" data-count="${stats.online}" data-percent="${onlinePct}"></circle>`;
+                offset += dashArray;
+            }
+            if (stats.warning > 0) {
+                const dashArray = (stats.warning / total) * circumference;
+                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#ffc107" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="warning" data-name="Chờ" data-count="${stats.warning}" data-percent="${warningPct}"></circle>`;
+                offset += dashArray;
+            }
+            if (stats.offline > 0) {
+                const dashArray = (stats.offline / total) * circumference;
+                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#dc3545" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="offline" data-name="Lỗi" data-count="${stats.offline}" data-percent="${offlinePct}"></circle>`;
+            }
+
+            donutSvg.innerHTML = segments + '<circle cx="100" cy="100" r="52" fill="white"></circle>';
+
+            donutLegend.innerHTML = `
+                ${stats.online > 0 ? '<div class="legend-item-detail" data-segment="online"><span class="legend-dot-detail" style="background: #22c55e;"></span><span class="legend-text-detail">Hoạt động (' + stats.online + ')</span></div>' : ''}
+                ${stats.warning > 0 ? '<div class="legend-item-detail" data-segment="warning"><span class="legend-dot-detail" style="background: #ffc107;"></span><span class="legend-text-detail">Chờ (' + stats.warning + ')</span></div>' : ''}
+                ${stats.offline > 0 ? '<div class="legend-item-detail" data-segment="offline"><span class="legend-dot-detail" style="background: #dc3545;"></span><span class="legend-text-detail">Lỗi (' + stats.offline + ')</span></div>' : ''}
+            `;
+
+            // Re-init donut chart interactions
+            initDonutInteractions();
+        }
+
+        // Update mini device cards
+        function updateDeviceListMini(devices) {
+            const container = document.getElementById('deviceListMini');
+            if (!container) return;
+
+            if (!Array.isArray(devices) || devices.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">Chưa có thiết bị</div>';
+                return;
+            }
+
+            container.innerHTML = devices.map(device => `
+                <div class="device-card-mini">
+                    <div class="device-card-mini-info">
+                        <span class="status-dot-mini" style="background: ${device.status === 'online' ? '#22c55e' : device.status === 'connecting' ? '#ffc107' : '#dc3545'};"></span>
+                        <span class="device-card-mini-name">${device.name || 'Thiết bị ' + device.id}</span>
+                    </div>
+                    <span class="badge badge-${getStatusClass(device.status)} device-card-mini-status">${getStatusText(device.status)}</span>
+                </div>
+            `).join('');
+        }
+
+        // Update coop summary list (all coops)
+        function updateCoopSummaryList(coops) {
+            const container = document.getElementById('coopSummaryList');
+            if (!container) return;
+
+            if (!Array.isArray(coops) || coops.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">Chưa có chuồng nào</div>';
+                return;
+            }
+
+            container.innerHTML = coops.map(coop => `
+                <div class="coop-summary-card ${coop.status === 'online' || coop.status === 'active' || coop.status === 'normal' ? 'online' : coop.status === 'warning' ? 'warning' : 'error'}">
+                    <div class="coop-summary-header">
+                        <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
+                        <span class="coop-summary-status ${coop.status === 'online' || coop.status === 'active' || coop.status === 'normal' ? 'online' : coop.status === 'warning' ? 'warning' : 'error'}">${getStatusText(coop.status)}</span>
+                    </div>
+                    <div class="coop-summary-info">
+                        <span><i class="fas fa-feather-alt"></i> ${coop.current_count || 0} gà</span>
+                        <span><i class="fas fa-ruler"></i> ${coop.area || 0} m²</span>
+                    </div>
+                </div>
+            `).join('') + '<a href="/coops" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>';
+        }
+
+        // Populate edit modal with current coop data
+        function populateEditModal(coop) {
+            if (!coop) return;
+
+            document.getElementById('coopNameModal').value = coop.name || '';
+            document.getElementById('coopLocationModal').value = coop.location || '';
+            document.getElementById('coopCapacityModal').value = coop.capacity || '';
+            document.getElementById('coopCurrentModal').value = coop.current_count || '';
+            document.getElementById('coopAreaModal').value = coop.area || '';
+            document.getElementById('tempMinModal').value = coop.temp_min || '';
+            document.getElementById('tempMaxModal').value = coop.temp_max || '';
+            document.getElementById('humidityMinModal').value = coop.humidity_min || '';
+            document.getElementById('humidityMaxModal').value = coop.humidity_max || '';
+            document.getElementById('feedThresholdModal').value = coop.feed_threshold || '';
+            document.getElementById('waterThresholdModal').value = coop.water_threshold || '';
+            document.getElementById('feedTime1Modal').value = coop.feed_time_1 ? coop.feed_time_1.substring(0, 5) : '';
+            document.getElementById('feedTime2Modal').value = coop.feed_time_2 ? coop.feed_time_2.substring(0, 5) : '';
+            document.getElementById('feedTime3Modal').value = coop.feed_time_3 ? coop.feed_time_3.substring(0, 5) : '';
+            document.getElementById('autoFanModal').checked = coop.auto_fan || false;
+            document.getElementById('autoLightModal').checked = coop.auto_light || false;
+            document.getElementById('autoFeedModal').checked = coop.auto_feed || false;
+            document.getElementById('autoWaterModal').checked = coop.auto_water || false;
+            document.getElementById('emergencyAlertModal').checked = coop.emergency_alert || false;
+        }
+
+        // Save changes to API
+        async function saveCoopChanges() {
+            const data = {
+                name: document.getElementById('coopNameModal').value,
+                location: document.getElementById('coopLocationModal').value,
+                capacity: parseInt(document.getElementById('coopCapacityModal').value) || 500,
+                current_count: parseInt(document.getElementById('coopCurrentModal').value) || 0,
+                area: parseFloat(document.getElementById('coopAreaModal').value) || 50,
+                temp_min: parseFloat(document.getElementById('tempMinModal').value) || 18,
+                temp_max: parseFloat(document.getElementById('tempMaxModal').value) || 28,
+                humidity_min: parseFloat(document.getElementById('humidityMinModal').value) || 40,
+                humidity_max: parseFloat(document.getElementById('humidityMaxModal').value) || 70,
+                feed_threshold: parseFloat(document.getElementById('feedThresholdModal').value) || 20,
+                water_threshold: parseFloat(document.getElementById('waterThresholdModal').value) || 20,
+                auto_fan: document.getElementById('autoFanModal').checked,
+                auto_light: document.getElementById('autoLightModal').checked,
+                auto_feed: document.getElementById('autoFeedModal').checked,
+                auto_water: document.getElementById('autoWaterModal').checked
+            };
+
+            try {
+                const response = await fetch('/api/coops/public/' + coopId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const updated = await response.json();
+                    updateCoopInfo(updated);
+                    populateEditModal(updated);
+                    return true;
+                }
+            } catch (error) {
+                console.error('Lỗi lưu thay đổi:', error);
+            }
+            return false;
+        }
+
+        // Override existing saveChanges function
+        window.saveChanges = async function() {
+            hideConfirmDialog();
+            closeEditModal();
+
+            const success = await saveCoopChanges();
+
+            if (success) {
+                document.getElementById('successNotification').classList.add('show');
+                setTimeout(function() {
+                    document.getElementById('successNotification').classList.remove('show');
+                }, 2000);
+            } else {
+                alert('Có lỗi xảy ra khi lưu thay đổi');
+            }
+        };
+
+        // Override openEditModal to populate with current data
+        window.openEditModal = function() {
+            if (currentCoopData) {
+                populateEditModal(currentCoopData);
+            }
+            saveOriginalValues();
+            document.getElementById('modalBackdrop').classList.add('show');
+            document.getElementById('editModal').classList.add('show');
+        };
+
+        // Re-init donut chart tooltip interactions
+        function initDonutInteractions() {
+            const segments = document.querySelectorAll('.donut-segment-detail');
+            const tooltip = document.getElementById('donutTooltipDetail');
+            const legendItems = document.querySelectorAll('.legend-item-detail');
+            
+            segments.forEach(segment => {
+                segment.onmouseenter = function(e) {
+                    const name = this.getAttribute('data-name');
+                    const percent = this.getAttribute('data-percent');
+                    const count = this.getAttribute('data-count');
+                    const color = this.getAttribute('stroke');
+                    
+                    tooltip.querySelector('.tooltip-name-detail').textContent = name;
+                    tooltip.querySelector('.tooltip-percent-detail').textContent = percent + '% (' + count + ')';
+                    tooltip.querySelector('.tooltip-percent-detail').style.color = color;
+                    tooltip.classList.add('show');
+                    
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.left = rect.left + rect.width / 2 - 50 + 'px';
+                    tooltip.style.top = rect.top - 55 + 'px';
+                };
+                
+                segment.onmouseleave = function() {
+                    tooltip.classList.remove('show');
+                };
+            });
+            
+            legendItems.forEach(item => {
+                item.onmouseenter = function() {
+                    const segmentType = this.getAttribute('data-segment');
+                    segments.forEach(seg => {
+                        if (seg.getAttribute('data-segment') === segmentType) {
+                            seg.style.strokeWidth = '26';
+                            seg.style.filter = 'brightness(1.15)';
+                        }
+                    });
+                };
+                
+                item.onmouseleave = function() {
+                    segments.forEach(seg => {
+                        seg.style.strokeWidth = '20';
+                        seg.style.filter = 'none';
+                    });
+                };
+            });
+        }
+
+        // Main data loading function
+        async function loadAllData() {
+            try {
+                // Load coop info
+                const coopRes = await fetch('/api/coops/public/' + coopId);
+                if (coopRes.ok) {
+                    const coop = await coopRes.json();
+                    updateCoopInfo(coop);
+                }
+
+                // Load environment data
+                const envRes = await fetch('/api/coops/public/' + coopId + '/environment');
+                if (envRes.ok) {
+                    const env = await envRes.json();
+                    updateEnvironment(env);
+                }
+
+                // Load devices in this coop
+                const devicesRes = await fetch('/api/coops/public/' + coopId + '/devices');
+                if (devicesRes.ok) {
+                    const devices = await devicesRes.json();
+                    updateDeviceList(devices);
+                    updateDonutChart(devices);
+                    updateDeviceListMini(devices);
+                }
+
+                // Load all coops for summary
+                const allCoopsRes = await fetch('/api/coops/public');
+                if (allCoopsRes.ok) {
+                    const allCoops = await allCoopsRes.json();
+                    updateCoopSummaryList(allCoops);
+                }
+
+            } catch (error) {
+                console.error('Lỗi tải dữ liệu:', error);
+            }
+        }
+
+        // Start polling
+        function startPolling() {
+            loadAllData();
+            pollInterval = setInterval(loadAllData, POLL_INTERVAL);
+        }
+
+        // Stop polling when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+        });
+
+        // Initialize
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startPolling);
+        } else {
+            startPolling();
+        }
+
     })();
     </script>
 

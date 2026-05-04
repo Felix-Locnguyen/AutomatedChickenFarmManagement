@@ -310,7 +310,7 @@
 
                     <!-- Page Heading -->
                     <div class="d-sm-flex align-items-center justify-content-between mb-4 page-heading">
-                        <h1 class="h3 mb-0 text-gray-800 page-title">Quản lý thiết bị chuồng trại</h1>
+                        <h1 class="h3 mb-0 text-gray-800 page-title" id="pageTitle">Quản lý thiết bị chuồng...</h1>
                         <div>
                             <a href="device-list.html" class="btn btn-secondary btn-sm shadow-sm">
                                 <i class="fas fa-arrow-left fa-sm"></i> Tất cả thiết bị
@@ -325,101 +325,16 @@
                         <div class="col-12">
                             <div class="card shadow mb-4">
                                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                                    <h6 class="m-0 font-weight-bold text-primary">Danh sách thiết bị trong Chuồng A</h6>
-                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#addDeviceModal">
+                                    <h6 class="m-0 font-weight-bold text-primary" id="deviceListTitle">Danh sách thiết bị trong...</h6>
+                                    <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#addDeviceModal" id="addDeviceBtn">
                                         <i class="fas fa-plus"></i> Thêm thiết bị
                                     </button>
                                 </div>
                                 <div class="card-body">
-                                    <div class="device-list-container">
-                                    <!-- Device Card 1 - Hoạt động -->
-                                    <div class="device-card status-active" data-device-id="1" data-device-name="Cảm biến nhiệt độ A1" data-connection-status="connected">
-                                        <div class="device-card-row device-card-header">
-                                            <span class="status-dot active"></span>
-                                            <span class="device-name">Cảm biến nhiệt độ A1</span>
+                                    <div class="device-list-container" id="deviceListContainer">
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
                                         </div>
-                                        <div class="device-card-row device-card-info">
-                                            <span><i class="fas fa-battery-full"></i> 85%</span>
-                                            <span><i class="fas fa-wifi"></i> Đã kết nối</span>
-                                        </div>
-                                        <div class="device-card-row device-card-actions">
-                                            <button class="btn btn-sm status-btn status-on device-toggle-btn" data-device-id="1" data-device-name="Cảm biến nhiệt độ A1">Bật</button>
-                                            <button class="btn btn-sm btn-outline-danger btn-delete-device" data-device-id="1" data-device-name="Cảm biến nhiệt độ A1">
-                                                <i class="fas fa-trash-alt"></i> Xóa
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Device Card 2 - Hoạt động -->
-                                    <div class="device-card status-active" data-device-id="2" data-device-name="Cảm biến ẩm A1" data-connection-status="connected">
-                                        <div class="device-card-row device-card-header">
-                                            <span class="status-dot active"></span>
-                                            <span class="device-name">Cảm biến ẩm A1</span>
-                                        </div>
-                                        <div class="device-card-row device-card-info">
-                                            <span><i class="fas fa-battery-full"></i> 92%</span>
-                                            <span><i class="fas fa-wifi"></i> Đã kết nối</span>
-                                        </div>
-                                        <div class="device-card-row device-card-actions">
-                                            <button class="btn btn-sm status-btn status-on device-toggle-btn" data-device-id="2" data-device-name="Cảm biến ẩm A1">Bật</button>
-                                            <button class="btn btn-sm btn-outline-danger btn-delete-device" data-device-id="2" data-device-name="Cảm biến ẩm A1">
-                                                <i class="fas fa-trash-alt"></i> Xóa
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Device Card 3 - Hoạt động -->
-                                    <div class="device-card status-active" data-device-id="3" data-device-name="Quạt thông gió A1" data-connection-status="connected">
-                                        <div class="device-card-row device-card-header">
-                                            <span class="status-dot active"></span>
-                                            <span class="device-name">Quạt thông gió A1</span>
-                                        </div>
-                                        <div class="device-card-row device-card-info">
-                                            <span><i class="fas fa-fan"></i> Quạt công nghiệp</span>
-                                            <span><i class="fas fa-wifi"></i> Đã kết nối</span>
-                                        </div>
-                                        <div class="device-card-row device-card-actions">
-                                            <button class="btn btn-sm status-btn status-on device-toggle-btn" data-device-id="3" data-device-name="Quạt thông gió A1">Bật</button>
-                                            <button class="btn btn-sm btn-outline-danger btn-delete-device" data-device-id="3" data-device-name="Quạt thông gió A1">
-                                                <i class="fas fa-trash-alt"></i> Xóa
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Device Card 4 - Chờ -->
-                                    <div class="device-card status-waiting" data-device-id="4" data-device-name="Đèn LED A1" data-connection-status="connecting">
-                                        <div class="device-card-row device-card-header">
-                                            <span class="status-dot waiting"></span>
-                                            <span class="device-name">Đèn LED A1</span>
-                                        </div>
-                                        <div class="device-card-row device-card-info">
-                                            <span><i class="fas fa-battery-full"></i> 70%</span>
-                                            <span><i class="fas fa-clock"></i> Chờ kết nối</span>
-                                        </div>
-                                        <div class="device-card-row device-card-actions">
-                                            <button class="btn btn-sm status-btn status-off device-toggle-btn" data-device-id="4" data-device-name="Đèn LED A1">Tắt</button>
-                                            <button class="btn btn-sm btn-outline-danger btn-delete-device" data-device-id="4" data-device-name="Đèn LED A1">
-                                                <i class="fas fa-trash-alt"></i> Xóa
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Device Card 5 - Lỗi -->
-                                    <div class="device-card status-error" data-device-id="5" data-device-name="Hệ thống cho ăn B1" data-connection-status="disconnected">
-                                        <div class="device-card-row device-card-header">
-                                            <span class="status-dot error"></span>
-                                            <span class="device-name">Hệ thống cho ăn B1</span>
-                                        </div>
-                                        <div class="device-card-row device-card-info">
-                                            <span class="connection-error"><i class="fas fa-exclamation-triangle"></i> Mất kết nối</span>
-                                        </div>
-                                        <div class="device-card-row device-card-actions">
-                                            <button class="btn btn-sm status-btn status-off device-toggle-btn" data-device-id="5" data-device-name="Hệ thống cho ăn B1">Tắt</button>
-                                            <button class="btn btn-sm btn-outline-danger btn-delete-device" data-device-id="5" data-device-name="Hệ thống cho ăn B1">
-                                                <i class="fas fa-trash-alt"></i> Xóa
-                                            </button>
-                                        </div>
-                                    </div>
                                     </div>
                                 </div>
                             </div>
@@ -441,53 +356,23 @@
                                 <div class="card-body">
                                     <div class="donut-chart-container-detail">
                                         <div class="donut-chart-detail" id="donutChartDetail">
-                                            <svg viewBox="0 0 200 200">
-                                                <!-- Hoạt động (60%) - 3 thiết bị -->
-                                                <circle class="donut-segment-detail" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#22c55e" stroke-width="20"
-                                                    stroke-dasharray="264 440" stroke-dashoffset="0"
-                                                    data-segment="hoatdong" data-name="Hoạt động" data-count="3" data-percent="60">
-                                                </circle>
-                                                <!-- Chờ (20%) - 1 thiết bị -->
-                                                <circle class="donut-segment-detail" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#ffc107" stroke-width="20"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-264"
-                                                    data-segment="cho" data-name="Chờ" data-count="1" data-percent="20">
-                                                </circle>
-                                                <!-- Lỗi (20%) - 1 thiết bị -->
-                                                <circle class="donut-segment-detail" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#dc3545" stroke-width="20"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-352"
-                                                    data-segment="loi" data-name="Lỗi" data-count="1" data-percent="20">
-                                                </circle>
-                                                <!-- Center circle -->
-                                                <circle cx="100" cy="100" r="52" fill="white"></circle>
+                                            <svg viewBox="0 0 200 200" id="donutSvg">
+                                                <!-- Dynamic segments -->
                                             </svg>
                                             <div class="donut-center-detail">
-                                                <span class="donut-total-detail">5</span>
+                                                <span class="donut-total-detail" id="deviceCount">0</span>
                                                 <span class="donut-label-detail">thiết bị</span>
                                             </div>
                                         </div>
                                         <div class="donut-tooltip-detail" id="donutTooltipDetail">
                                             <div class="tooltip-content-detail">
-                                                <span class="tooltip-name-detail">Hoạt động</span>
-                                                <span class="tooltip-percent-detail">60%</span>
+                                                <span class="tooltip-name-detail">--</span>
+                                                <span class="tooltip-percent-detail">--%</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="donut-legend-detail">
-                                        <div class="legend-item-detail" data-segment="hoatdong">
-                                            <span class="legend-dot-detail" style="background: #22c55e;"></span>
-                                            <span class="legend-text-detail">Hoạt động (3)</span>
-                                        </div>
-                                        <div class="legend-item-detail" data-segment="cho">
-                                            <span class="legend-dot-detail" style="background: #ffc107;"></span>
-                                            <span class="legend-text-detail">Chờ (1)</span>
-                                        </div>
-                                        <div class="legend-item-detail" data-segment="loi">
-                                            <span class="legend-dot-detail" style="background: #dc3545;"></span>
-                                            <span class="legend-text-detail">Lỗi (1)</span>
-                                        </div>
+                                    <div class="donut-legend-detail" id="donutLegend">
+                                        <!-- Dynamic legend -->
                                     </div>
                                 </div>
                             </div>
@@ -506,63 +391,10 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
                                 </div>
-                                <div class="card-body">
-                                    <!-- Chuồng A -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng A</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 480 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
+                                <div class="card-body" id="coopSummaryList">
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải...
                                     </div>
-                                    <!-- Chuồng B -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng B</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 280 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng C -->
-                                    <div class="coop-summary-card warning">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng C</span>
-                                            <span class="coop-summary-status warning">Cảnh báo</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 380 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng D -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng D</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 180 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng E -->
-                                    <div class="coop-summary-card error">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng E</span>
-                                            <span class="coop-summary-status error">Lỗi</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 320 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <a href="coop-list.html" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
                                 </div>
                             </div>
 
@@ -709,26 +541,9 @@
                         </div>
                     </div>
 
-                    <div class="device-list" style="max-height: 250px; overflow-y: auto; border: 1px solid #e3e6f0; border-radius: 0.35rem; padding: 10px; background: #f8f9fa;">
-                        <div class="custom-control custom-checkbox mb-2">
-                            <input type="checkbox" class="custom-control-input" id="device1">
-                            <label class="custom-control-label" for="device1">Cảm biến nhiệt độ 1</label>
-                        </div>
-                        <div class="custom-control custom-checkbox mb-2">
-                            <input type="checkbox" class="custom-control-input" id="device2">
-                            <label class="custom-control-label" for="device2">Cảm biến độ ẩm 2</label>
-                        </div>
-                        <div class="custom-control custom-checkbox mb-2">
-                            <input type="checkbox" class="custom-control-input" id="device3">
-                            <label class="custom-control-label" for="device3">Máy nước 1</label>
-                        </div>
-                        <div class="custom-control custom-checkbox mb-2">
-                            <input type="checkbox" class="custom-control-input" id="device4">
-                            <label class="custom-control-label" for="device4">Quạt thông gió 3</label>
-                        </div>
-                        <div class="custom-control custom-checkbox mb-2">
-                            <input type="checkbox" class="custom-control-input" id="device5">
-                            <label class="custom-control-label" for="device5">Đèn sưởi 1</label>
+                    <div class="device-list" id="unconnectedDeviceList" style="max-height: 250px; overflow-y: auto; border: 1px solid #e3e6f0; border-radius: 0.35rem; padding: 10px; background: #f8f9fa;">
+                        <div class="text-center text-muted py-3">
+                            <i class="fas fa-spinner fa-spin"></i> Đang tải...
                         </div>
                     </div>
 
@@ -926,6 +741,19 @@
         .status-btn:hover {
             opacity: 0.9;
             transform: scale(1.02);
+        }
+        .status-btn.status-disabled {
+            background: #e3e6f0;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .status-btn:disabled {
+            background: #e3e6f0;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
         }
 
         .btn-delete-device {
@@ -1721,36 +1549,420 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script>
-    // Device Detail - Chi tiết thiết bị
+    // Device Detail - Dynamic Data Loading with Polling (No Auth)
     (function() {
         'use strict';
 
-        if (!isAuthenticated()) {
-            window.location.href = '/login';
-            return;
+        // Get coop_id from URL - support both 'id' and 'coop' parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const coopId = parseInt(urlParams.get('id') || urlParams.get('coop')) || 1;
+        
+        const POLL_INTERVAL = 5000; // 5 seconds
+        let pollInterval = null;
+        let currentCoopData = null;
+        let coopDevices = [];
+        let unconnectedDevices = [];
+        let allCoops = [];
+
+        // Helper function to get device icon based on type
+        function getDeviceIcon(type) {
+            const icons = {
+                'temperature': 'fa-thermometer-half',
+                'humidity': 'fa-tint',
+                'fan': 'fa-fan',
+                'light': 'fa-lightbulb',
+                'feeder': 'fa-drumstick-bite',
+                'camera': 'fa-video',
+                'sensor': 'fa-wifi'
+            };
+            return icons[type] || 'fa-wifi';
         }
 
-        // Lấy device_id từ URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const deviceId = urlParams.get('id') || 1;
+        // Helper to get status class
+        function getStatusClass(status) {
+            const classMap = {
+                'online': 'active',
+                'connecting': 'waiting',
+                'offline': 'error'
+            };
+            return classMap[status] || 'error';
+        }
 
-        async function loadDeviceDetail() {
-            try {
-                const device = await devicesAPI.getOne(deviceId);
-                
-                // Cập nhật tên thiết bị
-                const deviceNameEl = document.querySelector('.device-detail-name');
-                if (deviceNameEl) deviceNameEl.textContent = device.name || 'Thiết bị ' + deviceId;
+        // Helper to get status text for UI
+        function getStatusText(status) {
+            const textMap = {
+                'online': 'Đã kết nối',
+                'connecting': 'Chờ kết nối',
+                'offline': 'Mất kết nối'
+            };
+            return textMap[status] || status;
+        }
 
-                // Cập nhật thông tin khác nếu có
-                console.log('Device:', device);
+        // Update page title with coop name
+        function updatePageTitle(coopName) {
+            const titleEl = document.getElementById('pageTitle');
+            const listTitleEl = document.getElementById('deviceListTitle');
+            const displayName = coopName || 'Chuồng ' + coopId;
+            if (titleEl) {
+                titleEl.textContent = 'Quản lí thiết bị ' + displayName;
+            }
+            if (listTitleEl) {
+                listTitleEl.textContent = 'Danh sách thiết bị ' + displayName;
+            }
+            document.title = 'Quản lí thiết bị ' + displayName + ' | Quản lý Trang trại Gà';
+        }
 
-            } catch (error) {
-                console.error('Lỗi load device detail:', error);
+        // Render device cards
+        function renderDeviceCards(devices) {
+            const container = document.getElementById('deviceListContainer');
+            if (!container) return;
+
+            if (!Array.isArray(devices) || devices.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-4">Chưa có thiết bị trong chuồng này</div>';
+                return;
+            }
+
+            container.innerHTML = devices.map(device => `
+                <div class="device-card status-${getStatusClass(device.status)}" data-device-id="${device.id}" data-device-name="${device.name || 'Thiết bị ' + device.id}">
+                    <div class="device-card-row device-card-header">
+                        <span class="status-dot ${getStatusClass(device.status)}"></span>
+                        <span class="device-name">${device.name || 'Thiết bị ' + device.id}</span>
+                    </div>
+                    <div class="device-card-row device-card-info">
+                        <span><i class="fas fa-battery-full"></i> ${device.battery || 100}%</span>
+                        <span><i class="fas fa-${getDeviceIcon(device.type)}"></i> ${getStatusText(device.status)}</span>
+                    </div>
+                    <div class="device-card-row device-card-actions">
+                        ${(() => {
+                            const isOnline = device.status === 'online';
+                            const btnText = isOnline 
+                                ? (device.is_active ? 'Tắt' : 'Bật') 
+                                : (device.status === 'connecting' ? 'Đang kết nối...' : 'Mất kết nối');
+                            const btnClass = isOnline 
+                                ? (device.is_active ? 'status-btn status-on' : 'status-btn status-off') 
+                                : 'status-btn status-disabled';
+                            return `<button class="btn btn-sm ${btnClass} device-toggle-btn" 
+                                        data-device-id="${device.id}" 
+                                        data-device-status="${device.status}"
+                                        data-device-name="${device.name || 'Thiết bị ' + device.id}"
+                                        ${!isOnline ? 'disabled' : ''}
+                                        onclick="toggleDevice(${device.id})">
+                                        ${btnText}
+                                    </button>`;
+                        })()}
+                        <button class="btn btn-sm btn-outline-danger btn-delete-device" 
+                                data-device-id="${device.id}" 
+                                data-device-name="${device.name || 'Thiết bị ' + device.id}"
+                                onclick="showDeleteConfirm(${device.id}, '${device.name || 'Thiết bị ' + device.id}')">
+                            <i class="fas fa-trash-alt"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update donut chart
+        function updateDonutChart(devices) {
+            const deviceCountEl = document.getElementById('deviceCount');
+            const donutSvg = document.getElementById('donutSvg');
+            const donutLegend = document.getElementById('donutLegend');
+
+            if (!Array.isArray(devices) || devices.length === 0) {
+                deviceCountEl.textContent = '0';
+                donutSvg.innerHTML = '<circle cx="100" cy="100" r="70" fill="none" stroke="#e3e6f0" stroke-width="20" stroke-dasharray="440 440"></circle><circle cx="100" cy="100" r="52" fill="white"></circle>';
+                donutLegend.innerHTML = '<span class="text-muted">Chưa có thiết bị</span>';
+                return;
+            }
+
+            deviceCountEl.textContent = devices.length;
+
+            const stats = {
+                online: devices.filter(d => d.status === 'online').length,
+                connecting: devices.filter(d => d.status === 'connecting').length,
+                offline: devices.filter(d => d.status === 'offline').length
+            };
+
+            const total = devices.length;
+            const circumference = 2 * Math.PI * 70;
+            let offset = 0;
+
+            let segments = '';
+            let legendHtml = '';
+
+            if (stats.online > 0) {
+                const pct = Math.round((stats.online / total) * 100);
+                const dashArray = (stats.online / total) * circumference;
+                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#22c55e" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="online" data-name="Hoạt động" data-count="${stats.online}" data-percent="${pct}"></circle>`;
+                legendHtml += `<div class="legend-item-detail" data-segment="online"><span class="legend-dot-detail" style="background: #22c55e;"></span><span class="legend-text-detail">Hoạt động (${stats.online})</span></div>`;
+                offset += dashArray;
+            }
+            if (stats.connecting > 0) {
+                const pct = Math.round((stats.connecting / total) * 100);
+                const dashArray = (stats.connecting / total) * circumference;
+                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#ffc107" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="connecting" data-name="Chờ" data-count="${stats.connecting}" data-percent="${pct}"></circle>`;
+                legendHtml += `<div class="legend-item-detail" data-segment="connecting"><span class="legend-dot-detail" style="background: #ffc107;"></span><span class="legend-text-detail">Chờ (${stats.connecting})</span></div>`;
+                offset += dashArray;
+            }
+            if (stats.offline > 0) {
+                const pct = Math.round((stats.offline / total) * 100);
+                const dashArray = (stats.offline / total) * circumference;
+                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#dc3545" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="offline" data-name="Lỗi" data-count="${stats.offline}" data-percent="${pct}"></circle>`;
+                legendHtml += `<div class="legend-item-detail" data-segment="offline"><span class="legend-dot-detail" style="background: #dc3545;"></span><span class="legend-text-detail">Lỗi (${stats.offline})</span></div>`;
+            }
+
+            donutSvg.innerHTML = segments + '<circle cx="100" cy="100" r="52" fill="white"></circle>';
+            donutLegend.innerHTML = legendHtml;
+
+            initDonutInteractions();
+        }
+
+        // Render coop summary list
+        function renderCoopSummary(coops) {
+            const container = document.getElementById('coopSummaryList');
+            if (!container) return;
+
+            if (!Array.isArray(coops) || coops.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">Chưa có chuồng nào</div>';
+                return;
+            }
+
+            container.innerHTML = coops.map(coop => `
+                <div class="coop-summary-card ${coop.status === 'active' || coop.status === 'normal' ? 'online' : coop.status === 'warning' ? 'warning' : 'error'}">
+                    <div class="coop-summary-header">
+                        <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
+                        <span class="coop-summary-status ${coop.status === 'active' || coop.status === 'normal' ? 'online' : coop.status === 'warning' ? 'warning' : 'error'}">${coop.status === 'active' || coop.status === 'normal' ? 'Bình thường' : coop.status === 'warning' ? 'Cảnh báo' : 'Lỗi'}</span>
+                    </div>
+                    <div class="coop-summary-info">
+                        <span><i class="fas fa-feather-alt"></i> ${coop.current_count || 0} gà</span>
+                        <span><i class="fas fa-ruler"></i> ${coop.area || 0} m²</span>
+                    </div>
+                </div>
+            `).join('') + '<a href="coop-list.html" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>';
+        }
+
+        // Render unconnected devices in add modal
+        function renderUnconnectedDevices(devices) {
+            const container = document.getElementById('unconnectedDeviceList');
+            if (!container) return;
+
+            if (!Array.isArray(devices) || devices.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3">Không có thiết bị nào chưa kết nối</div>';
+                return;
+            }
+
+            container.innerHTML = devices.map(device => `
+                <div class="custom-control custom-checkbox mb-2">
+                    <input type="checkbox" class="custom-control-input unconnected-device-checkbox" id="unconnected-device-${device.id}" data-device-id="${device.id}">
+                    <label class="custom-control-label" for="unconnected-device-${device.id}">${device.name || 'Thiết bị ' + device.id} (${device.type})</label>
+                </div>
+            `).join('');
+
+            // Add event listener for count update
+            container.querySelectorAll('.unconnected-device-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelectedCount);
+            });
+        }
+
+        // Update selected count
+        function updateSelectedCount() {
+            const checkboxes = document.querySelectorAll('.unconnected-device-checkbox:checked');
+            const countEl = document.getElementById('selectedCount');
+            if (countEl) {
+                countEl.textContent = 'Đã chọn: ' + checkboxes.length + ' thiết bị';
             }
         }
 
-        loadDeviceDetail();
+        // Toggle device on/off
+        window.toggleDevice = async function(deviceId) {
+            try {
+                // Find device element to get status
+                const btn = document.querySelector(`.device-toggle-btn[data-device-id="${deviceId}"]`);
+                if (!btn) return;
+                
+                const deviceStatus = btn.getAttribute('data-device-status');
+                
+                // Check device status before toggling
+                if (deviceStatus === 'connecting') {
+                    showToastNotification('Thiết bị đang kết nối, vui lòng thử lại sau', 'warning');
+                    return;
+                }
+                if (deviceStatus === 'offline') {
+                    showToastNotification('Thiết bị lỗi / mất kết nối, vui lòng kiểm tra lại thiết bị', 'error');
+                    return;
+                }
+                
+                // Only allow toggle for online devices
+                const response = await fetch('/api/devices/public/' + deviceId + '/toggle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    loadAllData(); // Reload to reflect changes
+                }
+            } catch (error) {
+                console.error('Lỗi toggle thiết bị:', error);
+            }
+        };
+
+        // Show delete confirmation
+        window.showDeleteConfirm = function(deviceId, deviceName) {
+            document.getElementById('deleteDeviceName').textContent = deviceName;
+            document.getElementById('confirmDeleteDevice').onclick = function() {
+                deleteDevice(deviceId);
+            };
+            $('#deleteDeviceModal').modal('show');
+        };
+
+        // Delete device from coop
+        async function deleteDevice(deviceId) {
+            try {
+                const response = await fetch('/api/coops/public/' + coopId + '/devices/' + deviceId, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    $('#deleteDeviceModal').modal('hide');
+                    loadAllData(); // Reload to reflect changes
+                }
+            } catch (error) {
+                console.error('Lỗi xóa thiết bị:', error);
+            }
+        }
+
+        // Add selected devices to coop
+        window.addSelectedDevices = async function() {
+            const checkboxes = document.querySelectorAll('.unconnected-device-checkbox:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.deviceId));
+
+            for (const deviceId of selectedIds) {
+                try {
+                    await fetch('/api/devices/public/add-to-coop', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            unconnected_device_id: deviceId,
+                            coop_id: coopId
+                        })
+                    });
+                } catch (error) {
+                    console.error('Lỗi thêm thiết bị:', error);
+                }
+            }
+
+            $('#addDeviceModal').modal('hide');
+            loadAllData();
+        };
+
+        // Main data loading function
+        async function loadAllData() {
+            try {
+                // Load coop info
+                const coopRes = await fetch('/api/coops/public/' + coopId);
+                if (coopRes.ok) {
+                    const coop = await coopRes.json();
+                    currentCoopData = coop;
+                    updatePageTitle(coop.name);
+                }
+
+                // Load devices in this coop
+                const devicesRes = await fetch('/api/coops/public/' + coopId + '/devices');
+                if (devicesRes.ok) {
+                    coopDevices = await devicesRes.json();
+                    renderDeviceCards(coopDevices);
+                    updateDonutChart(coopDevices);
+                }
+
+                // Load unconnected devices
+                const unconnectedRes = await fetch('/api/devices/public/unconnected');
+                if (unconnectedRes.ok) {
+                    unconnectedDevices = await unconnectedRes.json();
+                    renderUnconnectedDevices(unconnectedDevices);
+                }
+
+                // Load all coops for summary
+                const allCoopsRes = await fetch('/api/coops/public');
+                if (allCoopsRes.ok) {
+                    allCoops = await allCoopsRes.json();
+                    renderCoopSummary(allCoops);
+                }
+
+            } catch (error) {
+                console.error('Lỗi tải dữ liệu:', error);
+            }
+        }
+
+        // Initialize donut chart interactions
+        function initDonutInteractions() {
+            const segments = document.querySelectorAll('.donut-segment-detail');
+            const tooltip = document.getElementById('donutTooltipDetail');
+            const legendItems = document.querySelectorAll('.legend-item-detail');
+            
+            if (!segments.length) return;
+            
+            segments.forEach(segment => {
+                segment.onmouseenter = function(e) {
+                    const name = this.getAttribute('data-name');
+                    const percent = this.getAttribute('data-percent');
+                    const count = this.getAttribute('data-count');
+                    const color = this.getAttribute('stroke');
+                    
+                    tooltip.querySelector('.tooltip-name-detail').textContent = name;
+                    tooltip.querySelector('.tooltip-percent-detail').textContent = percent + '% (' + count + ')';
+                    tooltip.querySelector('.tooltip-percent-detail').style.color = color;
+                    tooltip.classList.add('show');
+                    
+                    const rect = this.getBoundingClientRect();
+                    tooltip.style.left = rect.left + rect.width / 2 - 50 + 'px';
+                    tooltip.style.top = rect.top - 55 + 'px';
+                };
+                
+                segment.onmouseleave = function() {
+                    tooltip.classList.remove('show');
+                };
+            });
+            
+            legendItems.forEach(item => {
+                item.onmouseenter = function() {
+                    const segmentType = this.getAttribute('data-segment');
+                    segments.forEach(seg => {
+                        if (seg.getAttribute('data-segment') === segmentType) {
+                            seg.style.strokeWidth = '26';
+                            seg.style.filter = 'brightness(1.15)';
+                        }
+                    });
+                };
+                
+                item.onmouseleave = function() {
+                    segments.forEach(seg => {
+                        seg.style.strokeWidth = '20';
+                        seg.style.filter = 'none';
+                    });
+                };
+            });
+        }
+
+        // Setup add device button
+        document.getElementById('confirmAddDevice').addEventListener('click', addSelectedDevices);
+
+        // Start polling
+        function startPolling() {
+            loadAllData();
+            pollInterval = setInterval(loadAllData, POLL_INTERVAL);
+        }
+
+        // Stop polling when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+        });
+
+        // Initialize
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startPolling);
+        } else {
+            startPolling();
+        }
+
     })();
     </script>
 
