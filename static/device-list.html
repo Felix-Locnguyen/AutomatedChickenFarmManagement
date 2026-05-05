@@ -1773,6 +1773,51 @@
         </div>
     </div>
 
+    <!-- Device Info Modal -->
+    <div class="modal fade" id="deviceInfoModal" tabindex="-1" role="dialog" aria-labelledby="deviceInfoModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deviceInfoModalLabel">Thông tin thiết bị</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="infoDeviceId">
+                    <div class="form-group">
+                        <label>Tên thiết bị</label>
+                        <input type="text" class="form-control" id="infoDeviceName" placeholder="Nhập tên thiết bị">
+                    </div>
+                    <div class="form-group">
+                        <label>Loại cảm biến</label>
+                        <div class="form-control-plaintext bg-light rounded px-3 py-2" id="infoDeviceType">-</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Chuồng đang lắp</label>
+                        <div class="form-control-plaintext bg-light rounded px-3 py-2" id="infoDeviceCoop">-</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã thiết bị (MAC)</label>
+                        <div class="form-control-plaintext bg-light rounded px-3 py-2" id="infoDeviceMac">-</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Thời gian tạo</label>
+                        <div class="form-control-plaintext bg-light rounded px-3 py-2" id="infoDeviceCreated">-</div>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Thời gian cập nhật</label>
+                        <div class="form-control-plaintext bg-light rounded px-3 py-2" id="infoDeviceUpdated">-</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Đóng</button>
+                    <button class="btn btn-primary" type="button" id="saveDeviceNameBtn">Lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Edit Device Modal -->
     <div class="modal fade" id="editDeviceModal" tabindex="-1" role="dialog" aria-labelledby="editDeviceModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -2440,6 +2485,11 @@
                                         onclick="toggleDevice(${device.id}, this)">
                                     ${device.is_active ? 'Bật' : 'Tắt'}
                                 </button>` : ''}
+                                ${device.status === 'online' || device.status === 'offline' ? `
+                                <button class="btn btn-sm btn-info btn-device-info"
+                                        onclick="openDeviceInfoModal(${device.id})">
+                                    <i class="fas fa-info-circle"></i> Thông tin
+                                </button>` : ''}
                                 <button class="btn btn-sm btn-outline-danger btn-delete-device"
                                         onclick="deleteDevice(${device.id}, this)">Xóa</button>
                             </div>
@@ -2509,7 +2559,92 @@
             }
         }
 
+        // Device Info Modal Functions
+        async function openDeviceInfoModal(deviceId) {
+            try {
+                const device = await devicesAPI.getOne(deviceId);
+                if (!device) {
+                    showToast('Không tìm thấy thiết bị', 'error');
+                    return;
+                }
+
+                document.getElementById('infoDeviceId').value = deviceId;
+                document.getElementById('infoDeviceName').value = device.name || '';
+
+                const typeLabels = {
+                    'temperature': 'Cảm biến nhiệt độ',
+                    'humidity': 'Cảm biến độ ẩm',
+                    'fan': 'Quạt thông gió',
+                    'light': 'Đèn chiếu sáng',
+                    'feeder': 'Hệ thống cho ăn',
+                    'camera': 'Camera giám sát',
+                    'sensor': 'Cảm biến'
+                };
+                document.getElementById('infoDeviceType').textContent = typeLabels[device.type] || device.type || '-';
+
+                if (device.coop_id) {
+                    const coops = await coopsAPI.getAll();
+                    const coop = coops.find(c => c.id === device.coop_id);
+                    document.getElementById('infoDeviceCoop').textContent = coop ? coop.name : 'Chuồng ' + device.coop_id;
+                } else {
+                    document.getElementById('infoDeviceCoop').textContent = 'Chưa gán chuồng';
+                }
+
+                document.getElementById('infoDeviceMac').textContent = device.mac_address || '-';
+                document.getElementById('infoDeviceCreated').textContent = formatDateTime(device.created_at);
+                document.getElementById('infoDeviceUpdated').textContent = formatDateTime(device.updated_at);
+
+                $('#deviceInfoModal').modal('show');
+            } catch (error) {
+                console.error('Lỗi lấy thông tin thiết bị:', error);
+                showToast('Không thể lấy thông tin thiết bị', 'error');
+            }
+        }
+
+        async function saveDeviceName() {
+            const deviceId = document.getElementById('infoDeviceId').value;
+            const newName = document.getElementById('infoDeviceName').value.trim();
+
+            if (!newName) {
+                showToast('Vui lòng nhập tên thiết bị', 'warning');
+                return;
+            }
+
+            try {
+                await devicesAPI.updateName(deviceId, newName);
+
+                const deviceCard = document.querySelector(`.device-card[data-device-id="${deviceId}"]`);
+                if (deviceCard) {
+                    const nameElement = deviceCard.querySelector('.device-name');
+                    if (nameElement) {
+                        nameElement.textContent = newName;
+                    }
+                    deviceCard.setAttribute('data-device-name', newName);
+                }
+
+                showToast('Cập nhật tên thiết bị thành công', 'success');
+                $('#deviceInfoModal').modal('hide');
+            } catch (error) {
+                console.error('Lỗi cập nhật tên thiết bị:', error);
+                showToast('Không thể cập nhật tên thiết bị', 'error');
+            }
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+
+        document.getElementById('saveDeviceNameBtn').addEventListener('click', saveDeviceName);
+
         // Expose functions to global scope for onclick
+        window.openDeviceInfoModal = openDeviceInfoModal;
         window.toggleDevice = toggleDevice;
         window.deleteDevice = deleteDevice;
 
