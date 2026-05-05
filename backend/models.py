@@ -220,7 +220,8 @@ class Device(db.Model):
             'is_active': self.is_active,
             'battery': self.battery,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'coop_id': self.coops[0].id if self.coops else None
         }
     
     def __repr__(self):
