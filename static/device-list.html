@@ -1404,119 +1404,8 @@
                     <!-- Content Row -->
                     <div class="row">
 
-                        <!-- Area Chart -->
-                        <div class="col-xl-8 col-lg-7">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Nhiệt độ trung bình các chuồng</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Tùy chọn:</div>
-                                            <a class="dropdown-item" href="#">Xem chi tiết</a>
-                                            <a class="dropdown-item" href="#">Xuất dữ liệu</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-area">
-                                        <canvas id="myAreaChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        
 
-                        <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Trạng thái thiết bị</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Tùy chọn:</div>
-                                            <a class="dropdown-item" href="#">Xem chi tiết</a>
-                                            <a class="dropdown-item" href="#">Xuất dữ liệu</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Hoạt động
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-warning"></i> Chờ
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-danger"></i> Offline
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-</div>
-                    </div>
-
-                    <!-- Content Row -->
-                    <div class="row">
-
-                        <!-- Pie Chart -->
-                        <div class="col-xl-4 col-lg-5">
-                            <div class="card shadow mb-4">
-                                <!-- Card Header - Dropdown -->
-                                <div
-                                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                                    <h6 class="m-0 font-weight-bold text-primary">Trạng thái thiết bị</h6>
-                                    <div class="dropdown no-arrow">
-                                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                                        </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Tùy chọn:</div>
-                                            <a class="dropdown-item" href="#">Xem chi tiết</a>
-                                            <a class="dropdown-item" href="#">Xuất dữ liệu</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Card Body -->
-                                <div class="card-body">
-                                    <div class="chart-pie pt-4 pb-2">
-                                        <canvas id="myPieChart"></canvas>
-                                    </div>
-                                    <div class="mt-4 text-center small">
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-success"></i> Hoạt động
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-warning"></i> Chờ
-                                        </span>
-                                        <span class="mr-2">
-                                            <i class="fas fa-circle text-danger"></i> Offline
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Content Row -->
                     <div class="row">
@@ -1860,11 +1749,25 @@
                     </button>
                 </div>
                 <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Cảnh báo:</strong> Hành động này không thể hoàn tác!
+                    </div>
                     <p>Bạn có chắc chắn muốn xóa thiết bị <strong id="deleteDeviceName"></strong>?</p>
+                    <div class="card bg-light mb-3">
+                        <div class="card-body text-center">
+                            <p class="mb-2">Nhập mã sau để xác nhận xóa:</p>
+                            <div class="d-inline-block bg-primary text-white px-4 py-2 rounded font-weight-bold" id="deleteConfirmCode" style="font-size: 24px; letter-spacing: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label>Nhập mã xác nhận:</label>
+                        <input type="text" class="form-control" id="deleteCodeInput" placeholder="Nhập 4 ký tự" maxlength="4" autocomplete="off" style="text-transform: uppercase; letter-spacing: 4px; text-align: center; font-weight: bold;">
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Hủy</button>
-                    <button class="btn btn-danger" type="button" id="confirmDeleteDevice">Xóa</button>
+                    <button class="btn btn-danger" type="button" id="confirmDeleteDevice" disabled>Xác nhận xóa</button>
                 </div>
             </div>
         </div>
@@ -2423,19 +2326,88 @@
         }
 
         // Xóa thiết bị
-        async function deleteDevice(deviceId) {
-            if (!confirm('Bạn có chắc muốn xóa thiết bị này?')) return;
+        let deleteConfirmCode = '';
+        let deviceIdToDelete = null;
+
+        function generateDeleteCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        async function deleteDevice(deviceId, btn) {
+            deviceIdToDelete = deviceId;
+            const deviceCard = btn.closest('.device-card');
+            const deviceName = deviceCard ? deviceCard.getAttribute('data-device-name') : 'thiết bị này';
+
+            deleteConfirmCode = generateDeleteCode();
+
+            document.getElementById('deleteDeviceName').textContent = deviceName;
+            document.getElementById('deleteConfirmCode').textContent = deleteConfirmCode;
+            document.getElementById('deleteCodeInput').value = '';
+            document.getElementById('confirmDeleteDevice').disabled = true;
+
+            $('#deleteDeviceModal').modal('show');
+        }
+
+        document.getElementById('deleteCodeInput').addEventListener('input', function() {
+            const inputCode = this.value;
+            const confirmBtn = document.getElementById('confirmDeleteDevice');
+            confirmBtn.disabled = inputCode !== deleteConfirmCode;
+        });
+
+        document.getElementById('confirmDeleteDevice').addEventListener('click', async function() {
+            if (!deviceIdToDelete) return;
+
             try {
-                await devicesAPI.delete(deviceId);
-                showToast('Đã xóa thiết bị', 'success');
-                loadDevices(); // Reload list
+                await devicesAPI.delete(deviceIdToDelete);
+
+                const deviceCard = document.querySelector(`.device-card[data-device-id="${deviceIdToDelete}"]`);
+                if (deviceCard) {
+                    deviceCard.style.opacity = '0';
+                    deviceCard.style.transform = 'translateX(-100%)';
+                    setTimeout(function() {
+                        deviceCard.remove();
+                    }, 300);
+                }
+
+                showToast('Xóa thiết bị thành công', 'success');
+                $('#deleteDeviceModal').modal('hide');
+
+                deviceIdToDelete = null;
+                deleteConfirmCode = '';
             } catch (error) {
                 console.error('Lỗi delete device:', error);
                 showToast('Không thể xóa thiết bị', 'error');
             }
+        });
+
+// Sắp xếp thiết bị theo trạng thái ưu tiên
+        function sortDevicesByStatus(devices) {
+            const statusPriority = {
+                'offline': 1,
+                'connecting': 2,
+                'online': 3
+            };
+
+            return [...devices].sort((a, b) => {
+                const priorityA = statusPriority[a.status] || 99;
+                const priorityB = statusPriority[b.status] || 99;
+
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+
+                const nameA = (a.name || '').toLowerCase();
+                const nameB = (b.name || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
         }
 
-async function loadDevices() {
+        async function loadDevices() {
             try {
                 const devices = await devicesAPI.getAll();
 
@@ -2444,7 +2416,10 @@ async function loadDevices() {
                         deviceContainer.innerHTML = '<div class="text-center text-muted py-5"><i class="fas fa-wifi fa-3x mb-3"></i><p>Chưa có thiết bị nào</p></div>';
                         return;
                     }
-                    deviceContainer.innerHTML = devices.map(device => {
+
+                    const sortedDevices = sortDevicesByStatus(devices);
+
+                    deviceContainer.innerHTML = sortedDevices.map(device => {
                         const statusText = device.status === 'online' ? 'Đã kết nối' : device.status === 'connecting' ? 'Đang kết nối' : 'Mất kết nối';
                         return `
                         <div class="device-card status-${device.status || 'offline'}"
@@ -2460,12 +2435,13 @@ async function loadDevices() {
                                 <span><i class="fas fa-wifi"></i> ${statusText}</span>
                             </div>
                             <div class="device-card-row device-card-actions">
+                                ${device.status === 'online' ? `
                                 <button class="btn btn-sm ${device.is_active ? 'status-btn status-on' : 'status-btn status-off'} device-toggle-btn"
                                         onclick="toggleDevice(${device.id}, this)">
                                     ${device.is_active ? 'Bật' : 'Tắt'}
-                                </button>
+                                </button>` : ''}
                                 <button class="btn btn-sm btn-outline-danger btn-delete-device"
-                                        onclick="deleteDevice(${device.id})">Xóa</button>
+                                        onclick="deleteDevice(${device.id}, this)">Xóa</button>
                             </div>
                         </div>
                     `}).join('');
