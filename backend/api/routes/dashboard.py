@@ -178,6 +178,115 @@ def get_alerts():
     return jsonify([alert.to_dict() for alert in alerts]), 200
 
 
+@dashboard_bp.route('/alerts-count', methods=['GET'])
+@jwt_required()
+def get_alerts_count():
+    """
+    Đếm tổng số cảnh báo từ nhiều nguồn:
+    - Thiết bị mất kết nối (offline/disconnected)
+    - Nhiệt độ vượt ngưỡng (temp_min/temp_max)
+    - Độ ẩm vượt ngưỡng (humidity_min/humidity_max)
+    - Lượng thức ăn dưới ngưỡng (feed_threshold)
+    - Lượng nước dưới ngưỡng (water_threshold)
+
+    Returns:
+        200: {
+            "totalAlerts": <tổng>,
+            "breakdown": {
+                "deviceOffline": <số>,
+                "temperature": <số>,
+                "humidity": <số>,
+                "food": <số>,
+                "water": <số>
+            }
+        }
+    """
+    from sqlalchemy import func
+
+    # 1. Thiết bị mất kết nối
+    device_offline = Device.query.filter(
+        Device.status.in_(['offline', 'disconnected']),
+        Device.deleted == False
+    ).count()
+
+    # Lấy environment data mới nhất của mỗi coop để kiểm tra
+    latest_env_subquery = db.session.query(
+        Environment.coop_id,
+        func.max(Environment.recorded_at).label('max_recorded')
+    ).filter(Environment.deleted == False).group_by(Environment.coop_id).subquery()
+
+    # 2. Nhiệt độ vượt ngưỡng
+    temp_alerts = db.session.query(Environment).join(
+        Coop, Environment.coop_id == Coop.id
+    ).join(
+        latest_env_subquery,
+        (Environment.coop_id == latest_env_subquery.c.coop_id) &
+        (Environment.recorded_at == latest_env_subquery.c.max_recorded)
+    ).filter(
+        Environment.deleted == False,
+        Coop.deleted == False,
+        db.or_(
+            Environment.temperature < Coop.temp_min,
+            Environment.temperature > Coop.temp_max
+        )
+    ).count()
+
+    # 3. Độ ẩm vượt ngưỡng
+    humidity_alerts = db.session.query(Environment).join(
+        Coop, Environment.coop_id == Coop.id
+    ).join(
+        latest_env_subquery,
+        (Environment.coop_id == latest_env_subquery.c.coop_id) &
+        (Environment.recorded_at == latest_env_subquery.c.max_recorded)
+    ).filter(
+        Environment.deleted == False,
+        Coop.deleted == False,
+        db.or_(
+            Environment.humidity < Coop.humidity_min,
+            Environment.humidity > Coop.humidity_max
+        )
+    ).count()
+
+    # 4. Lượng thức ăn dưới ngưỡng
+    food_alerts = db.session.query(Environment).join(
+        Coop, Environment.coop_id == Coop.id
+    ).join(
+        latest_env_subquery,
+        (Environment.coop_id == latest_env_subquery.c.coop_id) &
+        (Environment.recorded_at == latest_env_subquery.c.max_recorded)
+    ).filter(
+        Environment.deleted == False,
+        Coop.deleted == False,
+        Environment.feed_level < Coop.feed_threshold
+    ).count()
+
+    # 5. Lượng nước dưới ngưỡng
+    water_alerts = db.session.query(Environment).join(
+        Coop, Environment.coop_id == Coop.id
+    ).join(
+        latest_env_subquery,
+        (Environment.coop_id == latest_env_subquery.c.coop_id) &
+        (Environment.recorded_at == latest_env_subquery.c.max_recorded)
+    ).filter(
+        Environment.deleted == False,
+        Coop.deleted == False,
+        Environment.water_level < Coop.water_threshold
+    ).count()
+
+    total_alerts = device_offline + temp_alerts + humidity_alerts + food_alerts + water_alerts
+
+    return jsonify({
+        'totalAlerts': total_alerts,
+        'breakdown': {
+            'deviceOffline': device_offline,
+            'temperature': temp_alerts,
+            'humidity': humidity_alerts,
+            'food': food_alerts,
+            'water': water_alerts
+        }
+    }), 200
+
+
 @dashboard_bp.route('/recent-activities', methods=['GET'])
 @jwt_required()
 def get_recent_activities():

@@ -1083,8 +1083,22 @@
                             elements.onlineDevicesProgress.setAttribute('aria-valuenow', percent);
                         }
                     }
-                    if (data.alerts_count !== undefined && elements.alertsCount) {
-                        elements.alertsCount.textContent = data.alerts_count;
+                    if (data.totalAlerts !== undefined && elements.alertsCount) {
+                        elements.alertsCount.textContent = data.totalAlerts;
+
+                        // Tô vàng viền khi có cảnh báo
+                        const alertsCard = elements.alertsCount.closest('.card');
+                        if (alertsCard) {
+                            if (data.totalAlerts > 0) {
+                                alertsCard.style.borderColor = '#ffc107';
+                                alertsCard.style.borderWidth = '3px';
+                                alertsCard.style.borderStyle = 'solid';
+                            } else {
+                                alertsCard.style.borderColor = '';
+                                alertsCard.style.borderWidth = '';
+                                alertsCard.style.borderStyle = '';
+                            }
+                        }
                     }
 
                     // Update environment data
@@ -1281,9 +1295,66 @@
              */
             async function loadDashboardFallback() {
                 try {
-                    const data = await dashboardAPI.getOverview();
+                    // Lấy dữ liệu từ các API giống device-list và coop-list
+                    const [devicesData, coopsData] = await Promise.all([
+                        devicesAPI.getAll(),
+                        coopsAPI.getAll()
+                    ]);
+
+                    const data = {
+                        total_coops: coopsData ? coopsData.filter(c => !c.deleted).length : 0,
+                        total_devices: devicesData ? devicesData.filter(d => !d.deleted).length : 0,
+                        online_devices: devicesData ? devicesData.filter(d => d.status === 'online' && !d.deleted).length : 0,
+                        coops: coopsData,
+                        devices: devicesData
+                    };
+
+                    // Tính số cảnh báo từ dữ liệu
+                    let totalAlerts = 0;
+
+                    // 1. Thiết bị mất kết nối
+                    if (devicesData) {
+                        const deviceOffline = devicesData.filter(d =>
+                            d.status === 'offline' && !d.deleted
+                        ).length;
+                        totalAlerts += deviceOffline;
+                    }
+
+                    // 2. Cảnh báo môi trường từ coop-list
+                    if (coopsData) {
+                        for (const coop of coopsData) {
+                            if (coop.deleted) continue;
+
+                            // Kiểm tra nhiệt độ vượt ngưỡng
+                            if (coop.environment) {
+                                const temp = coop.environment.temperature;
+                                if (temp && (temp < coop.temp_min || temp > coop.temp_max)) {
+                                    totalAlerts++;
+                                }
+                                // Kiểm tra độ ẩm vượt ngưỡng
+                                const humid = coop.environment.humidity;
+                                if (humid && (humid < coop.humidity_min || humid > coop.humidity_max)) {
+                                    totalAlerts++;
+                                }
+                                // Kiểm tra thức ăn dưới ngưỡng
+                                const feedLevel = coop.environment.feed_level;
+                                if (feedLevel && feedLevel < coop.feed_threshold) {
+                                    totalAlerts++;
+                                }
+                                // Kiểm tra nước dưới ngưỡng
+                                const waterLevel = coop.environment.water_level;
+                                if (waterLevel && waterLevel < coop.water_threshold) {
+                                    totalAlerts++;
+                                }
+                            }
+                        }
+                    }
+
+                    data.totalAlerts = totalAlerts;
+
+                    // Cập nhật UI
                     updateDashboardOverview(data);
-                    
+
                     if (data.coops) {
                         updateCoopsList(data.coops);
                     }
