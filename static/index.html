@@ -766,7 +766,7 @@
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                                 Cảnh báo</div>
-                                            <div class="h5 mb-0 font-weight-bold text-gray-800">2</div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="alertsCountDisplay">...</div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
@@ -1078,14 +1078,14 @@
 
             // DOM Elements cache (avoid re-querying DOM)
             const elements = {
-                totalCoops: document.querySelector('.col-xl-3:nth-child(1) .h5'),
-                totalDevices: document.querySelector('.col-xl-3:nth-child(2) .h5'),
-                onlineDevices: document.querySelector('.col-xl-3:nth-child(3) .h5 .mr-3'),
+                totalCoops: document.getElementById('totalCoopsDisplay'),
+                totalDevices: document.getElementById('totalDevicesDisplay'),
+                onlineDevices: document.getElementById('onlineDevicesDisplay'),
                 onlineDevicesProgress: document.querySelector('.col-xl-3:nth-child(3) .progress-bar'),
-                alertsCount: document.querySelector('.col-xl-3:nth-child(4) .h5'),
+                alertsCount: document.getElementById('alertsCountDisplay'),
                 tempValue: document.querySelector('.coop-temp-value'),
                 humidValue: document.querySelector('.coop-humid-value'),
-                donutTotal: document.querySelector('.donut-total-coop'),
+                donutTotal: document.getElementById('donutTotalDisplay'),
                 coopsList: document.querySelector('.col-lg-6:first-child .card-body'),
                 devicesList: document.querySelector('.col-lg-6:last-child .card-body')
             };
@@ -1299,7 +1299,12 @@
                     // Fallback to REST API
                     console.log('WebSocket not available, using REST API fallback');
                     loadDashboardFallback();
-                    
+
+                    // Refresh data every 30 seconds
+                    setInterval(() => {
+                        loadDashboardFallback();
+                    }, 30000);
+
                     // Retry WebSocket connection
                     setTimeout(() => {
                         if (window.wsManager && !window.wsManager.connected) {
