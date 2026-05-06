@@ -32,10 +32,10 @@ def get_public_coops():
     Lấy danh sách tất cả các chuồng (Không cần auth - cho demo).
     
     Returns:
-        200: Array of coop objects
+        200: Array of coop objects (bao gồm environment data mới nhất)
     """
-    coops = Coop.query.all()
-    return jsonify([coop.to_dict() for coop in coops]), 200
+    coops = Coop.query.filter_by(deleted=False).all()
+    return jsonify([coop.to_dict(include_environment=True) for coop in coops]), 200
 
 
 @coops_bp.route('/public/<int:coop_id>', methods=['GET'])
@@ -231,11 +231,11 @@ def get_coops():
     Lấy danh sách tất cả các chuồng.
     
     Returns:
-        200: Array of coop objects
+        200: Array of coop objects (bao gồm environment data mới nhất)
         401: Unauthorized
     """
-    coops = Coop.query.all()
-    return jsonify([coop.to_dict() for coop in coops]), 200
+    coops = Coop.query.filter_by(deleted=False).all()
+    return jsonify([coop.to_dict(include_environment=True) for coop in coops]), 200
 
 
 @coops_bp.route('', methods=['POST'])

@@ -753,12 +753,12 @@
                                     <div class="coop-temp-humid">
                                         <div class="coop-temp">
                                             <div class="coop-temp-icon"><i class="fas fa-thermometer-half" style="color: #dc3545;"></i></div>
-                                            <div class="coop-temp-value">27°C</div>
+                                            <div class="coop-temp-value" id="avgTemperature">--°C</div>
                                             <div class="coop-temp-label">Nhiệt độ</div>
                                         </div>
                                         <div class="coop-humid">
                                             <div class="coop-humid-icon"><i class="fas fa-tint" style="color: #17a2b8;"></i></div>
-                                            <div class="coop-humid-value">65%</div>
+                                            <div class="coop-humid-value" id="avgHumidity">--%</div>
                                             <div class="coop-humid-label">Độ ẩm</div>
                                         </div>
                                     </div>
@@ -1352,6 +1352,9 @@
 
                     data.totalAlerts = totalAlerts;
 
+                    // Cập nhật nhiệt độ và độ ẩm trung bình
+                    updateAvgTemperatureHumidity(coopsData);
+
                     // Cập nhật UI
                     updateDashboardOverview(data);
 
@@ -1365,6 +1368,48 @@
                     console.error('Dashboard fallback error:', error);
                     showToast('Không thể tải dữ liệu', 'error');
                 }
+            }
+
+            /**
+             * Cập nhật nhiệt độ và độ ẩm trung bình các chuồng
+             * @param {array} coopsData - Danh sách chuồng từ API
+             */
+            function updateAvgTemperatureHumidity(coopsData) {
+                const avgTempEl = document.getElementById('avgTemperature');
+                const avgHumidEl = document.getElementById('avgHumidity');
+                
+                if (!avgTempEl || !avgHumidEl) return;
+                
+                if (!coopsData || coopsData.length === 0) {
+                    avgTempEl.textContent = '--°C';
+                    avgHumidEl.textContent = '--%';
+                    return;
+                }
+                
+                // Lọc các chuồng có dữ liệu môi trường (temperature > 0)
+                const coopsWithData = coopsData.filter(c => 
+                    !c.deleted && 
+                    c.environment && 
+                    c.environment.temperature !== null && 
+                    c.environment.temperature > 0
+                );
+                
+                if (coopsWithData.length === 0) {
+                    avgTempEl.textContent = '--°C';
+                    avgHumidEl.textContent = '--%';
+                    return;
+                }
+                
+                // Tính tổng
+                const totalTemp = coopsWithData.reduce((sum, c) => sum + (c.environment?.temperature || 0), 0);
+                const totalHumid = coopsWithData.reduce((sum, c) => sum + (c.environment?.humidity || 0), 0);
+                
+                // Tính trung bình (1 chữ số thập phân)
+                const avgTemp = (totalTemp / coopsWithData.length).toFixed(1);
+                const avgHumid = (totalHumid / coopsWithData.length).toFixed(1);
+                
+                avgTempEl.textContent = avgTemp + '°C';
+                avgHumidEl.textContent = avgHumid + '%';
             }
 
             // Initialize when DOM is ready

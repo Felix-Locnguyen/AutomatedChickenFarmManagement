@@ -129,9 +129,13 @@ class Coop(db.Model):
     feed_schedules = db.relationship('FeedSchedule', backref='coop', lazy='dynamic')
     alerts = db.relationship('Alert', backref='coop', lazy='dynamic')
     
-    def to_dict(self):
-        """Chuyển đổi thành dictionary cho JSON response."""
-        return {
+    def to_dict(self, include_environment=False):
+        """Chuyển đổi thành dictionary cho JSON response.
+        
+        Args:
+            include_environment (bool): Có bao gồm dữ liệu môi trường mới nhất không
+        """
+        result = {
             'id': self.id,
             'name': self.name,
             'location': self.location,
@@ -153,9 +157,25 @@ class Coop(db.Model):
             'auto_water': self.auto_water,
             'emergency_alert': self.emergency_alert,
             'status': self.status,
+            'deleted': self.deleted,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+        
+        if include_environment:
+            latest_env = Environment.query.filter_by(coop_id=self.id).order_by(Environment.recorded_at.desc()).first()
+            if latest_env:
+                result['environment'] = {
+                    'temperature': latest_env.temperature,
+                    'humidity': latest_env.humidity,
+                    'feed_level': latest_env.feed_level,
+                    'water_level': latest_env.water_level,
+                    'recorded_at': latest_env.recorded_at.isoformat() if latest_env.recorded_at else None
+                }
+            else:
+                result['environment'] = None
+        
+        return result
     
     def __repr__(self):
         return f'<Coop {self.name}>'
