@@ -597,3 +597,34 @@ def update_device_name(device_id):
         'message': 'Device name updated',
         'device': device.to_dict()
     }), 200
+
+
+@devices_bp.route('/status-stats', methods=['GET'])
+def get_device_status_stats():
+    """
+    Lấy thống kê thiết bị theo trạng thái.
+    
+    Returns:
+        200: {
+            "online": <số thiết bị online/connected>,
+            "connecting": <số thiết bị connecting/pending>,
+            "offline": <số thiết bị offline/disconnected/error>
+        }
+    """
+    devices = Device.query.filter_by(deleted=False).all()
+    
+    stats = {
+        'online': 0,
+        'connecting': 0,
+        'offline': 0
+    }
+    
+    for device in devices:
+        if device.status in ['online', 'connected']:
+            stats['online'] += 1
+        elif device.status in ['connecting', 'pending']:
+            stats['connecting'] += 1
+        else:
+            stats['offline'] += 1
+    
+    return jsonify(stats), 200

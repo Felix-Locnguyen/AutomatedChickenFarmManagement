@@ -1304,6 +1304,7 @@
 
     <!-- API Integration -->
     <script src="js/api.js"></script>
+    <script src="js/donut-device-status.js"></script>
     <script>
     // Coop List - Danh sách chuồng with dynamic data
     (function() {
@@ -1555,6 +1556,11 @@
         // Initialize - load data and set up polling
         loadAllCoopsData();
         pollInterval = setInterval(loadAllCoopsData, POLL_INTERVAL);
+
+        // Load device status donut chart
+        if (typeof loadDeviceStatusDonut === 'function') {
+            loadDeviceStatusDonut('donutChartCoop', 30000);
+        }
 
         // Search functionality
         const searchInput = document.getElementById('coopSearchInput');
