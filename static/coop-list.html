@@ -1095,7 +1095,10 @@
         <div class="modal-dialog modal-sm modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-body text-center py-4">
-                    <h5 class="mb-0">Bạn có chắc muốn xóa?</h5>
+                    <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                    <h5 class="mb-2">Bạn có chắc muốn xóa chuồng này?</h5>
+                    <p class="text-muted mb-1">Toàn bộ dữ liệu liên quan sẽ bị xóa.</p>
+                    <p class="font-weight-bold text-dark mb-0" id="deleteCoopName"></p>
                 </div>
                 <div class="modal-footer justify-content-center">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
@@ -1148,11 +1151,58 @@
     <script src="js/demo/chart-pie-demo.js"></script>
 
     <script>
+        let pendingDeleteCoopId = null;
+
+        $(document).on('click', '.btn-delete-coop', function() {
+            pendingDeleteCoopId = $(this).data('coop-id');
+            var coopName = $(this).data('coop-name');
+            $('#deleteCoopName').text('Chuồng: ' + coopName);
+        });
+
+        $('#confirmDeleteBtn').on('click', async function() {
+            if (!pendingDeleteCoopId) return;
+
+            var btn = $(this);
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Đang xóa...');
+
+            try {
+                const response = await fetch('/api/coops/' + pendingDeleteCoopId, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + getAuthToken()
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    $('.btn-delete-coop[data-coop-id="' + pendingDeleteCoopId + '"]')
+                        .closest('.coop-card').fadeOut(300, function() {
+                            $(this).remove();
+                        });
+
+                    showToast('Xóa chuồng thành công', 'success');
+
+                    loadAllCoopsData();
+                } else {
+                    showToast(data.error || 'Xóa thất bại, vui lòng thử lại', 'error');
+                }
+            } catch (error) {
+                console.error('Lỗi xóa chuồng:', error);
+                showToast('Xóa thất bại, vui lòng thử lại', 'error');
+            } finally {
+                btn.prop('disabled', false).text('Xóa');
+                $('#deleteCoopModal').modal('hide');
+                pendingDeleteCoopId = null;
+            }
+        });
+
+        $('#deleteCoopModal').on('hidden.bs.modal', function() {
+            pendingDeleteCoopId = null;
+        });
+
         document.getElementById('saveCoopBtn').addEventListener('click', function() {
             $('#addCoopModal').modal('hide');
-        });
-        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-            $('#deleteCoopModal').modal('hide');
         });
 
         // Donut Chart Interaction - coop-list.html
@@ -1474,7 +1524,7 @@
                                 <h3 class="coop-card-title">${coop.name || 'Chuồng ' + coop.id}</h3>
                                 <span class="coop-status ${statusClass}">${statusText}</span>
                             </div>
-                            <button type="button" class="btn btn-sm btn-delete-coop" data-toggle="modal" data-target="#deleteCoopModal">
+                            <button type="button" class="btn btn-sm btn-delete-coop" data-coop-id="${coop.id}" data-coop-name="${coop.name}" data-toggle="modal" data-target="#deleteCoopModal">
                                 <i class="fas fa-trash-alt"></i> Xóa
                             </button>
                         </div>

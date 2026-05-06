@@ -437,11 +437,11 @@ class Alert(db.Model):
 class UnconnectedDevice(db.Model):
     """
     Model thiết bị chưa kết nối (unconnected devices).
-    
+
     Lưu trữ các thiết bị chưa được gán vào bất kỳ chuồng nào.
     Khi thêm thiết bị vào chuồng, bản ghi này sẽ bị xóa.
     Khi gỡ thiết bị khỏi chuồng, bản ghi mới sẽ được tạo.
-    
+
     Attributes:
         id: Primary key tự tăng
         name: Tên thiết bị
@@ -450,10 +450,13 @@ class UnconnectedDevice(db.Model):
         status: Trạng thái (online/offline/connecting)
         is_active: Bật/tắt thiết bị
         battery: Mức pin (%)
+        device_id: FK đến thiết bị gốc trong bảng devices
+        previous_coop_id: FK đến chuồng trước đó
+        unconnected_at: Thời gian ngắt kết nối
         created_at: Thời gian thêm vào danh sách
     """
     __tablename__ = 'unconnected_devices'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     type = db.Column(db.String(20), nullable=False)
@@ -461,6 +464,9 @@ class UnconnectedDevice(db.Model):
     status = db.Column(db.String(20), default='offline')
     is_active = db.Column(db.Boolean, default=False)
     battery = db.Column(db.Integer, default=100)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'))
+    previous_coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'))
+    unconnected_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     deleted = db.Column(db.Boolean, default=False)
 
@@ -474,8 +480,11 @@ class UnconnectedDevice(db.Model):
             'status': self.status,
             'is_active': self.is_active,
             'battery': self.battery,
+            'device_id': self.device_id,
+            'previous_coop_id': self.previous_coop_id,
+            'unconnected_at': self.unconnected_at.isoformat() if self.unconnected_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
-    
+
     def __repr__(self):
         return f'<UnconnectedDevice {self.name}>'

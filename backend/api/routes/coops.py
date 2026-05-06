@@ -374,26 +374,69 @@ def update_coop(coop_id):
 @jwt_required()
 def delete_coop(coop_id):
     """
-    Xóa một chuồng.
-    
-    Lưu ý: Xóa chuồng sẽ không xóa các thiết bị liên quan,
-    chỉ xóa các liên kết trong bảng CoopDevice.
-    
+    Xóa một chuồng (soft delete).
+
+    Quy trình:
+    1. Soft delete chuồng (deleted = True)
+    2. Lấy danh sách thiết bị đang gắn với chuồng
+    3. Chuyển thiết bị sang bảng unconnected_devices
+    4. Soft delete liên kết trong coop_devices
+    5. Cập nhật trạng thái thiết bị: status='pending', is_active=False
+
+    Toàn bộ thực hiện trong một transaction, rollback nếu lỗi.
+
     Args:
         coop_id (int): ID của chuồng cần xóa
-        
+
     Returns:
-        200: Thông báo thành công
+        200: {'message': 'Coop deleted successfully', 'devices_moved': N}
         404: Không tìm thấy chuồng
+        500: Xóa thất bại
     """
-    coop = db.session.get(Coop, coop_id)
-    if not coop:
-        return jsonify({'error': 'Coop not found'}), 404
-    
-    db.session.delete(coop)
-    db.session.commit()
-    
-    return jsonify({'message': 'Coop deleted'}), 200
+    from models import UnconnectedDevice
+
+    try:
+        coop = db.session.get(Coop, coop_id)
+        if not coop or coop.deleted:
+            return jsonify({'error': 'Coop not found'}), 404
+
+        coop_device_links = CoopDevice.query.filter_by(
+            coop_id=coop_id, deleted=False
+        ).all()
+        device_ids = [cd.device_id for cd in coop_device_links]
+
+        coop.deleted = True
+
+        for cd in coop_device_links:
+            device = db.session.get(Device, cd.device_id)
+            if device:
+                unconnected = UnconnectedDevice(
+                    name=device.name,
+                    type=device.type,
+                    mac_address=device.mac_address,
+                    status='pending',
+                    is_active=False,
+                    battery=device.battery,
+                    device_id=device.id,
+                    previous_coop_id=coop_id
+                )
+                db.session.add(unconnected)
+
+                device.status = 'pending'
+                device.is_active = False
+
+            cd.deleted = True
+
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Coop deleted successfully',
+            'devices_moved': len(device_ids)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Delete failed, please try again'}), 500
 
 
 @coops_bp.route('/<int:coop_id>/devices', methods=['GET'])

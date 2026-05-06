@@ -107,18 +107,36 @@ def create_app(config_name='development'):
     # Chỉ tạo khi file database chưa tồn tại để tránh ghi đè dữ liệu
     
     with app.app_context():
-        # Kiểm tra database đã tồn tại chưa
         db_file = app.config['SQLALCHEMY_DATABASE_URI'].replace('sqlite:///', '')
-        
+
         if not os.path.exists(db_file):
-            # File database chưa tồn tại -> Tạo mới
             print(f"Creating new database: {db_file}")
             db.create_all()
             print("Database tables created successfully!")
         else:
-            # File đã tồn tại -> Chỉ đảm bảo tables tồn tại
             db.create_all()
             print(f"Database already exists: {db_file}")
+
+        # Auto-migrate: add missing columns to unconnected_devices
+        from sqlalchemy import inspect, text
+        inspector = inspect(db.engine)
+        if 'unconnected_devices' in inspector.get_table_names():
+            existing_cols = {col['name'] for col in inspector.get_columns('unconnected_devices')}
+            migrations = []
+            if 'device_id' not in existing_cols:
+                migrations.append('ALTER TABLE unconnected_devices ADD COLUMN device_id INTEGER')
+            if 'previous_coop_id' not in existing_cols:
+                migrations.append('ALTER TABLE unconnected_devices ADD COLUMN previous_coop_id INTEGER')
+            if 'unconnected_at' not in existing_cols:
+                migrations.append('ALTER TABLE unconnected_devices ADD COLUMN unconnected_at DATETIME')
+            for migration_sql in migrations:
+                try:
+                    db.session.execute(text(migration_sql))
+                    db.session.commit()
+                    print(f"Migration applied: {migration_sql}")
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"Migration skipped (column may exist): {e}")
     
     # ============================================================
     # 6. API HEALTH CHECK ROUTE

@@ -413,6 +413,53 @@
         .fullscreen-close:hover {
             background: rgba(255,255,255,0.3);
         }
+
+        .skeleton-pulse {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important;
+            user-select: none;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .device-online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .device-connecting {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .device-offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        #loadingOverlay {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            gap: 15px;
+        }
+
+        #loadingOverlay .fa-spinner {
+            font-size: 28px;
+            color: #4e73df;
+        }
+
+        #dataContent {
+            display: none;
+        }
     </style>
 
 </head>
@@ -527,6 +574,11 @@
                                     <h5><i class="fas fa-building"></i> <span id="coopName">Chuồng A</span></h5>
                                 </div>
                                 <div class="card-body">
+                                    <div id="loadingOverlay">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Đang tải dữ liệu...</span>
+                                    </div>
+                                    <div id="dataContent">
                                     <div class="coop-info-item">
                                         <span class="coop-info-label">Số lượng gà</span>
                                         <span class="coop-info-value" id="chickenCount">450 con</span>
@@ -578,6 +630,7 @@
                                             <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i> Đèn LED</span>
                                         </div>
                                     </div>
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -638,173 +691,8 @@
         </div>
     </nav>
 
-    <script>
-        const coopData = {
-            'A': {
-                name: 'Chuồng A - Khu vực nuôi lấy trứng',
-                chickenCount: '450 con',
-                area: '100 m²',
-                location: 'Khu vực A - Hàng 1',
-                status: 'success',
-                statusText: 'Bình thường',
-                tempRange: [26, 30],
-                humRange: [60, 70],
-                feedRange: [70, 90],
-                waterRange: [60, 80],
-                devices: [
-                    { name: 'Cảm biến nhiệt', active: true },
-                    { name: 'Quạt thông gió', active: true },
-                    { name: 'Đèn LED', active: true }
-                ]
-            },
-            'B': {
-                name: 'Chuồng B - Khu vực nuôi thịt',
-                chickenCount: '320 con',
-                area: '80 m²',
-                location: 'Khu vực B - Hàng 2',
-                status: 'success',
-                statusText: 'Bình thường',
-                tempRange: [24, 28],
-                humRange: [55, 65],
-                feedRange: [75, 95],
-                waterRange: [65, 85],
-                devices: [
-                    { name: 'Cảm biến nhiệt', active: true },
-                    { name: 'Quạt thông gió', active: true },
-                    { name: 'Hệ thống cho ăn', active: true }
-                ]
-            },
-            'C': {
-                name: 'Chuồng C - Khu vực ấp trứng',
-                chickenCount: '200 con',
-                area: '50 m²',
-                location: 'Khu vực C - Hàng 1',
-                status: 'warning',
-                statusText: 'Cảnh báo',
-                tempRange: [37, 38],
-                humRange: [50, 60],
-                feedRange: [50, 70],
-                waterRange: [40, 60],
-                devices: [
-                    { name: 'Máy ấp trứng', active: true },
-                    { name: 'Cảm biến nhiệt', active: true },
-                    { name: 'Đèn sưởi', active: false }
-                ]
-            },
-            'D': {
-                name: 'Chuồng D - Khu vực nuôi gà con',
-                chickenCount: '150 con',
-                area: '40 m²',
-                location: 'Khu vực D - Hàng 3',
-                status: 'success',
-                statusText: 'Bình thường',
-                tempRange: [30, 34],
-                humRange: [65, 75],
-                feedRange: [60, 85],
-                waterRange: [55, 75],
-                devices: [
-                    { name: 'Đèn sưởi', active: true },
-                    { name: 'Cảm biến nhiệt', active: true },
-                    { name: 'Hệ thống cho ăn', active: true }
-                ]
-            },
-            'E': {
-                name: 'Chuồng E - Khu vực chế biến',
-                chickenCount: '0 con',
-                area: '60 m²',
-                location: 'Khu vực E - Hàng 4',
-                status: 'secondary',
-                statusText: 'Không hoạt động',
-                tempRange: [20, 25],
-                humRange: [45, 55],
-                feedRange: [0, 10],
-                waterRange: [0, 10],
-                devices: [
-                    { name: 'Hệ thống chiếu sáng', active: false },
-                    { name: 'Quạt thông gió', active: false }
-                ]
-            }
-        };
-
-        function getUrlParameter(name) {
-            const params = new URLSearchParams(window.location.search);
-            return params.get(name);
-        }
-
-        function loadCoopData(coopId) {
-            const data = coopData[coopId];
-            if (!data) {
-                window.location.href = 'camera.html';
-                return;
-            }
-
-            document.getElementById('coopName').textContent = data.name;
-            document.getElementById('chickenCount').textContent = data.chickenCount;
-            document.getElementById('coopArea').textContent = data.area;
-            document.getElementById('coopLocation').textContent = data.location;
-            
-            const statusEl = document.getElementById('coopStatus');
-            statusEl.className = 'badge badge-' + data.status;
-            statusEl.textContent = data.statusText;
-
-            const deviceList = document.getElementById('deviceList');
-            deviceList.innerHTML = data.devices.map(device => 
-                `<span class="coop-device-tag ${device.active ? 'active' : ''}">
-                    <i class="fas fa-${device.active ? 'check-circle' : 'times-circle'}"></i> ${device.name}
-                </span>`
-            ).join('');
-        }
-
-        function simulateSensorData(coopId) {
-            const data = coopData[coopId] || coopData['A'];
-            const temp = data.tempRange[0] + Math.random() * (data.tempRange[1] - data.tempRange[0]);
-            const hum = data.humRange[0] + Math.random() * (data.humRange[1] - data.humRange[0]);
-            const feed = data.feedRange[0] + Math.random() * ((data.feedRange[1] || 100) - data.feedRange[0]);
-            const water = data.waterRange[0] + Math.random() * ((data.waterRange[1] || 100) - data.waterRange[0]);
-
-            document.getElementById('tempValue').textContent = temp.toFixed(1) + '°C';
-            document.getElementById('humidityValue').textContent = hum.toFixed(0) + '%';
-            document.getElementById('feedValue').textContent = feed.toFixed(0) + '%';
-            document.getElementById('waterValue').textContent = water.toFixed(0) + '%';
-        }
-
-        function updateTimestamp() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('videoTimestamp').textContent = 
-                hours + ':' + minutes + ':' + seconds;
-        }
-
-        function toggleFullscreen() {
-            const fs = document.getElementById('fullscreenVideo');
-            fs.classList.toggle('show');
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const coopId = getUrlParameter('coop') || 'A';
-            loadCoopData(coopId);
-
-            updateTimestamp();
-            setInterval(updateTimestamp, 1000);
-            simulateSensorData(coopId);
-            setInterval(() => simulateSensorData(coopId), 5000);
-
-            const navItems = document.querySelectorAll('.fab-nav-item');
-            navItems.forEach(function(item) {
-                item.addEventListener('click', function(e) {
-                    navItems.forEach(function(i) { i.classList.remove('active'); });
-                    this.classList.add('active');
-                });
-            });
-        });
-    </script>
-
-    <!-- API Integration -->
     <script src="js/api.js"></script>
     <script>
-    // Camera Detail - Xem camera theo chuồng
     (function() {
         'use strict';
 
@@ -813,17 +701,181 @@
             return;
         }
 
-        // Lấy coop từ URL
         const urlParams = new URLSearchParams(window.location.search);
-        const coop = urlParams.get('coop') || 'A';
+        const coopId = urlParams.get('coop');
 
-        // Cập nhật tiêu đề
-        const cameraTitle = document.querySelector('.camera-title');
-        if (cameraTitle) {
-            cameraTitle.textContent = 'Camera Chuồng ' + coop;
+        if (!coopId || isNaN(coopId)) {
+            window.location.href = 'camera.html';
+            return;
         }
 
-        console.log('Đang xem camera chuồng:', coop);
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const dataContent = document.getElementById('dataContent');
+
+        function updateTimestamp() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('videoTimestamp').textContent =
+                hours + ':' + minutes + ':' + seconds;
+        }
+
+        function toggleFullscreen() {
+            const fs = document.getElementById('fullscreenVideo');
+            fs.classList.toggle('show');
+        }
+        window.toggleFullscreen = toggleFullscreen;
+
+        function getStatusBadgeClass(status) {
+            if (status === 'active' || status === 'normal') return 'success';
+            if (status === 'warning') return 'warning';
+            return 'secondary';
+        }
+
+        function getStatusText(status) {
+            const map = {
+                'active': 'Bình thường',
+                'normal': 'Bình thường',
+                'warning': 'Cảnh báo',
+                'error': 'Lỗi',
+                'cleaning': 'Đang vệ sinh',
+                'empty': 'Trống',
+                'inactive': 'Không hoạt động'
+            };
+            return map[status] || 'Không xác định';
+        }
+
+        function getDeviceClass(device) {
+            const s = (device.status || '').toLowerCase();
+            if (s === 'online' || s === 'connected') return 'device-online';
+            if (s === 'connecting' || s === 'pending') return 'device-connecting';
+            return 'device-offline';
+        }
+
+        function getDeviceIcon(type) {
+            const icons = {
+                'temperature': 'thermometer-half',
+                'humidity': 'tint',
+                'fan': 'fan',
+                'light': 'lightbulb',
+                'feeder': 'drumstick-bite',
+                'camera': 'video'
+            };
+            return icons[type] || 'microchip';
+        }
+
+        function getDeviceLabel(type) {
+            const labels = {
+                'temperature': 'Cảm biến nhiệt',
+                'humidity': 'Cảm biến độ ẩm',
+                'fan': 'Quạt thông gió',
+                'light': 'Đèn LED',
+                'feeder': 'Hệ thống cho ăn',
+                'camera': 'Camera'
+            };
+            return labels[type] || type;
+        }
+
+        async function loadCoopDetail(partialUpdate = false) {
+            try {
+                const response = await fetch(`/api/camera/coop-detail/${coopId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${getAuthToken()}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (partialUpdate) {
+                    updateEnvironment(data.environment);
+                    updateDevices(data.devices);
+                } else {
+                    renderCoopDetail(data);
+                }
+            } catch (error) {
+                console.error('Lỗi tải dữ liệu chuồng:', error);
+                if (!partialUpdate) {
+                    showToast('Không thể tải dữ liệu chuồng', 'error');
+                    setTimeout(() => {
+                        window.location.href = 'camera.html';
+                    }, 2000);
+                }
+            }
+        }
+
+        function renderCoopDetail(data) {
+            const coop = data.coop;
+            document.getElementById('coopName').textContent = coop.name;
+            document.getElementById('chickenCount').textContent = coop.current_count + ' con';
+            document.getElementById('coopArea').textContent = coop.area + ' m²';
+            document.getElementById('coopLocation').textContent = coop.location || '--';
+
+            const statusEl = document.getElementById('coopStatus');
+            statusEl.className = 'badge badge-' + getStatusBadgeClass(coop.status);
+            statusEl.textContent = getStatusText(coop.status);
+
+            updateEnvironment(data.environment);
+            updateDevices(data.devices);
+
+            loadingOverlay.style.display = 'none';
+            dataContent.style.display = 'block';
+        }
+
+        function updateEnvironment(env) {
+            const tempEl = document.getElementById('tempValue');
+            const humEl = document.getElementById('humidityValue');
+            const feedEl = document.getElementById('feedValue');
+            const waterEl = document.getElementById('waterValue');
+
+            if (env) {
+                tempEl.textContent = (env.temperature != null ? env.temperature.toFixed(1) : '--') + '°C';
+                humEl.textContent = (env.humidity != null ? env.humidity.toFixed(0) : '--') + '%';
+                feedEl.textContent = (env.feed_level != null ? env.feed_level.toFixed(0) : '--') + '%';
+                waterEl.textContent = (env.water_level != null ? env.water_level.toFixed(0) : '--') + '%';
+            } else {
+                tempEl.textContent = '--';
+                humEl.textContent = '--';
+                feedEl.textContent = '--';
+                waterEl.textContent = '--';
+            }
+        }
+
+        function updateDevices(devices) {
+            const deviceList = document.getElementById('deviceList');
+            if (!devices || devices.length === 0) {
+                deviceList.innerHTML = '<span class="text-muted" style="font-size: 13px;">Không có thiết bị hoạt động</span>';
+                return;
+            }
+
+            deviceList.innerHTML = devices.map(device => {
+                const cls = getDeviceClass(device);
+                const icon = getDeviceIcon(device.type);
+                const label = getDeviceLabel(device.type);
+                return `<span class="coop-device-tag ${cls}">
+                    <i class="fas fa-${icon}"></i> ${label}
+                </span>`;
+            }).join('');
+        }
+
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+
+        loadCoopDetail(false);
+
+        setInterval(() => loadCoopDetail(true), 30000);
+
+        const navItems = document.querySelectorAll('.fab-nav-item');
+        navItems.forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                navItems.forEach(function(i) { i.classList.remove('active'); });
+                this.classList.add('active');
+            });
+        });
 
     })();
     </script>

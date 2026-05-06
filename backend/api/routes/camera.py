@@ -20,7 +20,7 @@ import sys
 import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from models import Coop, Device, CoopDevice
+from models import db, Coop, Device, CoopDevice, Environment
 
 # Tạo Blueprint cho routes camera
 # URL: /api/camera
@@ -257,4 +257,49 @@ def get_recordings(device_id):
         'device_id': device_id,
         'recordings': recordings,
         'count': len(recordings)
+    }), 200
+
+
+@camera_bp.route('/coop-detail/<int:coop_id>', methods=['GET'])
+@jwt_required()
+def get_coop_camera_detail(coop_id):
+    coop = db.session.get(Coop, coop_id)
+    if not coop or coop.deleted:
+        return jsonify({'error': 'Coop not found'}), 404
+
+    latest_env = Environment.query.filter_by(
+        coop_id=coop_id, deleted=False
+    ).order_by(Environment.recorded_at.desc()).first()
+
+    coop_device_links = CoopDevice.query.filter_by(
+        coop_id=coop_id, deleted=False
+    ).all()
+    device_ids = [cd.device_id for cd in coop_device_links]
+    devices = []
+    if device_ids:
+        devices = Device.query.filter(
+            Device.id.in_(device_ids),
+            Device.is_active == True,
+            Device.deleted == False
+        ).all()
+
+    return jsonify({
+        'coop': {
+            'id': coop.id,
+            'name': coop.name,
+            'current_count': coop.current_count,
+            'area': coop.area,
+            'location': coop.location,
+            'status': coop.status
+        },
+        'environment': latest_env.to_dict() if latest_env else None,
+        'devices': [
+            {
+                'id': d.id,
+                'name': d.name,
+                'type': d.type,
+                'status': d.status,
+                'is_active': d.is_active
+            } for d in devices
+        ]
     }), 200

@@ -551,115 +551,10 @@
                     </div>
 
                     <!-- Camera List -->
-                    <div class="camera-list-container">
-                        <!-- Camera Card 1 - Online -->
-                        <div class="camera-card status-online">
-                            <div class="camera-card-header">
-                                <div class="camera-info">
-                                    <h5 class="camera-coop-name">Chuồng A</h5>
-                                    <div class="camera-status">
-                                        <span class="camera-status-indicator online"></span>
-                                        <span>Camera: Hoạt động</span>
-                                    </div>
-                                </div>
-                                <div class="coop-status-badge online">Bình thường</div>
-                            </div>
-                            <div class="camera-card-footer">
-                                <a href="camera-detail.html?coop=A" class="btn btn-sm btn-primary btn-check-camera">
-                                    <i class="fas fa-video"></i> Kiểm tra
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger btn-delete-camera" data-coop="A" data-coop-name="Chuồng A">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Camera Card 2 - Online -->
-                        <div class="camera-card status-online">
-                            <div class="camera-card-header">
-                                <div class="camera-info">
-                                    <h5 class="camera-coop-name">Chuồng B</h5>
-                                    <div class="camera-status">
-                                        <span class="camera-status-indicator online"></span>
-                                        <span>Camera: Hoạt động</span>
-                                    </div>
-                                </div>
-                                <div class="coop-status-badge online">Bình thường</div>
-                            </div>
-                            <div class="camera-card-footer">
-                                <a href="camera-detail.html?coop=B" class="btn btn-sm btn-primary btn-check-camera">
-                                    <i class="fas fa-video"></i> Kiểm tra
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger btn-delete-camera" data-coop="B" data-coop-name="Chuồng B">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Camera Card 3 - Offline -->
-                        <div class="camera-card status-offline">
-                            <div class="camera-card-header">
-                                <div class="camera-info">
-                                    <h5 class="camera-coop-name">Chuồng C</h5>
-                                    <div class="camera-status">
-                                        <span class="camera-status-indicator offline"></span>
-                                        <span>Camera: Mất kết nối</span>
-                                    </div>
-                                </div>
-                                <div class="coop-status-badge warning">Cảnh báo</div>
-                            </div>
-                            <div class="camera-card-footer">
-                                <a href="camera-detail.html?coop=C" class="btn btn-sm btn-primary btn-check-camera">
-                                    <i class="fas fa-video"></i> Kiểm tra
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger btn-delete-camera" data-coop="C" data-coop-name="Chuồng C">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Camera Card 4 - Online -->
-                        <div class="camera-card status-online">
-                            <div class="camera-card-header">
-                                <div class="camera-info">
-                                    <h5 class="camera-coop-name">Chuồng D</h5>
-                                    <div class="camera-status">
-                                        <span class="camera-status-indicator online"></span>
-                                        <span>Camera: Hoạt động</span>
-                                    </div>
-                                </div>
-                                <div class="coop-status-badge online">Bình thường</div>
-                            </div>
-                            <div class="camera-card-footer">
-                                <a href="camera-detail.html?coop=D" class="btn btn-sm btn-primary btn-check-camera">
-                                    <i class="fas fa-video"></i> Kiểm tra
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger btn-delete-camera" data-coop="D" data-coop-name="Chuồng D">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Camera Card 5 - Error -->
-                        <div class="camera-card status-error">
-                            <div class="camera-card-header">
-                                <div class="camera-info">
-                                    <h5 class="camera-coop-name">Chuồng E</h5>
-                                    <div class="camera-status">
-                                        <span class="camera-status-indicator error"></span>
-                                        <span>Camera: Lỗi</span>
-                                    </div>
-                                </div>
-                                <div class="coop-status-badge error">Lỗi</div>
-                            </div>
-                            <div class="camera-card-footer">
-                                <a href="camera-detail.html?coop=E" class="btn btn-sm btn-primary btn-check-camera">
-                                    <i class="fas fa-video"></i> Kiểm tra
-                                </a>
-                                <button class="btn btn-sm btn-outline-danger btn-delete-camera" data-coop="E" data-coop-name="Chuồng E">
-                                    <i class="fas fa-trash"></i> Xóa
-                                </button>
-                            </div>
+                    <div id="camera-list-container" class="camera-list-container">
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x"></i>
+                            <p class="mt-2">Đang tải camera...</p>
                         </div>
                     </div>
 
@@ -799,51 +694,60 @@
 
         async function loadCameras() {
             try {
-                const cameras = await cameraAPI.getAll();
-                
-                if (cameraContainer && cameras && cameras.length > 0) {
-                    cameraContainer.innerHTML = cameras.map(camera => `
-                        <div class="coop-summary-card">
-                            <div class="coop-summary-header">
-                                <span class="coop-summary-name">${camera.name || 'Camera ' + camera.id}</span>
-                                <span class="coop-status ${camera.status || 'active'}">${camera.status === 'active' ? 'Hoạt động' : 'Offline'}</span>
+                const coops = await coopsAPI.getAll();
+
+                if (cameraContainer && coops && coops.length > 0) {
+                    const cameras = await cameraAPI.getAll();
+                    const coopCameras = {};
+                    cameras.forEach(cam => {
+                        if (cam.coops && cam.coops.length > 0) {
+                            cam.coops.forEach(c => {
+                                if (!coopCameras[c.id]) coopCameras[c.id] = [];
+                                coopCameras[c.id].push(cam);
+                            });
+                        }
+                    });
+
+                    cameraContainer.innerHTML = coops.map(coop => {
+                        const status = coop.status || 'inactive';
+                        let statusClass, statusBadge;
+                        if (status === 'active' || status === 'normal') {
+                            statusClass = 'online';
+                            statusBadge = '<span class="coop-status-badge online">Bình thường</span>';
+                        } else if (status === 'warning') {
+                            statusClass = 'warning';
+                            statusBadge = '<span class="coop-status-badge warning">Cảnh báo</span>';
+                        } else {
+                            statusClass = 'error';
+                            statusBadge = '<span class="coop-status-badge error">Lỗi</span>';
+                        }
+
+                        const coopCams = coopCameras[coop.id] || [];
+                        const camCount = coopCams.length;
+                        const camStatus = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'Hoạt động' : 'Ngoại tuyến') : 'Chưa có camera';
+                        const indicatorClass = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'online' : 'offline') : 'offline';
+
+                        return `
+                        <div class="camera-card status-${statusClass}">
+                            <div class="camera-card-header">
+                                <div class="camera-info">
+                                    <h5 class="camera-coop-name">${coop.name}</h5>
+                                    <div class="camera-status">
+                                        <span class="camera-status-indicator ${indicatorClass}"></span>
+                                        <span>Camera: ${camStatus}</span>
+                                    </div>
+                                </div>
+                                ${statusBadge}
                             </div>
-                            <div class="coop-summary-info">
-                                <span><i class="fas fa-video"></i> ${camera.coop_name || 'Chưa gán chuồng'}</span>
+                            <div class="camera-card-footer">
+                                <a href="camera-detail.html?coop=${coop.id}" class="btn btn-sm btn-primary btn-check-camera">
+                                    <i class="fas fa-video"></i> Kiểm tra
+                                </a>
                             </div>
-                            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                                <a href="camera-detail.html?coop=${camera.coop_id || 'A'}" class="btn btn-sm btn-outline-primary">Kiểm tra</a>
-                            </div>
-                        </div>
-                    `).join('');
+                        </div>`;
+                    }).join('');
                 } else if (cameraContainer) {
-                    // Mock data nếu API chưa có data
-                    cameraContainer.innerHTML = `
-                        <div class="coop-summary-card">
-                            <div class="coop-summary-header">
-                                <span class="coop-summary-name">Camera Chuồng A</span>
-                                <span class="coop-status active">Hoạt động</span>
-                            </div>
-                            <div class="coop-summary-info">
-                                <span><i class="fas fa-video"></i> Chuồng A</span>
-                            </div>
-                            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                                <a href="camera-detail.html?coop=A" class="btn btn-sm btn-outline-primary">Kiểm tra</a>
-                            </div>
-                        </div>
-                        <div class="coop-summary-card">
-                            <div class="coop-summary-header">
-                                <span class="coop-summary-name">Camera Chuồng B</span>
-                                <span class="coop-status active">Hoạt động</span>
-                            </div>
-                            <div class="coop-summary-info">
-                                <span><i class="fas fa-video"></i> Chuồng B</span>
-                            </div>
-                            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                                <a href="camera-detail.html?coop=B" class="btn btn-sm btn-outline-primary">Kiểm tra</a>
-                            </div>
-                        </div>
-                    `;
+                    cameraContainer.innerHTML = '<div class="text-center text-muted py-3">Không có dữ liệu chuồng</div>';
                 }
             } catch (error) {
                 console.error('Lỗi load cameras:', error);
@@ -890,28 +794,31 @@
                     return;
                 }
 
-                var coopsHtml = coops.map(function(coop) {
-                    var status = coop.status || 'inactive';
-                    var statusClass;
-                    if (status === 'active' || status === 'normal' || status === 'online') {
-                        statusClass = 'online';
-                    } else if (status === 'warning') {
-                        statusClass = 'warning';
-                    } else {
-                        statusClass = 'error';
-                    }
+                    var coopsHtml = coops.map(function(coop) {
+                        var status = coop.status || 'inactive';
+                        var statusClass;
+                        if (status === 'active' || status === 'normal' || status === 'online') {
+                            statusClass = 'online';
+                        } else if (status === 'warning') {
+                            statusClass = 'warning';
+                        } else {
+                            statusClass = 'error';
+                        }
 
-                    return '<div class="coop-summary-card ' + statusClass + '">' +
-                        '<div class="coop-summary-header">' +
-                        '<span class="coop-summary-name">' + (coop.name || 'Chuồng ' + coop.id) + '</span>' +
-                        '<span class="coop-summary-status ' + statusClass + '">' + getCoopStatusText(status) + '</span>' +
-                        '</div>' +
-                        '<div class="coop-summary-info">' +
-                        '<span><i class="fas fa-feather-alt"></i> ' + (coop.current_count || 0) + ' gà</span>' +
-                        '<span><i class="fas fa-ruler"></i> ' + (coop.area || 0) + ' m²</span>' +
-                        '</div>' +
-                        '</div>';
-                }).join('');
+                        return '<div class="coop-summary-card ' + statusClass + '">' +
+                            '<div class="coop-summary-header">' +
+                            '<span class="coop-summary-name">' + (coop.name || 'Chuồng ' + coop.id) + '</span>' +
+                            '<span class="coop-summary-status ' + statusClass + '">' + getCoopStatusText(status) + '</span>' +
+                            '</div>' +
+                            '<div class="coop-summary-info">' +
+                            '<span><i class="fas fa-feather-alt"></i> ' + (coop.current_count || 0) + ' gà</span>' +
+                            '<span><i class="fas fa-ruler"></i> ' + (coop.area || 0) + ' m²</span>' +
+                            '</div>' +
+                            '<div style="margin-top: 6px;">' +
+                            '<a href="camera-detail.html?coop=' + coop.id + '" class="btn btn-sm btn-outline-primary" style="font-size: 11px;">Xem camera</a>' +
+                            '</div>' +
+                            '</div>';
+                    }).join('');
 
                 container.innerHTML = coopsHtml + '<a href="/coops" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>'
             })
