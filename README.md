@@ -6,7 +6,7 @@
 
 **Trạng thái phát triển:**
 - Frontend: ✓ Hoàn tất đầy đủ chức năng quản lý
-- Backend: Đang phát triển - Database Models đã hoàn tất
+- Backend: ✓ API đầy đủ, database models hoàn tất, WebSocket real-time
 
 ---
 
@@ -69,6 +69,7 @@ backend/
 | `environments` | Dữ liệu môi trường | N-1 → coops |
 | `feed_schedules` | Lịch cho ăn | N-1 → coops |
 | `alerts` | Cảnh báo | N-1 → coops, devices |
+| `unconnected_devices` | Thiết bị chưa kết nối | FK → devices, coops |
 
 ### ERD Sơ Đồ
 
@@ -120,11 +121,13 @@ USERS ──────────────► ALERTS
    ▼                    │
 COOPS ◄───────────────► DEVICES
    │                    │
-   ├──► ENVIRONMENTS
+   ├──► ENVIRONMENTS     │
+   │                    │
+   ├──► FEED_SCHEDULES  │
+   │                    │
+   └─► COOP_DEVICES ◄───┘
    │
-   ├──► FEED_SCHEDULES
-   │
-   └─► COOP_DEVICES ◄─┘
+   └─► UNCONNECTED_DEVICES ◄── DEVICES (FK reference)
 ```
 
 ### Mermaid ERD Diagram
@@ -135,6 +138,9 @@ erDiagram
     COOPS ||--o{ ALERTS : generates
     DEVICES ||--o{ ALERTS : triggers
     COOPS }o--o{ DEVICES : monitors
+    
+    DEVICES }o--o{ UNCONNECTED_DEVICES : "moved to when coop deleted"
+    COOPS }o--o{ UNCONNECTED_DEVICES : "previous coop reference"
     
     COOPS {
         int id PK
@@ -178,8 +184,23 @@ erDiagram
         int id PK
         int coop_id FK
         int device_id FK
-        bool is_active
         datetime created_at
+        bool deleted
+    }
+    
+    UNCONNECTED_DEVICES {
+        int id PK
+        string name
+        string type
+        string mac_address
+        string status
+        bool is_active
+        int battery
+        int device_id FK
+        int previous_coop_id FK
+        datetime unconnected_at
+        datetime created_at
+        bool deleted
     }
     
     ENVIRONMENTS {
@@ -226,6 +247,8 @@ erDiagram
     
     COOPS ||--o{ ENVIRONMENTS : records
     COOPS ||--o{ FEED_SCHEDULES : has
+    COOPS ||--o{ UNCONNECTED_DEVICES : "devices moved here on delete"
+    DEVICES ||--o{ UNCONNECTED_DEVICES : "references original device"
 ```
 
 ### Chi tiết Tables (bao gồm cột deleted cho soft delete)
@@ -243,10 +266,10 @@ coop_devices:   id, coop_id, device_id, is_active, created_at, deleted
 environments:   id, coop_id, temperature, humidity, feed_level, water_level, recorded_at, deleted
 feed_schedules: id, coop_id, time, amount, enabled, created_at, deleted
 alerts:         id, coop_id, device_id, type, level, message, is_resolved, created_at, resolved_at, deleted
-unconnected_devices: id, name, type, mac_address, status, is_active, battery, created_at, deleted
+unconnected_devices: id, name, type, mac_address, status, is_active, battery, device_id (FK→devices), previous_coop_id (FK→coops), unconnected_at, created_at, deleted
 ```
 
-**Chú thích:** Tất cả bảng có thêm cột `deleted` (Boolean, default=False) để hỗ trợ soft delete - khi xóa chỉ đánh dấu deleted=1 thay vì xóa vĩnh viễn khỏi database.
+**Chú thích:** Tất cả bảng có thêm cột `deleted` (Boolean, default=False) để hỗ trợ soft delete - khi xóa chỉ đánh dấu deleted=1 thay vì xóa vĩnh viễn khỏi database. Bảng `unconnected_devices` có thêm các cột `device_id`, `previous_coop_id`, `unconnected_at` để theo dõi thiết bị sau khi chuồng bị xóa.
 
 ---
 
@@ -262,7 +285,7 @@ unconnected_devices: id, name, type, mac_address, status, is_active, battery, cr
 | | POST | `/api/coops` | Tạo chuồng mới |
 | | GET | `/api/coops/<id>` | Chi tiết chuồng |
 | | PUT | `/api/coops/<id>` | Cập nhật chuồng |
-| | DELETE | `/api/coops/<id>` | Xóa chuồng |
+| | DELETE | `/api/coops/<id>` | Soft delete chuồng + chuyển thiết bị sang unconnected |
 | | GET | `/api/coops/<id>/devices` | Thiết bị trong chuồng |
 | | GET | `/api/coops/<id>/environment` | Dữ liệu môi trường hiện tại |
 | | GET | `/api/coops/<id>/history` | Lịch sử dữ liệu |
@@ -283,6 +306,7 @@ unconnected_devices: id, name, type, mac_address, status, is_active, battery, cr
 | **Camera** | GET | `/api/camera` | Danh sách camera |
 | | GET | `/api/camera/<id>` | Chi tiết camera |
 | | GET | `/api/camera/coop/<id>` | Camera theo chuồng |
+| | GET | `/api/camera/coop-detail/<id>` | Tổng hợp dữ liệu chuồng (coop + environment + devices) |
 | | POST | `/api/camera/<id>/snapshot` | Chụp ảnh |
 | | GET | `/api/camera/<id>/stream` | Lấy URL stream |
 | | GET | `/api/camera/<id>/recordings` | Danh sách recordings |
@@ -299,6 +323,18 @@ unconnected_devices: id, name, type, mac_address, status, is_active, battery, cr
 ---
 
 ## 5. Cập nhật gần đây (May 2026)
+
+### May 6, 2026 - Camera Detail API + Soft Delete Chuồng với Device Migration
+
+| Thay đổi | File | Chi tiết |
+|----------|------|----------|
+| API camera-detail mới | `backend/api/routes/camera.py` | Endpoint `GET /api/camera/coop-detail/<id>` trả về coop info + environment mới nhất + danh sách thiết bị đang hoạt động |
+| Camera-detail dynamic | `static/camera-detail.html` | Xóa toàn bộ dữ liệu tĩnh `coopData`, thay bằng gọi API, skeleton loading, polling 30s, color-coded device status (online=xanh, connecting=vàng, offline=đỏ) |
+| Camera links dùng ID | `static/camera.html` | Cập nhật tất cả link từ `?coop=A` → `?coop=<numeric_id>`, render camera cards từ API |
+| Soft delete chuồng | `backend/api/routes/coops.py` | Endpoint DELETE: soft delete coop + tạo unconnected_devices + cập nhật device status=pending/is_active=False + soft delete coop_device links, tất cả trong transaction |
+| UnconnectedDevice schema | `backend/models.py` | Thêm 3 cột mới: `device_id`, `previous_coop_id`, `unconnected_at` |
+| Auto-migration | `backend/app.py` | Tự động `ALTER TABLE ADD COLUMN` cho các cột mới khi startup |
+| Delete confirmation | `static/coop-list.html` | Modal xác nhận xóa với icon, tên chuồng, loading state, fade-out card, toast notification |
 
 ### May 6, 2026 - Cập nhật Backend Soft Delete
 
@@ -360,9 +396,11 @@ unconnected_devices: id, name, type, mac_address, status, is_active, battery, cr
 | Component | Technology |
 |-----------|------------|
 | Frontend | Bootstrap 4.6.0, jQuery 3.6.0, Chart.js 3.x, Font Awesome 6.0 |
-| Backend | Python 3.x, Flask, Flask-SQLAlchemy |
+| Backend | Python 3.x, Flask, Flask-SQLAlchemy, Flask-SocketIO |
 | Database | SQLite (Development) |
+| Auth | JWT (flask-jwt-extended) |
 | IoT | REST API, QR Code / Manual code connection |
+| Real-time | WebSocket (SocketIO) với REST polling fallback |
 
 ### Setup - Frontend Only
 
@@ -435,11 +473,13 @@ curl -X GET http://localhost:5000/api/dashboard/stats \
 - [x] Giao diện Mobile (Fixed Bottom Navigation)
 - [x] Responsive design
 - [x] **Soft Delete** - Xóa không mất dữ liệu (thêm cột deleted vào tất cả bảng)
+- [x] **Xóa chuồng với device migration** - Soft delete + chuyển thiết bị sang unconnected_devices trong transaction
 - [x] **Xác nhận xóa thiết bị** - Mã 4 ký tự ngẫu nhiên
 - [x] **Sắp xếp thiết bị** - Ưu tiên offline → connecting → online
 - [x] **Thông tin thiết bị** - Modal hiển thị chi tiết và chỉnh sửa tên
 - [x] **Cảnh báo động** - Tính từ database, viền vàng khi có cảnh báo
 - [x] **Tự động làm mới** - Cập nhật dữ liệu mỗi 30 giây
+- [x] **Camera detail dynamic** - API tổng hợp, skeleton loading, realtime polling 30s, color-coded device status
 
 ### Chưa hoàn thành
 
