@@ -228,22 +228,25 @@ erDiagram
     COOPS ||--o{ FEED_SCHEDULES : has
 ```
 
-### Chi tiết Tables
+### Chi tiết Tables (bao gồm cột deleted cho soft delete)
 
 ```
-users:          id, username, email, password_hash, full_name, role, created_at, updated_at
+users:          id, username, email, password_hash, full_name, role, created_at, updated_at, deleted
 coops:          id, name, location, capacity, current_count, area,
-                temp_min, temp_max, humidity_min, humidity_max,
-                feed_threshold, water_threshold,
-                feed_time_1, feed_time_2, feed_time_3,
-                auto_fan, auto_light, auto_feed, auto_water,
-                emergency_alert, status, created_at, updated_at
-devices:        id, name, type, mac_address, status, is_active, battery, created_at, updated_at
-coop_devices:   id, coop_id, device_id, is_active, created_at
-environments:   id, coop_id, temperature, humidity, feed_level, water_level, recorded_at
-feed_schedules: id, coop_id, time, amount, enabled, created_at
-alerts:         id, coop_id, device_id, type, level, message, is_resolved, created_at, resolved_at
+                 temp_min, temp_max, humidity_min, humidity_max,
+                 feed_threshold, water_threshold,
+                 feed_time_1, feed_time_2, feed_time_3,
+                 auto_fan, auto_light, auto_feed, auto_water,
+                 emergency_alert, status, created_at, updated_at, deleted
+devices:        id, name, type, mac_address, status, is_active, battery, created_at, updated_at, deleted
+coop_devices:   id, coop_id, device_id, is_active, created_at, deleted
+environments:   id, coop_id, temperature, humidity, feed_level, water_level, recorded_at, deleted
+feed_schedules: id, coop_id, time, amount, enabled, created_at, deleted
+alerts:         id, coop_id, device_id, type, level, message, is_resolved, created_at, resolved_at, deleted
+unconnected_devices: id, name, type, mac_address, status, is_active, battery, created_at, deleted
 ```
+
+**Chú thích:** Tất cả bảng có thêm cột `deleted` (Boolean, default=False) để hỗ trợ soft delete - khi xóa chỉ đánh dấu deleted=1 thay vì xóa vĩnh viễn khỏi database.
 
 ---
 
@@ -275,6 +278,7 @@ alerts:         id, coop_id, device_id, type, level, message, is_resolved, creat
 | **Dashboard** | GET | `/api/dashboard` | Tổng quan dashboard |
 | | GET | `/api/dashboard/stats` | Thống kê chi tiết |
 | | GET | `/api/dashboard/alerts` | Danh sách cảnh báo |
+| | GET | `/api/dashboard/alerts-count` | Đếm cảnh báo (offline + môi trường) |
 | | GET | `/api/dashboard/recent-activities` | Hoạt động gần đây |
 | **Camera** | GET | `/api/camera` | Danh sách camera |
 | | GET | `/api/camera/<id>` | Chi tiết camera |
@@ -295,6 +299,38 @@ alerts:         id, coop_id, device_id, type, level, message, is_resolved, creat
 ---
 
 ## 5. Cập nhật gần đây (May 2026)
+
+### May 6, 2026 - Cập nhật Backend Soft Delete
+
+| Thay đổi | File | Chi tiết |
+|----------|------|----------|
+| Thêm cột deleted | `backend/models.py` | Thêm `deleted = db.Column(db.Boolean, default=False)` vào 8 models |
+| Cập nhật DELETE queries | `backend/api/routes/devices.py` | Thay `db.session.delete()` → `deleted = True` |
+| Cập nhật SELECT queries | `backend/api/routes/*.py` | Thêm `.filter(Model.deleted == False)` vào tất cả queries |
+| API cảnh báo mới | `backend/api/routes/dashboard.py` | Thêm `/api/dashboard/alerts-count` |
+
+**Models đã thêm cột deleted:** User, Coop, Device, CoopDevice, Environment, FeedSchedule, Alert, UnconnectedDevice
+
+### May 5, 2026 - Cập nhật Index Page
+
+| Thay đổi | File | Chi tiết |
+|----------|------|----------|
+| Dynamic statistics | `static/index.html` | Tổng chuồng, tổng thiết bị, thiết bị online được tính từ database |
+| Loading states | `static/index.html` | Hiển thị "..." khi đang tải dữ liệu |
+| Auto-refresh | `static/index.html` | Cập nhật dữ liệu mỗi 30 giây |
+| Remove search | `static/index.html` | Xóa nút tìm kiếm trên topbar |
+| Alert card | `static/index.html` | Viền tô vàng khi có cảnh báo |
+
+### May 4, 2026 - Cập nhật Device List
+
+| Thay đổi | File | Chi tiết |
+|----------|------|----------|
+| Toggle button | `static/device-list.html` | Hiển thị "Bật"/"Tắt" theo is_active |
+| Thông tin button | `static/device-list.html` | Chỉ hiển thị cho thiết bị online/offline |
+| Delete confirmation | `static/device-list.html` | Xác nhận bằng mã 4 ký tự ngẫu nhiên |
+| Sort by status | `static/device-list.html` | Sắp xếp offline → connecting → online |
+| Hide toggle | `static/device-list.html` | Ẩn nút toggle cho offline/connecting |
+| Status badge | `static/device-list.html` | Fix CSS cho các trạng thái |
 
 ### May 2, 2026 - Bổ sung API mới
 
@@ -398,6 +434,12 @@ curl -X GET http://localhost:5000/api/dashboard/stats \
 - [x] Theo dõi camera
 - [x] Giao diện Mobile (Fixed Bottom Navigation)
 - [x] Responsive design
+- [x] **Soft Delete** - Xóa không mất dữ liệu (thêm cột deleted vào tất cả bảng)
+- [x] **Xác nhận xóa thiết bị** - Mã 4 ký tự ngẫu nhiên
+- [x] **Sắp xếp thiết bị** - Ưu tiên offline → connecting → online
+- [x] **Thông tin thiết bị** - Modal hiển thị chi tiết và chỉnh sửa tên
+- [x] **Cảnh báo động** - Tính từ database, viền vàng khi có cảnh báo
+- [x] **Tự động làm mới** - Cập nhật dữ liệu mỗi 30 giây
 
 ### Chưa hoàn thành
 

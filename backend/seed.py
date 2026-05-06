@@ -39,7 +39,7 @@ def create_app():
     # Load cấu hình development (sử dụng SQLite cục bộ)
     app. config.from_object(config['development'])
     
-    # Khởi tạo SQLAlchemy với app
+    # Khởi tạo SQLAlchemy với app           
     db.init_app(app)
     
     return app
@@ -286,8 +286,7 @@ def seed_coop_devices(coops, devices):
             if not existing:
                 coop_device = CoopDevice(
                     coop_id=coop.id,
-                    device_id=devices[device_idx].id,
-                    is_active=True  # Thiết bị đang hoạt động trong chuồng này
+                    device_id=devices[device_idx].id
                 )
                 db.session.add(coop_device)
             

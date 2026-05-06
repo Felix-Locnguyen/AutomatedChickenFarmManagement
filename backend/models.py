@@ -36,7 +36,8 @@ class User(db.Model):
     role = db.Column(db.String(20), default='worker')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     def set_password(self, password):
         """Băm mật khẩu và lưu vào password_hash."""
         self.password_hash = generate_password_hash(password)
@@ -121,7 +122,8 @@ class Coop(db.Model):
     status = db.Column(db.String(20), default='active')
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     devices = db.relationship('Device', secondary='coop_devices', back_populates='coops')
     environments = db.relationship('Environment', backref='coop', lazy='dynamic')
     feed_schedules = db.relationship('FeedSchedule', backref='coop', lazy='dynamic')
@@ -205,7 +207,8 @@ class Device(db.Model):
     battery = db.Column(db.Integer, default=100)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     coops = db.relationship('Coop', secondary='coop_devices', back_populates='devices')
     alerts = db.relationship('Alert', backref='device', lazy='dynamic')
     
@@ -247,9 +250,9 @@ class CoopDevice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=False)
     device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=False)
-    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
         return {
@@ -290,7 +293,8 @@ class Environment(db.Model):
     feed_level = db.Column(db.Float)
     water_level = db.Column(db.Float)
     recorded_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
         return {
@@ -329,7 +333,8 @@ class FeedSchedule(db.Model):
     amount = db.Column(db.Float, default=10.0)
     enabled = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
         return {
@@ -389,7 +394,8 @@ class Alert(db.Model):
     is_resolved = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     resolved_at = db.Column(db.DateTime)
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
         return {
@@ -436,7 +442,8 @@ class UnconnectedDevice(db.Model):
     is_active = db.Column(db.Boolean, default=False)
     battery = db.Column(db.Integer, default=100)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
-    
+    deleted = db.Column(db.Boolean, default=False)
+
     def to_dict(self):
         """Chuyển đổi thành dictionary cho JSON response."""
         return {
