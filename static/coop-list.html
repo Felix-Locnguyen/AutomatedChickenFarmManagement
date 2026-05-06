@@ -1201,8 +1201,57 @@
             pendingDeleteCoopId = null;
         });
 
-        document.getElementById('saveCoopBtn').addEventListener('click', function() {
-            $('#addCoopModal').modal('hide');
+        document.getElementById('saveCoopBtn').addEventListener('click', async function() {
+            const name = document.getElementById('coopName').value.trim();
+            const currentCount = parseInt(document.getElementById('coopQuantity').value) || 0;
+            const capacity = parseInt(document.getElementById('coopCapacity').value) || 0;
+            const location = document.getElementById('coopArea').value.trim();
+
+            // Validate phía client
+            if (!name) {
+                showToast('Vui lòng nhập tên chuồng', 'error');
+                return;
+            }
+            if (currentCount < 0) {
+                showToast('Số lượng gà không được âm', 'error');
+                return;
+            }
+            if (capacity < currentCount) {
+                showToast('Sức chứa phải ≥ số lượng gà hiện tại', 'error');
+                return;
+            }
+
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+            try {
+                const data = await window.coopsAPI.create({
+                    name: name,
+                    current_count: currentCount,
+                    capacity: capacity,
+                    location: location
+                });
+
+                showToast('Tạo chuồng thành công', 'success');
+                $('#addCoopModal').modal('hide');
+
+                // Reset form
+                document.getElementById('coopName').value = '';
+                document.getElementById('coopQuantity').value = '';
+                document.getElementById('coopCapacity').value = '';
+                document.getElementById('coopArea').value = '';
+
+                // Refresh danh sách chuồng
+                loadAllCoopsData();
+
+            } catch (error) {
+                console.error('Lỗi tạo chuồng:', error);
+                showToast('Tạo chuồng thất bại, vui lòng thử lại', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Lưu chuồng';
+            }
         });
 
         // Donut Chart Interaction - coop-list.html

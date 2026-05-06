@@ -691,6 +691,7 @@
         }
 
         const cameraContainer = document.getElementById('camera-list-container');
+        let allCameraData = { coops: [], coopCameras: {} };
 
         async function loadCameras() {
             try {
@@ -708,44 +709,11 @@
                         }
                     });
 
-                    cameraContainer.innerHTML = coops.map(coop => {
-                        const status = coop.status || 'inactive';
-                        let statusClass, statusBadge;
-                        if (status === 'active' || status === 'normal') {
-                            statusClass = 'online';
-                            statusBadge = '<span class="coop-status-badge online">Bình thường</span>';
-                        } else if (status === 'warning') {
-                            statusClass = 'warning';
-                            statusBadge = '<span class="coop-status-badge warning">Cảnh báo</span>';
-                        } else {
-                            statusClass = 'error';
-                            statusBadge = '<span class="coop-status-badge error">Lỗi</span>';
-                        }
+                    // Lưu dữ liệu gốc
+                    allCameraData = { coops, coopCameras };
 
-                        const coopCams = coopCameras[coop.id] || [];
-                        const camCount = coopCams.length;
-                        const camStatus = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'Hoạt động' : 'Ngoại tuyến') : 'Chưa có camera';
-                        const indicatorClass = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'online' : 'offline') : 'offline';
-
-                        return `
-                        <div class="camera-card status-${statusClass}">
-                            <div class="camera-card-header">
-                                <div class="camera-info">
-                                    <h5 class="camera-coop-name">${coop.name}</h5>
-                                    <div class="camera-status">
-                                        <span class="camera-status-indicator ${indicatorClass}"></span>
-                                        <span>Camera: ${camStatus}</span>
-                                    </div>
-                                </div>
-                                ${statusBadge}
-                            </div>
-                            <div class="camera-card-footer">
-                                <a href="camera-detail.html?coop=${coop.id}" class="btn btn-sm btn-primary btn-check-camera">
-                                    <i class="fas fa-video"></i> Kiểm tra
-                                </a>
-                            </div>
-                        </div>`;
-                    }).join('');
+                    // Filter và render
+                    filterCameras();
                 } else if (cameraContainer) {
                     cameraContainer.innerHTML = '<div class="text-center text-muted py-3">Không có dữ liệu chuồng</div>';
                 }
@@ -755,7 +723,78 @@
             }
         }
 
+        function filterCameras() {
+            const searchInput = document.getElementById('cameraSearchInput');
+            const searchTerm = (searchInput?.value || '').toLowerCase().trim();
+
+            if (!allCameraData.coops || allCameraData.coops.length === 0) return;
+
+            // Filter theo tên chuồng (case-insensitive, substring match)
+            let filteredCoops = allCameraData.coops;
+            if (searchTerm) {
+                filteredCoops = allCameraData.coops.filter(coop =>
+                    (coop.name || '').toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Hiển thị không có kết quả
+            if (filteredCoops.length === 0 && allCameraData.coops.length > 0) {
+                cameraContainer.innerHTML = '<div class="text-center text-muted py-4"><p>Không tìm thấy camera phù hợp</p></div>';
+                return;
+            }
+
+            // Render camera cards
+            cameraContainer.innerHTML = filteredCoops.map(coop => {
+                const status = coop.status || 'inactive';
+                let statusClass, statusBadge;
+                if (status === 'active' || status === 'normal') {
+                    statusClass = 'online';
+                    statusBadge = '<span class="coop-status-badge online">Bình thường</span>';
+                } else if (status === 'warning') {
+                    statusClass = 'warning';
+                    statusBadge = '<span class="coop-status-badge warning">Cảnh báo</span>';
+                } else {
+                    statusClass = 'error';
+                    statusBadge = '<span class="coop-status-badge error">Lỗi</span>';
+                }
+
+                const coopCams = allCameraData.coopCameras[coop.id] || [];
+                const camCount = coopCams.length;
+                const camStatus = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'Hoạt động' : 'Ngoại tuyến') : 'Chưa có camera';
+                const indicatorClass = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'online' : 'offline') : 'offline';
+
+                return `
+                <div class="camera-card status-${statusClass}">
+                    <div class="camera-card-header">
+                        <div class="camera-info">
+                            <h5 class="camera-coop-name">${coop.name}</h5>
+                            <div class="camera-status">
+                                <span class="camera-status-indicator ${indicatorClass}"></span>
+                                <span>Camera: ${camStatus}</span>
+                            </div>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div class="camera-card-footer">
+                        <a href="camera-detail.html?coop=${coop.id}" class="btn btn-sm btn-primary btn-check-camera">
+                            <i class="fas fa-video"></i> Kiểm tra
+                        </a>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
         loadCameras();
+        // Tự động cập nhật mỗi 30 giây
+        setInterval(loadCameras, 30000);
+
+        // Real-time search - tìm kiếm theo tên chuồng
+        const cameraSearchInput = document.getElementById('cameraSearchInput');
+        if (cameraSearchInput) {
+            cameraSearchInput.addEventListener('input', function() {
+                filterCameras();
+            });
+        }
 
         // Get status text - giống coop-detail
         function getCoopStatusText(status) {

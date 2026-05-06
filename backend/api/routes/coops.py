@@ -302,8 +302,18 @@ def create_coop():
         status='normal'  # Trạng thái mặc định
     )
     
-    from models import db
     db.session.add(coop)
+    db.session.flush()  # Get coop.id before commit
+    
+    # Tạo bản ghi môi trường mặc định (NULL) cho chuồng mới
+    env = Environment(
+        coop_id=coop.id,
+        temperature=None,
+        humidity=None,
+        feed_level=None,
+        water_level=None
+    )
+    db.session.add(env)
     db.session.commit()
     
     return jsonify(coop.to_dict()), 201
