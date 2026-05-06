@@ -407,61 +407,9 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Thiết bị gần đây</h6>
                                 </div>
-                                <div class="card-body">
-                                    <!-- Thiết bị 1 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Cảm biến nhiệt A1</span>
-                                            <span class="device-recent-coop">Chuồng A</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 2 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Quạt thông gió A1</span>
-                                            <span class="device-recent-coop">Chuồng A</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 3 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Đèn LED B1</span>
-                                            <span class="device-recent-coop">Chuồng B</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 4 -->
-                                    <div class="device-recent-card waiting">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Cảm biến ẩm C1</span>
-                                            <span class="device-recent-coop">Chuồng C</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot waiting"></span>
-                                            <span class="status-text waiting">Đang chờ</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 5 -->
-                                    <div class="device-recent-card offline">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Hệ thống cho ăn E1</span>
-                                            <span class="device-recent-coop">Chuồng E</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot offline"></span>
-                                            <span class="status-text offline">Ngắt kết nối</span>
-                                        </div>
+                                <div class="card-body" id="recentDevicesContainerDeviceDetail">
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
                                     </div>
                                     <a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>
                                 </div>
@@ -1961,6 +1909,58 @@
             document.addEventListener('DOMContentLoaded', startPolling);
         } else {
             startPolling();
+        }
+
+        // Load recent devices - giống device-list.html
+        function loadRecentDevicesForDeviceDetail() {
+            var container = document.getElementById('recentDevicesContainerDeviceDetail');
+            if (!container) return;
+
+            // Dùng devicesAPI.getAll() giống device-list.html
+            devicesAPI.getAll()
+            .then(function(devices) {
+                if (!Array.isArray(devices) || devices.length === 0) {
+                    container.innerHTML = '<div class="text-muted p-3">Không có thiết bị</div>';
+                    return;
+                }
+
+                var recentDevices = devices.slice(0, 5);
+                var devicesHtml = recentDevices.map(function(device) {
+                    var status = device.status || 'offline';
+                    var statusClass, statusText;
+                    if (status === 'online' || status === 'connected') {
+                        statusClass = 'online';
+                        statusText = 'Hoạt động';
+                    } else if (status === 'connecting' || status === 'pending') {
+                        statusClass = 'waiting';
+                        statusText = 'Đang chờ';
+                    } else {
+                        statusClass = 'offline';
+                        statusText = 'Ngắt kết nối';
+                    }
+
+                    return '<div class="device-recent-card ' + statusClass + '">' +
+                        '<div class="device-recent-header">' +
+                        '<span class="device-recent-name">' + (device.device_name || device.name || 'Thiết bị ' + device.id) + '</span>' +
+                        '</div>' +
+                        '<div class="device-recent-status">' +
+                        '<span class="status-dot ' + statusClass + '"></span>' +
+                        '<span class="status-text ' + statusClass + '">' + statusText + '</span>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+
+                container.innerHTML = devicesHtml + '<a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>';
+            })
+            .catch(function(error) {
+                console.error('Error loading recent devices:', error);
+            });
+        }
+
+        // Initialize load
+        if (document.getElementById('recentDevicesContainerDeviceDetail')) {
+            loadRecentDevicesForDeviceDetail();
+            setInterval(loadRecentDevicesForDeviceDetail, 30000);
         }
 
     })();

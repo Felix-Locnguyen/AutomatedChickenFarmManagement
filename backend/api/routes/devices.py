@@ -626,5 +626,36 @@ def get_device_status_stats():
             stats['connecting'] += 1
         else:
             stats['offline'] += 1
-    
+
     return jsonify(stats), 200
+
+
+@devices_bp.route('/public/recent', methods=['GET'])
+def get_recent_devices():
+    """
+    Lấy danh sách thiết bị gần đây (Không cần auth - cho demo).
+    JOIN các bảng devices, coop_devices, coops để lấy tên chuồng.
+
+    Returns:
+        200: Array of recent device objects with coop_name
+    """
+    from models import Coop
+
+    # Query JOIN để lấy thiết bị kèm thông tin chuồng
+    devices = Device.query.filter_by(deleted=False).order_by(Device.updated_at.desc()).limit(10).all()
+
+    devices_list = []
+    for device in devices:
+        # Lấy tên chuồng đầu tiên nếu có
+        coop_name = None
+        if device.coops and len(device.coops) > 0:
+            coop_name = device.coops[0].name
+
+        devices_list.append({
+            'id': device.id,
+            'device_name': device.name,
+            'status': device.status,
+            'coop_name': coop_name
+        })
+
+    return jsonify(devices_list), 200

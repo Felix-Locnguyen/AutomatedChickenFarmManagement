@@ -854,63 +854,10 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Danh sách các chuồng</h6>
                                 </div>
-                                <div class="card-body">
-                                    <!-- Chuồng A -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng A</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 480 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
+                                <div class="card-body" id="coopListContainer">
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
                                     </div>
-                                    <!-- Chuồng B -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng B</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 280 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng C -->
-                                    <div class="coop-summary-card warning">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng C</span>
-                                            <span class="coop-summary-status warning">Cảnh báo</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 380 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng D -->
-                                    <div class="coop-summary-card online">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng D</span>
-                                            <span class="coop-summary-status online">Bình thường</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 180 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <!-- Chuồng E -->
-                                    <div class="coop-summary-card error">
-                                        <div class="coop-summary-header">
-                                            <span class="coop-summary-name">Chuồng E</span>
-                                            <span class="coop-summary-status error">Lỗi</span>
-                                        </div>
-                                        <div class="coop-summary-info">
-                                            <span><i class="fas fa-feather-alt"></i> 320 gà</span>
-                                            <span><i class="fas fa-wifi"></i> 4 thiết bị</span>
-                                        </div>
-                                    </div>
-                                    <a href="/coops" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>
                                 </div>
                             </div>
 
@@ -923,61 +870,9 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Thiết bị gần đây</h6>
                                 </div>
-                                <div class="card-body">
-                                    <!-- Thiết bị 1 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Cảm biến nhiệt A1</span>
-                                            <span class="device-recent-coop">Chuồng A</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 2 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Quạt thông gió A1</span>
-                                            <span class="device-recent-coop">Chuồng A</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 3 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Đèn LED B1</span>
-                                            <span class="device-recent-coop">Chuồng B</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 4 -->
-                                    <div class="device-recent-card waiting">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Cảm biến ẩm C1</span>
-                                            <span class="device-recent-coop">Chuồng C</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot waiting"></span>
-                                            <span class="status-text waiting">Đang chờ</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 5 -->
-                                    <div class="device-recent-card offline">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Hệ thống cho ăn E1</span>
-                                            <span class="device-recent-coop">Chuồng E</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot offline"></span>
-                                            <span class="status-text offline">Ngắt kết nối</span>
-                                        </div>
+<div class="card-body" id="recentDevicesContainerIndex">
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
                                     </div>
                                     <a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>
                                 </div>
@@ -1048,8 +943,8 @@
                 tempValue: document.querySelector('.coop-temp-value'),
                 humidValue: document.querySelector('.coop-humid-value'),
                 donutTotal: document.getElementById('donutTotalDisplay'),
-                coopsList: document.querySelector('.col-lg-6:first-child .card-body'),
-                devicesList: document.querySelector('.col-lg-6:last-child .card-body')
+                coopsList: document.getElementById('coopListContainer'),
+                devicesList: document.getElementById('recentDevicesContainerIndex')
             };
 
             // Cache for data comparison (avoid unnecessary re-renders)
@@ -1163,7 +1058,26 @@
             }
 
             /**
+             * Get status text - giống coop-detail
+             */
+            function getCoopStatusText(status) {
+                const statusMap = {
+                    'online': 'Bình thường',
+                    'active': 'Bình thường',
+                    'normal': 'Bình thường',
+                    'warning': 'Cảnh báo',
+                    'offline': 'Tắt',
+                    'error': 'Lỗi',
+                    'cleaning': 'Đang vệ sinh',
+                    'empty': 'Trống',
+                    'inactive': 'Tắt'
+                };
+                return statusMap[status] || status || 'Không xác định';
+            }
+
+            /**
              * Update coops list with data comparison
+             * Sử dụng dữ liệu từ bảng coops trong database
              */
             function updateCoopsList(coops) {
                 if (!elements.coopsList || !Array.isArray(coops)) return;
@@ -1176,33 +1090,39 @@
 
                 requestAnimationFrame(() => {
                     const coopsHtml = coops.slice(0, 5).map(coop => {
-                        const statusClass = coop.status === 'online' ? 'online' : 
-                                          coop.status === 'warning' ? 'warning' : 'error';
-                        const statusText = coop.status === 'online' ? 'Bình thường' :
-                                         coop.status === 'warning' ? 'Cảnh báo' : 'Lỗi';
+                        // Mapping status từ database - giống coop-detail
+                        const status = coop.status || 'inactive';
+                        let statusClass;
+                        if (status === 'online' || status === 'active' || status === 'normal') {
+                            statusClass = 'online';
+                        } else if (status === 'warning') {
+                            statusClass = 'warning';
+                        } else {
+                            statusClass = 'error';
+                        }
 
                         return `
                             <div class="coop-summary-card ${statusClass}">
                                 <div class="coop-summary-header">
                                     <span class="coop-summary-name">${coop.name || 'Chuồng ' + coop.id}</span>
-                                    <span class="coop-summary-status ${statusClass}">${statusText}</span>
+                                    <span class="coop-summary-status ${statusClass}">${getCoopStatusText(status)}</span>
                                 </div>
                                 <div class="coop-summary-info">
-                                    <span><i class="fas fa-feather-alt"></i> ${coop.chicken_count || 0} gà</span>
-                                    <span><i class="fas fa-wifi"></i> ${coop.device_count || 0} thiết bị</span>
+                                    <span><i class="fas fa-feather-alt"></i> ${coop.current_count || 0} gà</span>
+                                    <span><i class="fas fa-ruler"></i> ${coop.area || 0} m²</span>
                                 </div>
                             </div>
                         `;
                     }).join('');
 
-                    // Replace only the coop cards, keep the "View all" button
-                    const viewAllBtn = elements.coopsList.querySelector('a');
-                    elements.coopsList.innerHTML = coopsHtml + (viewAllBtn ? viewAllBtn.outerHTML : '');
+                    // Add "View all" button
+                    elements.coopsList.innerHTML = coopsHtml + '<a href="/coops" class="btn btn-primary mt-3">Xem tất cả chuồng &rarr;</a>';
                 });
             }
 
             /**
              * Update devices list with data comparison
+             * Giống device-list.html - không có coop_name
              */
             function updateDevicesList(devices) {
                 if (!elements.devicesList || !Array.isArray(devices)) return;
@@ -1215,15 +1135,24 @@
 
                 requestAnimationFrame(() => {
                     const devicesHtml = devices.slice(0, 5).map(device => {
-                        const statusClass = device.status || 'offline';
-                        const statusText = statusClass === 'online' ? 'Hoạt động' :
-                                         statusClass === 'waiting' ? 'Đang chờ' : 'Ngắt kết nối';
+                        // Mapping status - giống device-list.html
+                        const status = device.status || device.device_status || 'offline';
+                        let statusClass, statusText;
+                        if (status === 'online' || status === 'connected') {
+                            statusClass = 'online';
+                            statusText = 'Hoạt động';
+                        } else if (status === 'connecting' || status === 'pending') {
+                            statusClass = 'waiting';
+                            statusText = 'Đang chờ';
+                        } else {
+                            statusClass = 'offline';
+                            statusText = 'Ngắt kết nối';
+                        }
 
                         return `
                             <div class="device-recent-card ${statusClass}">
                                 <div class="device-recent-header">
-                                    <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
-                                    <span class="device-recent-coop">${device.coop_name || ''}</span>
+                                    <span class="device-recent-name">${device.device_name || device.name || 'Thiết bị ' + device.id}</span>
                                 </div>
                                 <div class="device-recent-status">
                                     <span class="status-dot ${statusClass}"></span>
@@ -1237,6 +1166,23 @@
                     const viewAllBtn = elements.devicesList.querySelector('a');
                     elements.devicesList.innerHTML = devicesHtml + (viewAllBtn ? viewAllBtn.outerHTML : '');
                 });
+            }
+
+            // Load recent devices from API - giống device-list.html
+            async function loadRecentDevicesForIndex() {
+                if (!elements.devicesList) return;
+
+                try {
+                    // Dùng devicesAPI.getAll() giống device-list.html
+                    const devices = await devicesAPI.getAll();
+
+                    if (Array.isArray(devices) && devices.length > 0) {
+                        const recentDevices = devices.slice(0, 5);
+                        updateDevicesList(recentDevices);
+                    }
+                } catch (error) {
+                    console.error('Error loading recent devices:', error);
+                }
             }
 
             /**

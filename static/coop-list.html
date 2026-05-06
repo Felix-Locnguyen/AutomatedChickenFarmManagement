@@ -1019,61 +1019,9 @@
                                 <div class="card-header py-3">
                                     <h6 class="m-0 font-weight-bold text-primary">Thiết bị gần đây</h6>
                                 </div>
-                                <div class="card-body">
-                                    <!-- Thiết bị 1 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Cảm biến nhiệt A1</span>
-                                            <span class="device-recent-coop">Chuồng A</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 2 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Quạt thông gió A1</span>
-                                            <span class="device-recent-coop">Chuồng A</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 3 -->
-                                    <div class="device-recent-card online">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Đèn LED B1</span>
-                                            <span class="device-recent-coop">Chuồng B</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot online"></span>
-                                            <span class="status-text online">Hoạt động</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 4 -->
-                                    <div class="device-recent-card waiting">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Cảm biến ẩm C1</span>
-                                            <span class="device-recent-coop">Chuồng C</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot waiting"></span>
-                                            <span class="status-text waiting">Đang chờ</span>
-                                        </div>
-                                    </div>
-                                    <!-- Thiết bị 5 -->
-                                    <div class="device-recent-card offline">
-                                        <div class="device-recent-header">
-                                            <span class="device-recent-name">Hệ thống cho ăn E1</span>
-                                            <span class="device-recent-coop">Chuồng E</span>
-                                        </div>
-                                        <div class="device-recent-status">
-                                            <span class="status-dot offline"></span>
-                                            <span class="status-text offline">Ngắt kết nối</span>
-                                        </div>
+                                <div class="card-body" id="recentDevicesContainerCoopList">
+                                    <div class="text-center text-muted py-3">
+                                        <i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...
                                     </div>
                                     <a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>
                                 </div>
@@ -1443,6 +1391,22 @@
             updateAverages(filteredData);
         }
 
+        // Get status text - giống coop-detail
+        function getCoopStatusText(status) {
+            const statusMap = {
+                'online': 'Bình thường',
+                'active': 'Bình thường',
+                'normal': 'Bình thường',
+                'warning': 'Cảnh báo',
+                'offline': 'Tắt',
+                'error': 'Lỗi',
+                'cleaning': 'Đang vệ sinh',
+                'empty': 'Trống',
+                'inactive': 'Tắt'
+            };
+            return statusMap[status] || status || 'Không xác định';
+        }
+
         // Get alert class based on environment thresholds and device status
         function getCoopAlertClass(coop) {
             // Check environment thresholds (priority 1 - red blinking)
@@ -1450,31 +1414,31 @@
             const humid = coop.environment?.humidity || 0;
             const feedLevel = coop.environment?.feed_level || 0;
             const waterLevel = coop.environment?.water_level || 0;
-            
+
             const tempMin = coop.temp_min || 18;
             const tempMax = coop.temp_max || 28;
             const humidMin = coop.humidity_min || 40;
             const humidMax = coop.humidity_max || 70;
             const feedThreshold = coop.feed_threshold || 20;
             const waterThreshold = coop.water_threshold || 20;
-            
+
             const tempOutOfRange = (temp > 0) && (temp < tempMin || temp > tempMax);
             const humidOutOfRange = (humid > 0) && (humid < humidMin || humid > humidMax);
             const feedLow = (feedLevel > 0) && (feedLevel < feedThreshold);
             const waterLow = (waterLevel > 0) && (waterLevel < waterThreshold);
-            
+
             if (tempOutOfRange || humidOutOfRange || feedLow || waterLow) {
                 return 'alert-danger';
             }
-            
+
             // Check device status (priority 2 - yellow static)
             const allDevices = coop.devices || [];
             const hasConnectionIssue = allDevices.some(d => d.status === 'connecting' || d.status === 'offline');
-            
+
             if (hasConnectionIssue) {
                 return 'alert-warning';
             }
-            
+
             return ''; // No alert
         }
 
@@ -1483,8 +1447,17 @@
             if (!coopCardsContainer) return;
 
             coopCardsContainer.innerHTML = coopData.map(coop => {
-                const statusClass = coop.status === 'active' ? 'online' : 'offline';
-                const statusText = coop.status === 'active' ? 'Hoạt động' : (coop.status || 'Không hoạt động');
+                // Mapping status - giống coop-detail
+                const status = coop.status || 'inactive';
+                let statusClass;
+                if (status === 'online' || status === 'active' || status === 'normal') {
+                    statusClass = 'online';
+                } else if (status === 'warning') {
+                    statusClass = 'warning';
+                } else {
+                    statusClass = 'error';
+                }
+                const statusText = getCoopStatusText(status);
                 const alertClass = getCoopAlertClass(coop);
                 
                 const temp = coop.environment?.temperature || 0;
@@ -1589,6 +1562,57 @@
                 clearInterval(pollInterval);
             }
         });
+
+        // Load recent devices - giống device-list.html
+        function loadRecentDevicesForCoopList() {
+            var container = document.getElementById('recentDevicesContainerCoopList');
+            if (!container) return;
+
+            devicesAPI.getAll()
+            .then(function(devices) {
+                if (!Array.isArray(devices) || devices.length === 0) {
+                    container.innerHTML = '<div class="text-muted p-3">Không có thiết bị</div>';
+                    return;
+                }
+
+                var recentDevices = devices.slice(0, 5);
+                var devicesHtml = recentDevices.map(function(device) {
+                    var status = device.status || 'offline';
+                    var statusClass, statusText;
+                    if (status === 'online' || status === 'connected') {
+                        statusClass = 'online';
+                        statusText = 'Hoạt động';
+                    } else if (status === 'connecting' || status === 'pending') {
+                        statusClass = 'waiting';
+                        statusText = 'Đang chờ';
+                    } else {
+                        statusClass = 'offline';
+                        statusText = 'Ngắt kết nối';
+                    }
+
+                    return '<div class="device-recent-card ' + statusClass + '">' +
+                        '<div class="device-recent-header">' +
+                        '<span class="device-recent-name">' + (device.device_name || device.name || 'Thiết bị ' + device.id) + '</span>' +
+                        '</div>' +
+                        '<div class="device-recent-status">' +
+                        '<span class="status-dot ' + statusClass + '"></span>' +
+                        '<span class="status-text ' + statusClass + '">' + statusText + '</span>' +
+                        '</div>' +
+                        '</div>';
+                }).join('');
+
+                container.innerHTML = devicesHtml + '<a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>';
+            })
+            .catch(function(error) {
+                console.error('Error loading recent devices:', error);
+            });
+        }
+
+        // Initialize load
+        if (document.getElementById('recentDevicesContainerCoopList')) {
+            loadRecentDevicesForCoopList();
+            setInterval(loadRecentDevicesForCoopList, 30000);
+        }
     })();
     </script>
 
