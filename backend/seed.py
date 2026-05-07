@@ -138,7 +138,6 @@ def seed_coops():
             current_count=data['current_count'],  # Số gà hiện tại
             area=50.0,               # Diện tích: 50m²
             has_camera=data.get('has_camera', 0),  # Camera: 0 hoặc 1
-            has_camera=data.get('has_camera', 0),  # Có camera hay không
             
             # Ngưỡng nhiệt độ: 20-30°C
             temp_min=20.0,
