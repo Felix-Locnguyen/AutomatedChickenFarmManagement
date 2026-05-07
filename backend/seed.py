@@ -113,11 +113,11 @@ def seed_coops():
     
     # Danh sách thông tin chuồng (tên, số gà hiện tại, vị trí)
     coop_data = [
-        {'name': 'Chuồng A', 'current_count': 480, 'location': 'Tầng 1 - Khu A'},
-        {'name': 'Chuồng B', 'current_count': 450, 'location': 'Tầng 1 - Khu B'},
-        {'name': 'Chuồng C', 'current_count': 420, 'location': 'Tầng 2 - Khu A'},
-        {'name': 'Chuồng D', 'current_count': 500, 'location': 'Tầng 2 - Khu B'},
-        {'name': 'Chuồng E', 'current_count': 380, 'location': 'Tầng 3 - Khu A'},
+        {'name': 'Chuồng A', 'current_count': 480, 'location': 'Tầng 1 - Khu A', 'has_camera': 1},
+        {'name': 'Chuồng B', 'current_count': 450, 'location': 'Tầng 1 - Khu B', 'has_camera': 0},
+        {'name': 'Chuồng C', 'current_count': 420, 'location': 'Tầng 2 - Khu A', 'has_camera': 1},
+        {'name': 'Chuồng D', 'current_count': 500, 'location': 'Tầng 2 - Khu B', 'has_camera': 1},
+        {'name': 'Chuồng E', 'current_count': 380, 'location': 'Tầng 3 - Khu A', 'has_camera': 0},
     ]
     
     coops = []
@@ -137,6 +137,8 @@ def seed_coops():
             capacity=500,           # Sức chứa tối đa: 500 gà
             current_count=data['current_count'],  # Số gà hiện tại
             area=50.0,               # Diện tích: 50m²
+            has_camera=data.get('has_camera', 0),  # Camera: 0 hoặc 1
+            has_camera=data.get('has_camera', 0),  # Có camera hay không
             
             # Ngưỡng nhiệt độ: 20-30°C
             temp_min=20.0,
@@ -180,12 +182,13 @@ def seed_coops():
 
 def seed_devices(coops):
     """
-    Tạo 15 thiết bị IoT (3 thiết bị/ chuồng).
+    Tạo 15 thiết bị IoT (3 thiết bị/ chuồng) + camera cho chuồng có camera.
     
     Mỗi chuồng được gán:
     - 01 Cảm biến nhiệt độ (type: temperature)
     - 01 Cảm biến độ ẩm (type: humidity)
     - 01 Thiết bị điều khiển (type: fan hoặc light)
+    - 01 Camera (type: camera) - chỉ cho chuồng có has_camera=1
     
     Trạng thái thiết bị (status) được phân bổ ngẫu nhiên:
     - online: Đang kết nối
@@ -197,8 +200,9 @@ def seed_devices(coops):
     - humidity: Cảm biến độ ẩm
     - fan: Quạt thông gió
     - light: Đèn chiếu sáng
+    - camera: Camera giám sát
     """
-    print("  Đang tạo 15 thiết bị IoT...")
+    print("  Đang tạo thiết bị IoT...")
     
     # Các loại trạng thái kết nối
     statuses = ['online', 'offline', 'connecting']
@@ -207,6 +211,7 @@ def seed_devices(coops):
     control_types = ['fan', 'light']
     
     devices = []
+    camera_devices = []  # Lưu camera để gán sau
     device_index = 1  # Số thứ tự thiết bị (để tạo tên duy nhất)
     
     for coop in coops:

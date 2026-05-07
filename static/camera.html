@@ -214,6 +214,21 @@
         .camera-card.status-error {
             border-left: 4px solid #dc3545;
         }
+        /* Priority Styles */
+        .camera-card.priority-1 {
+            border-left: 4px solid #dc3545;
+            animation: blink-red 1s infinite;
+        }
+        .camera-card.priority-2 {
+            border-left: 4px solid #ffc107;
+        }
+        .camera-card.priority-3 {
+            /* Normal - no special styling */
+        }
+        @keyframes blink-red {
+            0%, 100% { box-shadow: 0 0 20px 5px rgba(220, 53, 69, 0.6); }
+            50% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
         .camera-card-header {
             display: flex;
             justify-content: space-between;
@@ -606,27 +621,6 @@
     <!-- Fullscreen Success -->
     <div id="fullscreenSuccess" class="fullscreen-success"></div>
 
-    <!-- Delete Camera Confirmation Modal -->
-    <div class="modal fade" id="deleteCameraModal" tabindex="-1" role="dialog" aria-labelledby="deleteCameraModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteCameraModalLabel">Xác nhận xóa camera</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn xóa camera của <strong id="deleteCameraName"></strong>?</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Hủy</button>
-                    <button class="btn btn-danger" type="button" id="confirmDeleteCamera">Xóa</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -695,7 +689,7 @@
 
         async function loadCameras() {
             try {
-                const coops = await coopsAPI.getAll();
+                const coops = await coopsAPI.getWithCamera();
 
                 if (cameraContainer && coops && coops.length > 0) {
                     const cameras = await cameraAPI.getAll();
@@ -709,13 +703,11 @@
                         }
                     });
 
-                    // Lưu dữ liệu gốc
                     allCameraData = { coops, coopCameras };
 
-                    // Filter và render
                     filterCameras();
                 } else if (cameraContainer) {
-                    cameraContainer.innerHTML = '<div class="text-center text-muted py-3">Không có dữ liệu chuồng</div>';
+                    cameraContainer.innerHTML = '<div class="text-center text-muted py-4"><p><i class="fas fa-video-slash fa-3x text-muted mb-3"></i></p><p>Chưa có chuồng nào được gắn camera</p><p class="text-muted small">Thêm thiết bị camera vào chuồng để hiển thị tại đây</p></div>';
                 }
             } catch (error) {
                 console.error('Lỗi load cameras:', error);
@@ -736,6 +728,16 @@
                     (coop.name || '').toLowerCase().includes(searchTerm)
                 );
             }
+
+            // Sắp xếp theo ưu tiên: priority 1 -> 2 -> 3, sau đó tên A-Z
+            filteredCoops.sort((a, b) => {
+                const priorityA = a.priority || 3;
+                const priorityB = b.priority || 3;
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+                return (a.name || '').localeCompare(b.name || '');
+            });
 
             // Hiển thị không có kết quả
             if (filteredCoops.length === 0 && allCameraData.coops.length > 0) {
@@ -762,9 +764,10 @@
                 const camCount = coopCams.length;
                 const camStatus = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'Hoạt động' : 'Ngoại tuyến') : 'Chưa có camera';
                 const indicatorClass = camCount > 0 ? (coopCams.some(c => c.status === 'online') ? 'online' : 'offline') : 'offline';
+                const priorityClass = 'priority-' + (coop.priority || 3);
 
                 return `
-                <div class="camera-card status-${statusClass}">
+                <div class="camera-card status-${statusClass} ${priorityClass}">
                     <div class="camera-card-header">
                         <div class="camera-info">
                             <h5 class="camera-coop-name">${coop.name}</h5>
@@ -793,6 +796,66 @@
         if (cameraSearchInput) {
             cameraSearchInput.addEventListener('input', function() {
                 filterCameras();
+            });
+        }
+
+        // WebSocket realtime updates - cập nhật thứ tự ưu tiên tự động
+        function setupWebSocketListeners() {
+            if (!window.wsManager || !window.wsManager.connected) {
+                // Fallback: dùng setInterval đã có ở trên (line 815)
+                return;
+            }
+
+            // Khi có cập nhật trạng thái chuồng
+            window.wsManager.subscribe(window.WS_EVENTS.COOP_STATUS, function() {
+                loadCameras();
+            });
+
+            // Khi có cập nhật thiết bị (offline/online)
+            window.wsManager.subscribe(window.WS_EVENTS.DEVICE_STATUS, function() {
+                loadCameras();
+            });
+
+            // Khi có cập nhật môi trường (nhiệt độ, độ ẩm...)
+            window.wsManager.subscribe(window.WS_EVENTS.ENVIRONMENT_UPDATE, function() {
+                loadCameras();
+            });
+
+            // Khi có cảnh báo mới
+            window.wsManager.subscribe(window.WS_EVENTS.ALERT_NEW, function() {
+                loadCameras();
+            });
+
+            // Khi có chuồng bị xóa - tự động remove khỏi danh sách
+            window.wsManager.subscribe(window.WS_EVENTS.COOP_DELETED, function(data) {
+                if (!data || !data.coop_id) return;
+
+                // Xóa coop khỏi dữ liệu local
+                if (allCameraData.coops && Array.isArray(allCameraData.coops)) {
+                    allCameraData.coops = allCameraData.coops.filter(c => c.id !== data.coop_id);
+                }
+
+                // Xóa camera data của coop đó
+                if (allCameraData.coopCameras && allCameraData.coopCameras[data.coop_id]) {
+                    delete allCameraData.coopCameras[data.coop_id];
+                }
+
+                // Re-render without page reload
+                filterCameras();
+
+                console.log('✓ Camera: Coop ' + data.coop_id + ' removed via WebSocket');
+            });
+
+            console.log('✓ Camera page: WebSocket listeners for priority sorting active');
+        }
+
+        // Setup WebSocket listeners khi trang load
+        if (window.wsManager && window.wsManager.connected) {
+            setupWebSocketListeners();
+        } else {
+            // Đợi WebSocket kết nối
+            document.addEventListener('ws:connected', function() {
+                setupWebSocketListeners();
             });
         }
 

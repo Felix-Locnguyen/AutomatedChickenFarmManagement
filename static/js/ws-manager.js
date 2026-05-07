@@ -228,6 +228,7 @@
         window.WS_EVENTS = {
             DASHBOARD_OVERVIEW: 'dashboard:overview',
             COOP_STATUS: 'coop:status',
+            COOP_DELETED: 'coop:deleted',
             DEVICE_STATUS: 'device:status',
             ENVIRONMENT_UPDATE: 'environment:update',
             COOP_UPDATE: 'coop:update',

@@ -120,6 +120,7 @@ class Coop(db.Model):
     
     emergency_alert = db.Column(db.Boolean, default=False)
     status = db.Column(db.String(20), default='active')
+    has_camera = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
     deleted = db.Column(db.Boolean, default=False)
@@ -157,6 +158,7 @@ class Coop(db.Model):
             'auto_water': self.auto_water,
             'emergency_alert': self.emergency_alert,
             'status': self.status,
+            'has_camera': self.has_camera,
             'deleted': self.deleted,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None

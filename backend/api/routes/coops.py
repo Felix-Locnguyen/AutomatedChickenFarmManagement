@@ -224,17 +224,59 @@ def get_public_coop_history(coop_id):
     return jsonify([env.to_dict() for env in environments]), 200
 
 
+@coops_bp.route('/<int:coop_id>/camera', methods=['PATCH'])
+@jwt_required()
+def update_coop_camera(coop_id):
+    """
+    Cập nhật trạng thái camera của chuồng.
+    
+    Args:
+        coop_id (int): ID của chuồng
+        Request Body (JSON):
+            - has_camera (int): 1 để bật camera, 0 để tắt
+            
+    Returns:
+        200: Coop object đã cập nhật
+        400: Giá trị has_camera không hợp lệ
+        404: Không tìm thấy chuồng
+    """
+    coop = db.session.get(Coop, coop_id)
+    if not coop or coop.deleted:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    data = request.get_json()
+    has_camera = data.get('has_camera')
+    
+    if has_camera is not None:
+        if has_camera not in [0, 1]:
+            return jsonify({'error': 'has_camera must be 0 or 1'}), 400
+        coop.has_camera = has_camera
+        db.session.commit()
+    
+    return jsonify(coop.to_dict()), 200
+
+
 @coops_bp.route('', methods=['GET'])
 @jwt_required()
 def get_coops():
     """
     Lấy danh sách tất cả các chuồng.
-    
+
+    Query Params:
+        has_camera (int, optional): Lọc chuồng có camera (1) hoặc không có (0)
+        
     Returns:
-        200: Array of coop objects (bao gồm environment data mới nhất)
+        200: Array of coop objects (bao gồm environment data mới nhất và priority)
         401: Unauthorized
     """
-    coops = Coop.query.filter_by(deleted=False).all()
+    has_camera = request.args.get('has_camera', type=int)
+    
+    query = Coop.query.filter_by(deleted=False)
+    
+    if has_camera is not None:
+        query = query.filter_by(has_camera=has_camera)
+    
+    coops = query.all()
     return jsonify([coop.to_dict(include_environment=True) for coop in coops]), 200
 
 

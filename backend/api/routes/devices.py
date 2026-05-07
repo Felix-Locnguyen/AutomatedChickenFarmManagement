@@ -218,6 +218,10 @@ def add_device_to_coop():
     coop_device = CoopDevice(coop_id=coop_id, device_id=device.id, is_active=True)
     db.session.add(coop_device)
     
+    # Đồng bộ has_camera nếu là thiết bị camera
+    if device.type == 'camera':
+        coop.has_camera = 1
+    
     # Xóa khỏi unconnected list
     db.session.delete(unconnected)
     db.session.commit()
@@ -240,12 +244,32 @@ def remove_device_from_coop(device_id):
         200: Thông báo thành công
         404: Không tìm thấy thiết bị
     """
+    from models import Coop
+    
     device = db.session.get(Device, device_id)
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
+    # Lấy danh sách chuồng của thiết bị trước khi gỡ
+    coop_devices = CoopDevice.query.filter_by(device_id=device_id).all()
+    coop_ids = [cd.coop_id for cd in coop_devices]
+    
     # Gỡ liên kết với chuồng
     CoopDevice.query.filter_by(device_id=device_id).delete()
+    
+    # Đồng bộ has_camera nếu là thiết bị camera
+    if device.type == 'camera':
+        for coop_id in coop_ids:
+            coop = db.session.get(Coop, coop_id)
+            if coop:
+                # Kiểm tra còn camera nào trong chuồng không
+                remaining_cameras = db.session.query(CoopDevice).join(Device).filter(
+                    CoopDevice.coop_id == coop_id,
+                    Device.type == 'camera',
+                    Device.deleted == False
+                ).count()
+                if remaining_cameras == 0:
+                    coop.has_camera = 0
     
     # Thêm vào unconnected list
     unconnected = UnconnectedDevice(

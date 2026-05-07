@@ -327,3 +327,16 @@ def broadcast_new_alert(alert_data):
     Gửi cảnh báo mới tới tất cả clients
     """
     socketio.emit('alert:new', alert_data, namespace='/')
+
+
+def broadcast_coop_deleted(coop_id):
+    """
+    Thông báo cho tất cả clients biết một chuồng đã bị xóa
+    """
+    try:
+        socketio.emit('coop:deleted', {
+            'coop_id': coop_id,
+            'timestamp': datetime.now().isoformat()
+        }, namespace='/')
+    except Exception as e:
+        logger.error(f"Error broadcasting coop deletion: {e}")

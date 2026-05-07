@@ -313,6 +313,14 @@
         },
 
         /**
+         * Lấy danh sách chuồng có camera
+         * @returns {array}
+         */
+        getWithCamera: async function() {
+            return await window.apiFetch('/coops?has_camera=1');
+        },
+
+        /**
          * Lấy thông tin một chuồng (REST fallback)
          * @param {number} id - ID của chuồng
          * @returns {object}
