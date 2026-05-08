@@ -1728,6 +1728,7 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script src="js/status-helpers.js"></script>
+    <script src="js/utils/deviceStatus.js"></script>
     
     <script>
     // Coop Detail - Dynamic Data Loading với Polling (No Auth)
@@ -1771,9 +1772,15 @@
 
         // Helper to get status class
         function getStatusClass(status, isActive) {
-            // Dùng DeviceStatus cho thiết bị
             if (isActive !== undefined) {
-                return DeviceStatus.getClass(status, isActive);
+                const info = getDeviceStatus({ status, is_active: isActive });
+                const badgeMap = {
+                    'active': 'success',
+                    'connecting': 'warning',
+                    'error': 'danger',
+                    'waiting': 'secondary'
+                };
+                return badgeMap[info.statusClass] || 'secondary';
             }
             const classMap = {
                 'online': 'success',
@@ -1864,42 +1871,36 @@
             deviceCountEl.textContent = devices.length;
 
             const stats = {
-                online: devices.filter(d => d.status === 'online').length,
-                offline: devices.filter(d => d.status === 'offline').length,
-                warning: devices.filter(d => d.status === 'connecting' || d.status === 'warning').length
+                active: devices.filter(d => d.is_active && d.status === 'online').length,
+                error: devices.filter(d => d.is_active && d.status === 'offline').length,
+                connecting: devices.filter(d => d.is_active && d.status === 'connecting').length,
+                waiting: devices.filter(d => !d.is_active).length
             };
 
             const total = devices.length;
-            const onlinePct = Math.round((stats.online / total) * 100);
-            const warningPct = Math.round((stats.warning / total) * 100);
-            const offlinePct = Math.round((stats.offline / total) * 100);
 
             const circumference = 2 * Math.PI * 70;
             let offset = 0;
 
             let segments = '';
-            if (stats.online > 0) {
-                const dashArray = (stats.online / total) * circumference;
-                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#22c55e" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="online" data-name="Hoạt động" data-count="${stats.online}" data-percent="${onlinePct}"></circle>`;
-                offset += dashArray;
-            }
-            if (stats.warning > 0) {
-                const dashArray = (stats.warning / total) * circumference;
-                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#ffc107" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="warning" data-name="Chờ" data-count="${stats.warning}" data-percent="${warningPct}"></circle>`;
-                offset += dashArray;
-            }
-            if (stats.offline > 0) {
-                const dashArray = (stats.offline / total) * circumference;
-                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#dc3545" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="offline" data-name="Lỗi" data-count="${stats.offline}" data-percent="${offlinePct}"></circle>`;
-            }
+            let legendHtml = '';
+            const chartDefs = [
+                { key: 'active',     color: '#4CAF50', label: 'Đang hoạt động' },
+                { key: 'connecting', color: '#FFC107', label: 'Đang kết nối' },
+                { key: 'error',      color: '#F44336', label: 'Lỗi' },
+                { key: 'waiting',    color: '#9E9E9E', label: 'Đang chờ được kết nối' }
+            ];
+            chartDefs.forEach(def => {
+                if (stats[def.key] > 0) {
+                    const dashArray = (stats[def.key] / total) * circumference;
+                    segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="${def.color}" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="${def.key}" data-name="${def.label}" data-count="${stats[def.key]}" data-percent="${Math.round((stats[def.key] / total) * 100)}"></circle>`;
+                    legendHtml += `<div class="legend-item-detail" data-segment="${def.key}"><span class="legend-dot-detail" style="background: ${def.color};"></span><span class="legend-text-detail">${def.label} (${stats[def.key]})</span></div>`;
+                    offset += dashArray;
+                }
+            });
 
             donutSvg.innerHTML = segments + '<circle cx="100" cy="100" r="52" fill="white"></circle>';
-
-            donutLegend.innerHTML = `
-                ${stats.online > 0 ? '<div class="legend-item-detail" data-segment="online"><span class="legend-dot-detail" style="background: #22c55e;"></span><span class="legend-text-detail">Hoạt động (' + stats.online + ')</span></div>' : ''}
-                ${stats.warning > 0 ? '<div class="legend-item-detail" data-segment="warning"><span class="legend-dot-detail" style="background: #ffc107;"></span><span class="legend-text-detail">Chờ (' + stats.warning + ')</span></div>' : ''}
-                ${stats.offline > 0 ? '<div class="legend-item-detail" data-segment="offline"><span class="legend-dot-detail" style="background: #dc3545;"></span><span class="legend-text-detail">Lỗi (' + stats.offline + ')</span></div>' : ''}
-            `;
+            donutLegend.innerHTML = legendHtml;
 
             // Re-init donut chart interactions
             initDonutInteractions();
@@ -1915,15 +1916,17 @@
                 return;
             }
 
-            container.innerHTML = devices.map(device => `
+            container.innerHTML = devices.map(device => {
+                const statusInfo = getDeviceStatus(device);
+                return `
                 <div class="device-card-mini">
                     <div class="device-card-mini-info">
-                        <span class="status-dot-mini" style="background: ${device.is_active ? (device.status === 'online' ? '#22c55e' : device.status === 'connecting' ? '#ffc107' : '#dc3545') : '#6c757d'};"></span>
+                        <span class="status-dot-mini" style="background: ${statusInfo.color};"></span>
                         <span class="device-card-mini-name">${device.name || 'Thiết bị ' + device.id}</span>
                     </div>
-                    <span class="badge badge-${getStatusClass(device.status, device.is_active)} device-card-mini-status">${DeviceStatus.getText(device.status, device.is_active)}</span>
-                </div>
-            `).join('');
+                    <span class="badge badge-${statusInfo.statusClass} device-card-mini-status">${statusInfo.label}</span>
+                </div>`;
+            }).join('');
         }
 
         // Update coop summary list (all coops)

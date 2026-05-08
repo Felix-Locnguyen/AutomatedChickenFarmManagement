@@ -207,9 +207,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #22c55e; }
-        .device-recent-card.waiting { border-left-color: #ffc107; }
-        .device-recent-card.offline { border-left-color: #dc3545; }
+        .device-recent-card.active { border-left-color: #4CAF50; }
+        .device-recent-card.connecting { border-left-color: #FFC107; }
+        .device-recent-card.error { border-left-color: #F44336; }
+        .device-recent-card.waiting { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -238,16 +239,18 @@
             height: 8px;
             border-radius: 50%;
         }
-        .status-dot.online, .status-dot.connected { background: #22c55e; }
-        .status-dot.connecting, .status-dot.waiting { background: #ffc107; }
-        .status-dot.offline { background: #dc3545; }
+        .status-dot.active { background: #4CAF50; }
+        .status-dot.connecting { background: #FFC107; }
+        .status-dot.error { background: #F44336; }
+        .status-dot.waiting { background: #9E9E9E; }
         .status-text {
             font-size: 12px;
             font-weight: 500;
         }
-        .status-text.online { color: #22c55e; }
-        .status-text.waiting { color: #ffc107; }
-        .status-text.offline { color: #dc3545; }
+        .status-text.active { color: #4CAF50; }
+        .status-text.connecting { color: #FFC107; }
+        .status-text.error { color: #F44336; }
+        .status-text.waiting { color: #9E9E9E; }
         /* Device Card Styles */
         .device-card {
             background: #fff;
@@ -264,15 +267,14 @@
         .device-card:hover {
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-card.status-active { border-left-color: #22c55e; }
-        .device-card.status-waiting { border-left-color: #ffc107; }
-        .device-card.status-error { border-left-color: #dc3545; }
-        /* Border-left theo status - matching database status values */
+        .device-card.status-active { border-left-color: #4CAF50; }
+        .device-card.status-connecting { border-left-color: #FFC107; }
+        .device-card.status-error { border-left-color: #F44336; }
+        .device-card.status-waiting { border-left-color: #9E9E9E; }
         .device-card.status-online,
-        .device-card.status-connected { border-left-color: #22c55e; }
-        .device-card.status-connecting,
-        .device-card.status-waiting { border-left-color: #ffc107; }
-        .device-card.status-offline { border-left-color: #dc3545; }
+        .device-card.status-connected { border-left-color: #4CAF50; }
+        .device-card.status-connecting { border-left-color: #FFC107; }
+        .device-card.status-offline { border-left-color: #F44336; }
         .device-card-row {
             display: flex;
             align-items: center;
@@ -320,17 +322,21 @@
             font-weight: 600;
             text-transform: uppercase;
         }
-        .device-card .status-badge.online, .device-card .status-badge.connected {
+        .device-card .status-badge.active {
             background: #dcfce7;
             color: #166534;
         }
-        .device-card .status-badge.offline {
+        .device-card .status-badge.error {
             background: #fee2e2;
             color: #dc2626;
         }
-        .device-card .status-badge.connecting, .device-card .status-badge.waiting {
+        .device-card .status-badge.connecting {
             background: #fef9c3;
             color: #d97706;
+        }
+        .device-card .status-badge.waiting {
+            background: #f3f4f6;
+            color: #6b7280;
         }
         /* Hover effect cho cards trong scroll container */
         .device-list-container .device-card:hover {
@@ -344,9 +350,10 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .status-dot.active { background: #22c55e; }
-        .status-dot.waiting { background: #ffc107; }
-        .status-dot.error { background: #dc3545; }
+        .status-dot.active { background: #4CAF50; }
+        .status-dot.connecting { background: #FFC107; }
+        .status-dot.error { background: #F44336; }
+        .status-dot.waiting { background: #9E9E9E; }
         .status-btn {
             padding: 8px 18px;
             border-radius: 6px;
@@ -1412,10 +1419,10 @@
                                     <div class="donut-chart-container-coop">
                                         <div class="donut-chart-coop" id="donutChartDeviceList">
                                             <svg viewBox="0 0 200 200">
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#4CAF50" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="hoatdong"></circle>
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#FFC107" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="dangketnoi"></circle>
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#F44336" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="loi"></circle>
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#9E9E9E" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="datat"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#4CAF50" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="active"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#FFC107" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="connecting"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#F44336" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="error"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#9E9E9E" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="waiting"></circle>
                                                 <circle cx="100" cy="100" r="52" fill="white"></circle>
                                             </svg>
                                             <div class="donut-center-coop">
@@ -1431,24 +1438,24 @@
                                         </div>
                                     </div>
                                     <div class="donut-legend-coop">
-                                        <div class="legend-item-coop" data-segment="hoatdong">
+                                        <div class="legend-item-coop" data-segment="active">
                                             <span class="legend-dot-coop" style="background: #4CAF50;"></span>
                                             <span class="legend-text-coop">Đang hoạt động</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="dangketnoi">
+                                        <div class="legend-item-coop" data-segment="connecting">
                                             <span class="legend-dot-coop" style="background: #FFC107;"></span>
                                             <span class="legend-text-coop">Đang kết nối</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="loi">
+                                        <div class="legend-item-coop" data-segment="error">
                                             <span class="legend-dot-coop" style="background: #F44336;"></span>
                                             <span class="legend-text-coop">Lỗi</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="datat">
+                                        <div class="legend-item-coop" data-segment="waiting">
                                             <span class="legend-dot-coop" style="background: #9E9E9E;"></span>
-                                            <span class="legend-text-coop">Đã tắt</span>
+                                            <span class="legend-text-coop">Đang chờ được kết nối</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
                                     </div>
@@ -2317,6 +2324,7 @@
     <script src="js/api.js"></script>
     <script src="js/donut-device-status.js"></script>
     <script src="js/status-helpers.js"></script>
+    <script src="js/utils/deviceStatus.js"></script>
     <script>
     // Device List - Danh sách thiết bị
     (function() {
@@ -2453,19 +2461,19 @@
                     const sortedDevices = sortDevicesByStatus(devices);
 
                     deviceContainer.innerHTML = sortedDevices.map(device => {
-                        const statusText = DeviceStatus.getText(device.status, device.is_active);
+                        const statusInfo = getDeviceStatus(device);
                         return `
-                        <div class="device-card status-${device.status || 'offline'}"
+                        <div class="device-card status-${statusInfo.statusClass}"
                              data-device-id="${device.id}"
                              data-device-name="${device.name || 'Thiết bị ' + device.id}">
-                            <span class="status-badge ${device.status || 'offline'}">${statusText}</span>
+                            <span class="status-badge ${statusInfo.statusClass}">${statusInfo.label}</span>
                             <div class="device-card-row device-card-header">
-                                <span class="status-dot ${device.status || 'offline'}"></span>
+                                <span class="status-dot ${statusInfo.statusClass}"></span>
                                 <span class="device-name">${device.name || 'Thiết bị ' + device.id}</span>
                             </div>
                             <div class="device-card-row device-card-info">
                                 <span><i class="fas fa-battery-full"></i> ${device.battery || 0}%</span>
-                                <span><i class="fas ${getDeviceIcon(device.type)}"></i> ${statusText}</span>
+                                <span><i class="fas ${getDeviceIcon(device.type)}"></i> ${statusInfo.label}</span>
                             </div>
                             <div class="device-card-row device-card-actions">
                                 ${device.status === 'online' ? `
@@ -2528,18 +2536,20 @@
                 const devices = await devicesAPI.getAll();
                 if (recentDevicesContainer && devices && devices.length > 0) {
                     const recentDevices = devices.slice(0, 5);
-                    recentDevicesContainer.innerHTML = recentDevices.map(device => `
-                        <div class="device-recent-card ${device.status || 'offline'}">
+                    recentDevicesContainer.innerHTML = recentDevices.map(device => {
+                        const statusInfo = getDeviceStatus(device);
+                        return `
+                        <div class="device-recent-card ${statusInfo.statusClass}">
                             <div class="device-recent-header">
                                 <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
-                                <span class="device-recent-coop">${DeviceStatus.getText(device.status, device.is_active)}</span>
+                                <span class="device-recent-coop">${statusInfo.label}</span>
                             </div>
                             <div class="device-recent-status">
-                                <span class="status-dot ${DeviceStatus.getClass(device.status, device.is_active)}"></span>
-                                <span class="status-text ${DeviceStatus.getClass(device.status, device.is_active)}">${DeviceStatus.getText(device.status, device.is_active)}</span>
+                                <span class="status-dot ${statusInfo.statusClass}"></span>
+                                <span class="status-text ${statusInfo.statusClass}">${statusInfo.label}</span>
                             </div>
-                        </div>
-                    `).join('');
+                        </div>`;
+                    }).join('');
                     recentDevicesContainer.innerHTML += '<a href="device-list.html" class="btn btn-primary mt-3">Xem tất cả thiết bị &rarr;</a>';
                 }
             } catch (error) {

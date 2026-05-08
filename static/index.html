@@ -231,10 +231,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #4CAF50; }
-        .device-recent-card.waiting { border-left-color: #FFC107; }
-        .device-recent-card.offline { border-left-color: #F44336; }
-        .device-recent-card.off { border-left-color: #9E9E9E; }
+        .device-recent-card.active { border-left-color: #4CAF50; }
+        .device-recent-card.connecting { border-left-color: #FFC107; }
+        .device-recent-card.error { border-left-color: #F44336; }
+        .device-recent-card.waiting { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -263,17 +263,18 @@
             height: 8px;
             border-radius: 50%;
         }
-        .status-dot.online { background: #22c55e; }
-        .status-dot.waiting { background: #ffc107; }
-        .status-dot.offline { background: #dc3545; }
+        .status-dot.active { background: #4CAF50; }
+        .status-dot.connecting { background: #FFC107; }
+        .status-dot.error { background: #F44336; }
+        .status-dot.waiting { background: #9E9E9E; }
         .status-text {
             font-size: 12px;
             font-weight: 500;
         }
-        .status-text.online { color: #4CAF50; }
-        .status-text.waiting { color: #FFC107; }
-        .status-text.offline { color: #F44336; }
-        .status-text.off { color: #9E9E9E; }
+        .status-text.active { color: #4CAF50; }
+        .status-text.connecting { color: #FFC107; }
+        .status-text.error { color: #F44336; }
+        .status-text.waiting { color: #9E9E9E; }
         /* FAB Bottom Navigation */
         .fab-nav {
             display: none;
@@ -394,11 +395,27 @@
             margin-top: 2px;
             display: block;
         }
+        
+        /* Responsive styles */
         @media (max-width: 767px) {
             .fab-nav { display: flex; }
             .bottom-nav { display: none; }
             #accordionSidebar { display: none !important; }
-            body { padding-bottom: 20px; }
+            body { padding-bottom: 20px; overflow-x: hidden; }
+            
+            /* Modal fullscreen on mobile */
+            .modal-dialog { margin: 0; max-width: 100%; }
+            .modal-content { border-radius: 0; min-height: 100vh; }
+            
+            /* Touch targets */
+            .btn, button, a.nav-link, .form-control { min-height: 44px; }
+            
+            /* Donut chart */
+            .donut-chart-container-coop { max-width: 100%; }
+            .donut-chart-coop { width: 180px; height: 180px; margin: 0 auto; }
+            
+            /* Stats cards */
+            .col-xl-3 { margin-bottom: 1rem; }
         }
     </style>
 
@@ -687,7 +704,7 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Tổng thiết bị</div>
+                                                Tổng thiết bị đã được kết nối</div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800" id="totalDevicesDisplay">...</div>
                                         </div>
                                         <div class="col-auto">
@@ -802,25 +819,25 @@
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#4CAF50" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="hoatdong" data-name="Đang hoạt động" data-count="0" data-percent="0">
+                                                    data-segment="active" data-name="Đang hoạt động" data-count="0" data-percent="0">
                                                 </circle>
                                                 <!-- Đang kết nối -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#FFC107" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="dangketnoi" data-name="Đang kết nối" data-count="0" data-percent="0">
+                                                    data-segment="connecting" data-name="Đang kết nối" data-count="0" data-percent="0">
                                                 </circle>
                                                 <!-- Lỗi -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#F44336" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="loi" data-name="Lỗi" data-count="0" data-percent="0">
+                                                    data-segment="error" data-name="Lỗi" data-count="0" data-percent="0">
                                                 </circle>
-                                                <!-- Đã tắt -->
+                                                <!-- Đang chờ được kết nối -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#9E9E9E" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="datat" data-name="Đã tắt" data-count="0" data-percent="0">
+                                                    data-segment="waiting" data-name="Đang chờ được kết nối" data-count="0" data-percent="0">
                                                 </circle>
                                                 <!-- Center circle -->
                                                 <circle cx="100" cy="100" r="52" fill="white"></circle>
@@ -838,24 +855,24 @@
                                         </div>
                                     </div>
                                     <div class="donut-legend-coop">
-                                        <div class="legend-item-coop" data-segment="hoatdong">
+                                        <div class="legend-item-coop" data-segment="active">
                                             <span class="legend-dot-coop" style="background: #4CAF50;"></span>
                                             <span class="legend-text-coop">Đang hoạt động</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="dangketnoi">
+                                        <div class="legend-item-coop" data-segment="connecting">
                                             <span class="legend-dot-coop" style="background: #FFC107;"></span>
                                             <span class="legend-text-coop">Đang kết nối</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="loi">
+                                        <div class="legend-item-coop" data-segment="error">
                                             <span class="legend-dot-coop" style="background: #F44336;"></span>
                                             <span class="legend-text-coop">Lỗi</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="datat">
+                                        <div class="legend-item-coop" data-segment="waiting">
                                             <span class="legend-dot-coop" style="background: #9E9E9E;"></span>
-                                            <span class="legend-text-coop">Đã tắt</span>
+                                            <span class="legend-text-coop">Đang chờ được kết nối</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
                                     </div>
@@ -943,6 +960,7 @@
     <script src="js/api.js"></script>
     <script src="js/donut-device-status.js"></script>
     <script src="js/status-helpers.js"></script>
+    <script src="js/utils/deviceStatus.js"></script>
     
     <script>
         // Dashboard - Real-time Data with WebSocket + Fallback
@@ -1071,12 +1089,11 @@
                     const textEl = item.querySelector('.legend-text-coop');
                     const countEl = item.querySelector('.legend-count-coop');
                     if (textEl && countEl) {
-                        const segmentType = item.getAttribute('data-segment');
                         const descriptions = {
-                            'hoatdong': 'Đang hoạt động',
-                            'dangketnoi': 'Đang kết nối',
-                            'loi': 'Lỗi',
-                            'datat': 'Đã tắt'
+                            'active': 'Đang hoạt động',
+                            'connecting': 'Đang kết nối',
+                            'error': 'Lỗi',
+                            'waiting': 'Đang chờ được kết nối'
                         };
                         textEl.textContent = descriptions[segmentType] || segmentType;
                         countEl.textContent = `(${count})`;
@@ -1162,19 +1179,16 @@
 
                 requestAnimationFrame(() => {
                     const devicesHtml = devices.slice(0, 5).map(device => {
-                        const status = device.status || device.device_status || 'offline';
-                        const isActive = device.is_active;
-                        const statusClass = DeviceStatus.getClass(status, isActive);
-                        const statusText = DeviceStatus.getText(status, isActive);
+                        const statusInfo = getDeviceStatus(device);
 
                         return `
-                            <div class="device-recent-card ${statusClass}">
+                            <div class="device-recent-card ${statusInfo.statusClass}">
                                 <div class="device-recent-header">
                                     <span class="device-recent-name">${device.device_name || device.name || 'Thiết bị ' + device.id}</span>
                                 </div>
                                 <div class="device-recent-status">
-                                    <span class="status-dot ${statusClass}"></span>
-                                    <span class="status-text ${statusClass}">${statusText}</span>
+                                    <span class="status-dot ${statusInfo.statusClass}"></span>
+                                    <span class="status-text ${statusInfo.statusClass}">${statusInfo.label}</span>
                                 </div>
                             </div>
                         `;

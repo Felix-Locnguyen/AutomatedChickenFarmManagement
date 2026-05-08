@@ -24,21 +24,9 @@
         render: function(device) {
             if (!device) return '';
 
-            // Mapping status
-            const status = device.status || 'offline';
-            let statusClass, statusText;
-
-            if (status === 'online' || status === 'connected') {
-                statusClass = 'online';
-                statusText = 'Hoạt động';
-            } else if (status === 'connecting' || status === 'pending') {
-                statusClass = 'waiting';
-                statusText = 'Đang chờ';
-            } else {
-                statusClass = 'offline';
-                statusText = 'Ngắt kết nối';
-            }
-
+            const statusInfo = getDeviceStatus(device);
+            const statusClass = statusInfo.statusClass;
+            const statusText = statusInfo.label;
             const coopName = device.coop_name || 'Chưa lắp đặt';
 
             return `

@@ -750,9 +750,10 @@
                                             transform: translateY(-2px);
                                             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
                                         }
-                                        .device-recent-card.online { border-left-color: #22c55e; }
-                                        .device-recent-card.waiting { border-left-color: #ffc107; }
-                                        .device-recent-card.offline { border-left-color: #dc3545; }
+                                        .device-recent-card.active { border-left-color: #4CAF50; }
+                                        .device-recent-card.connecting { border-left-color: #FFC107; }
+                                        .device-recent-card.error { border-left-color: #F44336; }
+                                        .device-recent-card.waiting { border-left-color: #9E9E9E; }
                                         .device-recent-header {
                                             display: flex;
                                             justify-content: space-between;
@@ -781,16 +782,18 @@
                                             height: 8px;
                                             border-radius: 50%;
                                         }
-                                        .status-dot.online { background: #22c55e; }
-                                        .status-dot.waiting { background: #ffc107; }
-                                        .status-dot.offline { background: #dc3545; }
+                                        .status-dot.active { background: #4CAF50; }
+                                        .status-dot.connecting { background: #FFC107; }
+                                        .status-dot.error { background: #F44336; }
+                                        .status-dot.waiting { background: #9E9E9E; }
                                         .status-text {
                                             font-size: 12px;
                                             font-weight: 500;
                                         }
-                                        .status-text.online { color: #22c55e; }
-                                        .status-text.waiting { color: #ffc107; }
-                                        .status-text.offline { color: #dc3545; }
+                                        .status-text.active { color: #4CAF50; }
+                                        .status-text.connecting { color: #FFC107; }
+                                        .status-text.error { color: #F44336; }
+                                        .status-text.waiting { color: #9E9E9E; }
                                         /* FAB Bottom Navigation */
                                         .fab-nav {
                                             display: none;
@@ -970,22 +973,22 @@
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#4CAF50" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="hoatdong" data-name="Đang hoạt động" data-count="0" data-percent="0">
+                                                    data-segment="active" data-name="Đang hoạt động" data-count="0" data-percent="0">
                                                 </circle>
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#FFC107" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="dangketnoi" data-name="Đang kết nối" data-count="0" data-percent="0">
+                                                    data-segment="connecting" data-name="Đang kết nối" data-count="0" data-percent="0">
                                                 </circle>
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#F44336" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="loi" data-name="Lỗi" data-count="0" data-percent="0">
+                                                    data-segment="error" data-name="Lỗi" data-count="0" data-percent="0">
                                                 </circle>
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
                                                     fill="none" stroke="#9E9E9E" stroke-width="22"
                                                     stroke-dasharray="0 440" stroke-dashoffset="0"
-                                                    data-segment="datat" data-name="Đã tắt" data-count="0" data-percent="0">
+                                                    data-segment="waiting" data-name="Đang chờ được kết nối" data-count="0" data-percent="0">
                                                 </circle>
                                                 <circle cx="100" cy="100" r="52" fill="white"></circle>
                                             </svg>
@@ -1002,24 +1005,24 @@
                                         </div>
                                     </div>
                                     <div class="donut-legend-coop">
-                                        <div class="legend-item-coop" data-segment="hoatdong">
+                                        <div class="legend-item-coop" data-segment="active">
                                             <span class="legend-dot-coop" style="background: #4CAF50;"></span>
-                                            <span class="legend-text-coop">Đang hoạt động - Thiết bị bật &amp; kết nối</span>
+                                            <span class="legend-text-coop">Đang hoạt động</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="dangketnoi">
+                                        <div class="legend-item-coop" data-segment="connecting">
                                             <span class="legend-dot-coop" style="background: #FFC107;"></span>
-                                            <span class="legend-text-coop">Đang kết nối - Đang chờ kết nối...</span>
+                                            <span class="legend-text-coop">Đang kết nối</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="loi">
+                                        <div class="legend-item-coop" data-segment="error">
                                             <span class="legend-dot-coop" style="background: #F44336;"></span>
-                                            <span class="legend-text-coop">Lỗi - Thiết bị bật, mất kết nối</span>
+                                            <span class="legend-text-coop">Lỗi</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="datat">
+                                        <div class="legend-item-coop" data-segment="waiting">
                                             <span class="legend-dot-coop" style="background: #9E9E9E;"></span>
-                                            <span class="legend-text-coop">Đã tắt - Thiết bị đã tắt nguồn</span>
+                                            <span class="legend-text-coop">Đang chờ được kết nối</span>
                                             <span class="legend-count-coop">(0)</span>
                                         </div>
                                     </div>
@@ -1372,6 +1375,7 @@
     <script src="js/api.js"></script>
     <script src="js/donut-device-status.js"></script>
     <script src="js/status-helpers.js"></script>
+    <script src="js/utils/deviceStatus.js"></script>
     <script>
     // Coop List - Danh sách chuồng with dynamic data
     (function() {
@@ -1697,18 +1701,14 @@
 
                 var recentDevices = devices.slice(0, 5);
                 var devicesHtml = recentDevices.map(function(device) {
-                    var status = device.status || 'offline';
-                    var isActive = device.is_active;
-                    var statusClass = DeviceStatus.getClass(status, isActive);
-                    var statusText = DeviceStatus.getText(status, isActive);
-
-                    return '<div class="device-recent-card ' + statusClass + '">' +
+                    var statusInfo = getDeviceStatus(device);
+                    return '<div class="device-recent-card ' + statusInfo.statusClass + '">' +
                         '<div class="device-recent-header">' +
                         '<span class="device-recent-name">' + (device.device_name || device.name || 'Thiết bị ' + device.id) + '</span>' +
                         '</div>' +
                         '<div class="device-recent-status">' +
-                        '<span class="status-dot ' + statusClass + '"></span>' +
-                        '<span class="status-text ' + statusClass + '">' + statusText + '</span>' +
+                        '<span class="status-dot ' + statusInfo.statusClass + '"></span>' +
+                        '<span class="status-text ' + statusInfo.statusClass + '">' + statusInfo.label + '</span>' +
                         '</div>' +
                         '</div>';
                 }).join('');

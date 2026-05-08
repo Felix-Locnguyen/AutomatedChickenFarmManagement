@@ -549,6 +549,7 @@
     <script src="js/demo/chart-area-demo.js"></script>
     <script src="js/demo/chart-pie-demo.js"></script>
     <script src="js/status-helpers.js"></script>
+    <script src="js/utils/deviceStatus.js"></script>
 
     <style>
         .device-card {
@@ -614,9 +615,10 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .status-dot.active { background: #22c55e; }
-        .status-dot.waiting { background: #ffc107; }
-        .status-dot.error { background: #dc3545; }
+        .status-dot.active { background: #4CAF50; }
+        .status-dot.connecting { background: #FFC107; }
+        .status-dot.error { background: #F44336; }
+        .status-dot.waiting { background: #9E9E9E; }
         .device-name {
             font-weight: 600;
             font-size: 15px;
@@ -1195,10 +1197,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #4CAF50; }
-        .device-recent-card.waiting { border-left-color: #FFC107; }
-        .device-recent-card.offline { border-left-color: #F44336; }
-        .device-recent-card.off { border-left-color: #9E9E9E; }
+        .device-recent-card.active { border-left-color: #4CAF50; }
+        .device-recent-card.connecting { border-left-color: #FFC107; }
+        .device-recent-card.error { border-left-color: #F44336; }
+        .device-recent-card.waiting { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -1227,20 +1229,62 @@
             height: 8px;
             border-radius: 50%;
         }
-        .status-dot.online { background: #22c55e; }
-        .status-dot.waiting { background: #ffc107; }
-        .status-dot.offline { background: #dc3545; }
+        .status-dot.active { background: #4CAF50; }
+        .status-dot.connecting { background: #FFC107; }
+        .status-dot.error { background: #F44336; }
+        .status-dot.waiting { background: #9E9E9E; }
         .status-text {
             font-size: 12px;
             font-weight: 500;
         }
-        .status-text.online { color: #22c55e; }
-        .status-text.waiting { color: #ffc107; }
-        .status-text.offline { color: #dc3545; }
+        .status-text.active { color: #4CAF50; }
+        .status-text.connecting { color: #FFC107; }
+        .status-text.error { color: #F44336; }
+        .status-text.waiting { color: #9E9E9E; }
+        
+        /* Responsive: Modal fullscreen on mobile */
         @media (max-width: 767px) {
             .bottom-nav { display: flex; }
+            .fab-nav { display: none !important; }
             #accordionSidebar { display: none !important; }
-            body { padding-bottom: 60px; }
+            body { padding-bottom: 60px; overflow-x: hidden; }
+            
+            /* Modal fullscreen on mobile */
+            .modal-dialog {
+                margin: 0;
+                max-width: 100%;
+                height: 100%;
+            }
+            .modal-content {
+                height: 100%;
+                border-radius: 0;
+                border: none;
+            }
+            .modal-body {
+                max-height: calc(100vh - 120px);
+                overflow-y: auto;
+            }
+            
+            /* Touch targets */
+            .btn, button, a.nav-link, .form-control {
+                min-height: 44px;
+            }
+            
+            /* Donut chart responsive */
+            .donut-chart-container-detail {
+                max-width: 100%;
+                width: 100%;
+            }
+            .donut-chart-detail {
+                width: 180px;
+                height: 180px;
+                margin: 0 auto;
+            }
+            
+            /* Device cards responsive */
+            .device-list-container {
+                max-height: calc(100vh - 250px);
+            }
         }
     </style>
 
@@ -1530,12 +1574,12 @@
 
         // Helper to get status class
         function getStatusClass(status, isActive) {
-            return DeviceStatus.getClass(status, isActive);
+            return getDeviceStatus({ status, is_active: isActive }).statusClass;
         }
 
         // Helper to get status text for UI
         function getStatusText(status, isActive) {
-            return DeviceStatus.getText(status, isActive);
+            return getDeviceStatus({ status, is_active: isActive }).label;
         }
 
         // Update page title with coop name
@@ -1612,41 +1656,40 @@
             deviceCountEl.textContent = devices.length;
 
             const stats = {
-                online: devices.filter(d => d.status === 'online').length,
-                connecting: devices.filter(d => d.status === 'connecting').length,
-                offline: devices.filter(d => d.status === 'offline').length
+                active: devices.filter(d => d.is_active && d.status === 'online').length,
+                error: devices.filter(d => d.is_active && d.status === 'offline').length,
+                connecting: devices.filter(d => d.is_active && d.status === 'connecting').length,
+                waiting: devices.filter(d => !d.is_active).length
             };
 
             const total = devices.length;
             const circumference = 2 * Math.PI * 70;
             let offset = 0;
 
-            let segments = '';
-            let legendHtml = '';
+            const segments = [];
+            const legendHtml = [];
+            const chartDefs = [
+                { key: 'active',     color: '#4CAF50', label: 'Đang hoạt động' },
+                { key: 'connecting', color: '#FFC107', label: 'Đang kết nối' },
+                { key: 'error',      color: '#F44336', label: 'Lỗi' },
+                { key: 'waiting',    color: '#9E9E9E', label: 'Đang chờ được kết nối' }
+            ];
 
-            if (stats.online > 0) {
-                const pct = Math.round((stats.online / total) * 100);
-                const dashArray = (stats.online / total) * circumference;
-                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#22c55e" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="online" data-name="Hoạt động" data-count="${stats.online}" data-percent="${pct}"></circle>`;
-                legendHtml += `<div class="legend-item-detail" data-segment="online"><span class="legend-dot-detail" style="background: #22c55e;"></span><span class="legend-text-detail">Hoạt động (${stats.online})</span></div>`;
-                offset += dashArray;
-            }
-            if (stats.connecting > 0) {
-                const pct = Math.round((stats.connecting / total) * 100);
-                const dashArray = (stats.connecting / total) * circumference;
-                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#ffc107" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="connecting" data-name="Chờ" data-count="${stats.connecting}" data-percent="${pct}"></circle>`;
-                legendHtml += `<div class="legend-item-detail" data-segment="connecting"><span class="legend-dot-detail" style="background: #ffc107;"></span><span class="legend-text-detail">Chờ (${stats.connecting})</span></div>`;
-                offset += dashArray;
-            }
-            if (stats.offline > 0) {
-                const pct = Math.round((stats.offline / total) * 100);
-                const dashArray = (stats.offline / total) * circumference;
-                segments += `<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="#dc3545" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="offline" data-name="Lỗi" data-count="${stats.offline}" data-percent="${pct}"></circle>`;
-                legendHtml += `<div class="legend-item-detail" data-segment="offline"><span class="legend-dot-detail" style="background: #dc3545;"></span><span class="legend-text-detail">Lỗi (${stats.offline})</span></div>`;
-            }
+            chartDefs.forEach(def => {
+                if (stats[def.key] > 0) {
+                    const pct = Math.round((stats[def.key] / total) * 100);
+                    const dashArray = (stats[def.key] / total) * circumference;
+                    segments.push(`<circle class="donut-segment-detail" cx="100" cy="100" r="70" fill="none" stroke="${def.color}" stroke-width="20" stroke-dasharray="${dashArray} ${circumference}" stroke-dashoffset="${-offset}" data-segment="${def.key}" data-name="${def.label}" data-count="${stats[def.key]}" data-percent="${pct}"></circle>`);
+                    legendHtml.push(`<div class="legend-item-detail" data-segment="${def.key}"><span class="legend-dot-detail" style="background: ${def.color};"></span><span class="legend-text-detail">${def.label} (${stats[def.key]})</span></div>`);
+                    offset += dashArray;
+                }
+            });
 
-            donutSvg.innerHTML = segments + '<circle cx="100" cy="100" r="52" fill="white"></circle>';
-            donutLegend.innerHTML = legendHtml;
+            const segmentsStr = segments.join('');
+            const legendStr = legendHtml.join('');
+
+            donutSvg.innerHTML = segmentsStr + '<circle cx="100" cy="100" r="52" fill="white"></circle>';
+            donutLegend.innerHTML = legendStr;
 
             initDonutInteractions();
         }
@@ -1681,14 +1724,17 @@
             if (!container) return;
 
             if (!Array.isArray(devices) || devices.length === 0) {
-                container.innerHTML = '<div class="text-center text-muted py-3">Không có thiết bị nào chưa kết nối</div>';
+                container.innerHTML = '<div class="text-center text-muted py-3">Không có thiết bị nào đang chờ kết nối</div>';
                 return;
             }
 
             container.innerHTML = devices.map(device => `
                 <div class="custom-control custom-checkbox mb-2">
                     <input type="checkbox" class="custom-control-input unconnected-device-checkbox" id="unconnected-device-${device.id}" data-device-id="${device.id}">
-                    <label class="custom-control-label" for="unconnected-device-${device.id}">${device.name || 'Thiết bị ' + device.id} (${device.type})</label>
+                    <label class="custom-control-label" for="unconnected-device-${device.id}">
+                        ${device.name || 'Thiết bị ' + device.id} (${device.type})<br>
+                        <small class="text-muted">${device.mac_address || ''}</small>
+                    </label>
                 </div>
             `).join('');
 
@@ -1768,22 +1814,43 @@
             const checkboxes = document.querySelectorAll('.unconnected-device-checkbox:checked');
             const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.deviceId));
 
+            if (selectedIds.length === 0) {
+                showToastNotification('Vui lòng chọn ít nhất một thiết bị', 'warning');
+                return;
+            }
+
+            let successCount = 0;
+            let failCount = 0;
+
             for (const deviceId of selectedIds) {
                 try {
-                    await fetch('/api/devices/public/add-to-coop', {
+                    const response = await fetch('/api/devices/public/attach-to-coop', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            unconnected_device_id: deviceId,
+                            device_id: deviceId,
                             coop_id: coopId
                         })
                     });
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        failCount++;
+                    }
                 } catch (error) {
                     console.error('Lỗi thêm thiết bị:', error);
+                    failCount++;
                 }
             }
 
             $('#addDeviceModal').modal('hide');
+            
+            if (failCount === 0) {
+                showFullScreenSuccess('Đã thêm ' + successCount + ' thiết bị thành công!');
+            } else {
+                showToastNotification('Đã thêm ' + successCount + ' thiết bị. ' + failCount + ' thất bại.', 'warning');
+            }
+            
             loadAllData();
         };
 
@@ -1807,7 +1874,7 @@
                 }
 
                 // Load unconnected devices
-                const unconnectedRes = await fetch('/api/devices/public/unconnected');
+                const unconnectedRes = await fetch('/api/devices/public/unconnected/available');
                 if (unconnectedRes.ok) {
                     unconnectedDevices = await unconnectedRes.json();
                     renderUnconnectedDevices(unconnectedDevices);
@@ -1913,18 +1980,14 @@
 
                 var recentDevices = devices.slice(0, 5);
                 var devicesHtml = recentDevices.map(function(device) {
-                    var status = device.status || 'offline';
-                    var isActive = device.is_active;
-                    var statusClass = DeviceStatus.getClass(status, isActive);
-                    var statusText = DeviceStatus.getText(status, isActive);
-
-                    return '<div class="device-recent-card ' + statusClass + '">' +
+                    var statusInfo = getDeviceStatus(device);
+                    return '<div class="device-recent-card ' + statusInfo.statusClass + '">' +
                         '<div class="device-recent-header">' +
                         '<span class="device-recent-name">' + (device.device_name || device.name || 'Thiết bị ' + device.id) + '</span>' +
                         '</div>' +
                         '<div class="device-recent-status">' +
-                        '<span class="status-dot ' + statusClass + '"></span>' +
-                        '<span class="status-text ' + statusClass + '">' + statusText + '</span>' +
+                        '<span class="status-dot ' + statusInfo.statusClass + '"></span>' +
+                        '<span class="status-text ' + statusInfo.statusClass + '">' + statusInfo.label + '</span>' +
                         '</div>' +
                         '</div>';
                 }).join('');

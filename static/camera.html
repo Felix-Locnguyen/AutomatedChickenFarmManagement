@@ -411,10 +411,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #4CAF50; }
-        .device-recent-card.waiting { border-left-color: #FFC107; }
-        .device-recent-card.offline { border-left-color: #F44336; }
-        .device-recent-card.off { border-left-color: #9E9E9E; }
+        .device-recent-card.active { border-left-color: #4CAF50; }
+        .device-recent-card.connecting { border-left-color: #FFC107; }
+        .device-recent-card.error { border-left-color: #F44336; }
+        .device-recent-card.waiting { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -443,20 +443,18 @@
             height: 8px;
             border-radius: 50%;
         }
-        .status-dot.online { background: #4CAF50; }
-        .status-dot.waiting { background: #FFC107; }
-        .status-dot.offline { background: #F44336; }
-        .status-dot.off { background: #9E9E9E; }
+        .status-dot.active { background: #4CAF50; }
+        .status-dot.connecting { background: #FFC107; }
+        .status-dot.error { background: #F44336; }
+        .status-dot.waiting { background: #9E9E9E; }
         .status-text {
             font-size: 12px;
             font-weight: 500;
         }
-        .status-text.online { color: #4CAF50; }
-        .status-text.waiting { color: #FFC107; }
-        .status-text.offline { color: #F44336; }
-        .status-text.off { color: #9E9E9E; }
-        .status-text.waiting { color: #ffc107; }
-        .status-text.offline { color: #dc3545; }
+        .status-text.active { color: #4CAF50; }
+        .status-text.connecting { color: #FFC107; }
+        .status-text.error { color: #F44336; }
+        .status-text.waiting { color: #9E9E9E; }
     </style>
 
 </head>
@@ -680,6 +678,7 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script src="js/status-helpers.js"></script>
+    <script src="js/utils/deviceStatus.js"></script>
     <script>
     // Camera List - Danh sách camera
     (function() {
@@ -954,18 +953,14 @@
 
                 var recentDevices = devices.slice(0, 5);
                 var devicesHtml = recentDevices.map(function(device) {
-                    var status = device.status || 'offline';
-                    var isActive = device.is_active;
-                    var statusClass = DeviceStatus.getClass(status, isActive);
-                    var statusText = DeviceStatus.getText(status, isActive);
-
-                    return '<div class="device-recent-card ' + statusClass + '">' +
+                    var statusInfo = getDeviceStatus(device);
+                    return '<div class="device-recent-card ' + statusInfo.statusClass + '">' +
                         '<div class="device-recent-header">' +
                         '<span class="device-recent-name">' + (device.device_name || device.name || 'Thiết bị ' + device.id) + '</span>' +
                         '</div>' +
                         '<div class="device-recent-status">' +
-                        '<span class="status-dot ' + statusClass + '"></span>' +
-                        '<span class="status-text ' + statusClass + '">' + statusText + '</span>' +
+                        '<span class="status-dot ' + statusInfo.statusClass + '"></span>' +
+                        '<span class="status-text ' + statusInfo.statusClass + '">' + statusInfo.label + '</span>' +
                         '</div>' +
                         '</div>';
                 }).join('');
