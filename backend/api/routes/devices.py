@@ -672,26 +672,30 @@ def get_device_status_stats():
     
     Returns:
         200: {
-            "online": <số thiết bị online/connected>,
-            "connecting": <số thiết bị connecting/pending>,
-            "offline": <số thiết bị offline/disconnected/error>
+            "off": <số thiết bị đã tắt (is_active = 0)>,
+            "active": <số thiết bị đang hoạt động (is_active = 1 AND status = 'online')>,
+            "connecting": <số thiết bị đang kết nối>,
+            "error": <số thiết bị lỗi (is_active = 1 AND status = 'offline')>
         }
     """
     devices = Device.query.filter_by(deleted=False).all()
     
     stats = {
-        'online': 0,
+        'off': 0,
+        'active': 0,
         'connecting': 0,
-        'offline': 0
+        'error': 0
     }
     
     for device in devices:
-        if device.status in ['online', 'connected']:
-            stats['online'] += 1
+        if device.is_active == False:
+            stats['off'] += 1
+        elif device.status in ['online', 'connected']:
+            stats['active'] += 1
         elif device.status in ['connecting', 'pending']:
             stats['connecting'] += 1
         else:
-            stats['offline'] += 1
+            stats['error'] += 1
 
     return jsonify(stats), 200
 

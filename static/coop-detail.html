@@ -1727,6 +1727,7 @@
     
     <!-- API Integration -->
     <script src="js/api.js"></script>
+    <script src="js/status-helpers.js"></script>
     
     <script>
     // Coop Detail - Dynamic Data Loading với Polling (No Auth)
@@ -1769,7 +1770,11 @@
         }
 
         // Helper to get status class
-        function getStatusClass(status) {
+        function getStatusClass(status, isActive) {
+            // Dùng DeviceStatus cho thiết bị
+            if (isActive !== undefined) {
+                return DeviceStatus.getClass(status, isActive);
+            }
             const classMap = {
                 'online': 'success',
                 'active': 'success',
@@ -1913,10 +1918,10 @@
             container.innerHTML = devices.map(device => `
                 <div class="device-card-mini">
                     <div class="device-card-mini-info">
-                        <span class="status-dot-mini" style="background: ${device.status === 'online' ? '#22c55e' : device.status === 'connecting' ? '#ffc107' : '#dc3545'};"></span>
+                        <span class="status-dot-mini" style="background: ${device.is_active ? (device.status === 'online' ? '#22c55e' : device.status === 'connecting' ? '#ffc107' : '#dc3545') : '#6c757d'};"></span>
                         <span class="device-card-mini-name">${device.name || 'Thiết bị ' + device.id}</span>
                     </div>
-                    <span class="badge badge-${getStatusClass(device.status)} device-card-mini-status">${getStatusText(device.status)}</span>
+                    <span class="badge badge-${getStatusClass(device.status, device.is_active)} device-card-mini-status">${DeviceStatus.getText(device.status, device.is_active)}</span>
                 </div>
             `).join('');
         }

@@ -56,7 +56,7 @@ def get_dashboard():
     # Thống kê cơ bản
     total_coops = len(coops)
     total_devices = len(devices)
-    online_devices = len([d for d in devices if d.status == 'online'])
+    online_devices = len([d for d in devices if d.status == 'online' and d.is_active == True])
     offline_devices = len([d for d in devices if d.status == 'offline'])
     connecting_devices = len([d for d in devices if d.status == 'connecting'])
     
@@ -141,7 +141,7 @@ def get_stats():
     """
     chicken_count = db.session.query(func.sum(Coop.current_count)).filter(Coop.deleted == False).scalar() or 0
     total_capacity = db.session.query(func.sum(Coop.capacity)).filter(Coop.deleted == False).scalar() or 0
-    online_devices = Device.query.filter(Device.status == 'online', Device.deleted == False).count()
+    online_devices = Device.query.filter(Device.status == 'online', Device.is_active == True, Device.deleted == False).count()
     unresolved_alerts = Alert.query.filter(Alert.is_resolved == False, Alert.deleted == False).count()
     
     coop_status = {

@@ -1,5 +1,8 @@
 const DeviceStatus = {
-    getText: (status) => {
+    getText: (status, isActive) => {
+        if (isActive === 0 || isActive === false) {
+            return 'Thiết bị đã tắt';
+        }
         const map = {
             'online': 'Hoạt động',
             'connected': 'Hoạt động',
@@ -9,7 +12,10 @@ const DeviceStatus = {
         };
         return map[status] || 'Lỗi';
     },
-    getClass: (status) => {
+    getClass: (status, isActive) => {
+        if (isActive === 0 || isActive === false) {
+            return 'off';
+        }
         const map = {
             'online': 'online',
             'connected': 'online',

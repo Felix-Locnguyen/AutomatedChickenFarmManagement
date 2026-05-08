@@ -1538,13 +1538,8 @@
         }
 
         // Helper to get status text for UI
-        function getStatusText(status) {
-            const textMap = {
-                'online': 'Đã kết nối',
-                'connecting': 'Chờ kết nối',
-                'offline': 'Lỗi'
-            };
-            return textMap[status] || status;
+        function getStatusText(status, isActive) {
+            return DeviceStatus.getText(status, isActive);
         }
 
         // Update page title with coop name
@@ -1579,7 +1574,7 @@
                     </div>
                     <div class="device-card-row device-card-info">
                         <span><i class="fas fa-battery-full"></i> ${device.battery || 100}%</span>
-                        <span><i class="fas fa-${getDeviceIcon(device.type)}"></i> ${getStatusText(device.status)}</span>
+                        <span><i class="fas fa-${getDeviceIcon(device.type)}"></i> ${getStatusText(device.status, device.is_active)}</span>
                     </div>
                     <div class="device-card-row device-card-actions">
                         ${(() => {
@@ -1928,17 +1923,9 @@
                 var recentDevices = devices.slice(0, 5);
                 var devicesHtml = recentDevices.map(function(device) {
                     var status = device.status || 'offline';
-                    var statusClass, statusText;
-                    if (status === 'online' || status === 'connected') {
-                        statusClass = 'online';
-                        statusText = 'Hoạt động';
-                    } else if (status === 'connecting' || status === 'pending') {
-                        statusClass = 'waiting';
-                        statusText = 'Đang chờ';
-                    } else {
-                        statusClass = 'offline';
-                        statusText = DeviceStatus.getText(status);
-                    }
+                    var isActive = device.is_active;
+                    var statusClass = DeviceStatus.getClass(status, isActive);
+                    var statusText = DeviceStatus.getText(status, isActive);
 
                     return '<div class="device-recent-card ' + statusClass + '">' +
                         '<div class="device-recent-header">' +

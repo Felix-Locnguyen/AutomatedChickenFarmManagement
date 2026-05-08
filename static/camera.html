@@ -950,17 +950,9 @@
                 var recentDevices = devices.slice(0, 5);
                 var devicesHtml = recentDevices.map(function(device) {
                     var status = device.status || 'offline';
-                    var statusClass, statusText;
-                    if (status === 'online' || status === 'connected') {
-                        statusClass = 'online';
-                        statusText = 'Hoạt động';
-                    } else if (status === 'connecting' || status === 'pending') {
-                        statusClass = 'waiting';
-                        statusText = 'Đang chờ';
-                    } else {
-                        statusClass = 'offline';
-                        statusText = DeviceStatus.getText(status);
-                    }
+                    var isActive = device.is_active;
+                    var statusClass = DeviceStatus.getClass(status, isActive);
+                    var statusText = DeviceStatus.getText(status, isActive);
 
                     return '<div class="device-recent-card ' + statusClass + '">' +
                         '<div class="device-recent-header">' +

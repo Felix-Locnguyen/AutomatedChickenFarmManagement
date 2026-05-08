@@ -120,6 +120,11 @@
             height: 10px;
             border-radius: 50%;
         }
+        .legend-count-coop {
+            margin-left: auto;
+            font-weight: 600;
+            color: #374151;
+        }
         /* Giá trị trung bình */
         .coop-temp-humid {
             display: flex;
@@ -791,23 +796,29 @@
                                     <div class="donut-chart-container-coop">
                                         <div class="donut-chart-coop" id="donutChartCoop">
                                             <svg viewBox="0 0 200 200">
-                                                <!-- Hoạt động (60%) - 9 thiết bị -->
+                                                <!-- Đang hoạt động -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#22c55e" stroke-width="22"
-                                                    stroke-dasharray="264 440" stroke-dashoffset="0"
-                                                    data-segment="hoatdong" data-name="Hoạt động" data-count="9" data-percent="60">
+                                                    fill="none" stroke="#4CAF50" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="hoatdong" data-name="Đang hoạt động" data-count="0" data-percent="0">
                                                 </circle>
-                                                <!-- Chờ (20%) - 3 thiết bị -->
+                                                <!-- Đang kết nối -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#ffc107" stroke-width="22"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-264"
-                                                    data-segment="cho" data-name="Chờ" data-count="3" data-percent="20">
+                                                    fill="none" stroke="#FFC107" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="dangketnoi" data-name="Đang kết nối" data-count="0" data-percent="0">
                                                 </circle>
-                                                <!-- Lỗi (20%) - 3 thiết bị -->
+                                                <!-- Lỗi -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#dc3545" stroke-width="22"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-352"
-                                                    data-segment="loi" data-name="Lỗi" data-count="3" data-percent="20">
+                                                    fill="none" stroke="#F44336" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="loi" data-name="Lỗi" data-count="0" data-percent="0">
+                                                </circle>
+                                                <!-- Đã tắt -->
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70"
+                                                    fill="none" stroke="#9E9E9E" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="datat" data-name="Đã tắt" data-count="0" data-percent="0">
                                                 </circle>
                                                 <!-- Center circle -->
                                                 <circle cx="100" cy="100" r="52" fill="white"></circle>
@@ -826,23 +837,30 @@
                                     </div>
                                     <div class="donut-legend-coop">
                                         <div class="legend-item-coop" data-segment="hoatdong">
-                                            <span class="legend-dot-coop" style="background: #22c55e;"></span>
-                                            <span class="legend-text-coop">Hoạt động (9)</span>
+                                            <span class="legend-dot-coop" style="background: #4CAF50;"></span>
+                                            <span class="legend-text-coop">Đang hoạt động</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="cho">
-                                            <span class="legend-dot-coop" style="background: #ffc107;"></span>
-                                            <span class="legend-text-coop">Chờ (3)</span>
+                                        <div class="legend-item-coop" data-segment="dangketnoi">
+                                            <span class="legend-dot-coop" style="background: #FFC107;"></span>
+                                            <span class="legend-text-coop">Đang kết nối</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
                                         <div class="legend-item-coop" data-segment="loi">
-                                            <span class="legend-dot-coop" style="background: #dc3545;"></span>
-                                            <span class="legend-text-coop">Lỗi (3)</span>
+                                            <span class="legend-dot-coop" style="background: #F44336;"></span>
+                                            <span class="legend-text-coop">Lỗi</span>
+                                            <span class="legend-count-coop">(0)</span>
+                                        </div>
+                                        <div class="legend-item-coop" data-segment="datat">
+                                            <span class="legend-dot-coop" style="background: #9E9E9E;"></span>
+                                            <span class="legend-text-coop">Đã tắt</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     <!-- Content Row -->
                     <div class="row">
 
@@ -921,6 +939,7 @@
     
     <!-- API Integration -->
     <script src="js/api.js"></script>
+    <script src="js/donut-device-status.js"></script>
     
     <script>
         // Dashboard - Real-time Data with WebSocket + Fallback
@@ -1047,12 +1066,17 @@
                     const segmentType = item.getAttribute('data-segment');
                     const count = statusCounts[segmentType] || 0;
                     const textEl = item.querySelector('.legend-text-coop');
-                    if (textEl) {
-                        textEl.textContent = item.querySelector('.legend-dot-coop').style.background.includes('22c55e') 
-                            ? `Hoạt động (${count})`
-                            : item.querySelector('.legend-dot-coop').style.background.includes('ffc107')
-                            ? `Chờ (${count})`
-                            : `Lỗi (${count})`;
+                    const countEl = item.querySelector('.legend-count-coop');
+                    if (textEl && countEl) {
+                        const segmentType = item.getAttribute('data-segment');
+                        const descriptions = {
+                            'hoatdong': 'Đang hoạt động',
+                            'dangketnoi': 'Đang kết nối',
+                            'loi': 'Lỗi',
+                            'datat': 'Đã tắt'
+                        };
+                        textEl.textContent = descriptions[segmentType] || segmentType;
+                        countEl.textContent = `(${count})`;
                     }
                 });
             }
@@ -1496,6 +1520,11 @@
                 });
             });
         })();
+
+        // Load device status donut chart
+        if (typeof loadDeviceStatusDonut === 'function') {
+            loadDeviceStatusDonut('donutChartCoop', 30000);
+        }
     </script>
 
 </body>

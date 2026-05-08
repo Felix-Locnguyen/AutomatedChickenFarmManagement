@@ -703,6 +703,10 @@
                                             height: 10px;
                                             border-radius: 50%;
                                         }
+                                        .legend-count-coop {
+                                            margin-left: auto;
+                                            font-weight: 600;
+                                        }
                                         /* Giá trị trung bình */
                                         .coop-temp-humid {
                                             display: flex;
@@ -963,25 +967,26 @@
                                     <div class="donut-chart-container-coop">
                                         <div class="donut-chart-coop" id="donutChartCoop">
                                             <svg viewBox="0 0 200 200">
-                                                <!-- Hoạt động (60%) - 9 thiết bị -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#22c55e" stroke-width="22"
-                                                    stroke-dasharray="264 440" stroke-dashoffset="0"
-                                                    data-segment="hoatdong" data-name="Hoạt động" data-count="9" data-percent="60">
+                                                    fill="none" stroke="#4CAF50" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="hoatdong" data-name="Đang hoạt động" data-count="0" data-percent="0">
                                                 </circle>
-                                                <!-- Chờ (20%) - 3 thiết bị -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#ffc107" stroke-width="22"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-264"
-                                                    data-segment="cho" data-name="Chờ" data-count="3" data-percent="20">
+                                                    fill="none" stroke="#FFC107" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="dangketnoi" data-name="Đang kết nối" data-count="0" data-percent="0">
                                                 </circle>
-                                                <!-- Lỗi (20%) - 3 thiết bị -->
                                                 <circle class="donut-segment-coop" cx="100" cy="100" r="70"
-                                                    fill="none" stroke="#dc3545" stroke-width="22"
-                                                    stroke-dasharray="88 440" stroke-dashoffset="-352"
-                                                    data-segment="loi" data-name="Lỗi" data-count="3" data-percent="20">
+                                                    fill="none" stroke="#F44336" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="loi" data-name="Lỗi" data-count="0" data-percent="0">
                                                 </circle>
-                                                <!-- Center circle -->
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70"
+                                                    fill="none" stroke="#9E9E9E" stroke-width="22"
+                                                    stroke-dasharray="0 440" stroke-dashoffset="0"
+                                                    data-segment="datat" data-name="Đã tắt" data-count="0" data-percent="0">
+                                                </circle>
                                                 <circle cx="100" cy="100" r="52" fill="white"></circle>
                                             </svg>
                                             <div class="donut-center-coop">
@@ -998,16 +1003,24 @@
                                     </div>
                                     <div class="donut-legend-coop">
                                         <div class="legend-item-coop" data-segment="hoatdong">
-                                            <span class="legend-dot-coop" style="background: #22c55e;"></span>
-                                            <span class="legend-text-coop">Hoạt động (9)</span>
+                                            <span class="legend-dot-coop" style="background: #4CAF50;"></span>
+                                            <span class="legend-text-coop">Đang hoạt động - Thiết bị bật &amp; kết nối</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="cho">
-                                            <span class="legend-dot-coop" style="background: #ffc107;"></span>
-                                            <span class="legend-text-coop">Chờ (3)</span>
+                                        <div class="legend-item-coop" data-segment="dangketnoi">
+                                            <span class="legend-dot-coop" style="background: #FFC107;"></span>
+                                            <span class="legend-text-coop">Đang kết nối - Đang chờ kết nối...</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
                                         <div class="legend-item-coop" data-segment="loi">
-                                            <span class="legend-dot-coop" style="background: #dc3545;"></span>
-                                            <span class="legend-text-coop">Lỗi (3)</span>
+                                            <span class="legend-dot-coop" style="background: #F44336;"></span>
+                                            <span class="legend-text-coop">Lỗi - Thiết bị bật, mất kết nối</span>
+                                            <span class="legend-count-coop">(0)</span>
+                                        </div>
+                                        <div class="legend-item-coop" data-segment="datat">
+                                            <span class="legend-dot-coop" style="background: #9E9E9E;"></span>
+                                            <span class="legend-text-coop">Đã tắt - Thiết bị đã tắt nguồn</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1684,17 +1697,9 @@
                 var recentDevices = devices.slice(0, 5);
                 var devicesHtml = recentDevices.map(function(device) {
                     var status = device.status || 'offline';
-                    var statusClass, statusText;
-                    if (status === 'online' || status === 'connected') {
-                        statusClass = 'online';
-                        statusText = 'Hoạt động';
-                    } else if (status === 'connecting' || status === 'pending') {
-                        statusClass = 'waiting';
-                        statusText = 'Đang chờ';
-                    } else {
-                        statusClass = 'offline';
-                        statusText = DeviceStatus.getText(status);
-                    }
+                    var isActive = device.is_active;
+                    var statusClass = DeviceStatus.getClass(status, isActive);
+                    var statusText = DeviceStatus.getText(status, isActive);
 
                     return '<div class="device-recent-card ' + statusClass + '">' +
                         '<div class="device-recent-header">' +

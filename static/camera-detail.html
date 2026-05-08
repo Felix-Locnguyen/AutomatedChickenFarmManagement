@@ -805,6 +805,7 @@
     </nav>
 
     <script src="js/api.js"></script>
+    <script src="js/status-helpers.js"></script>
     <script>
     (function() {
         'use strict';
@@ -895,10 +896,7 @@
         }
 
         function getDeviceClass(device) {
-            const s = (device.status || '').toLowerCase();
-            if (s === 'online' || s === 'connected') return 'device-online';
-            if (s === 'connecting' || s === 'pending') return 'device-connecting';
-            return 'device-offline';
+            return DeviceStatus.getClass(device.status, device.is_active);
         }
 
         function getDeviceIcon(type) {

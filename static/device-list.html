@@ -37,6 +37,7 @@
         .donut-legend-coop { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         .legend-item-coop { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
         .legend-dot-coop { width: 10px; height: 10px; border-radius: 50%; }
+        .legend-count-coop { margin-left: auto; font-weight: 600; }
 
         /* Bottom Navigation */
         .bottom-nav {
@@ -1411,9 +1412,10 @@
                                     <div class="donut-chart-container-coop">
                                         <div class="donut-chart-coop" id="donutChartDeviceList">
                                             <svg viewBox="0 0 200 200">
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#22c55e" stroke-width="22" stroke-dasharray="264 440" stroke-dashoffset="0" data-segment="hoatdong"></circle>
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#ffc107" stroke-width="22" stroke-dasharray="88 440" stroke-dashoffset="-264" data-segment="cho"></circle>
-                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#dc3545" stroke-width="22" stroke-dasharray="88 440" stroke-dashoffset="-352" data-segment="loi"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#4CAF50" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="hoatdong"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#FFC107" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="dangketnoi"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#F44336" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="loi"></circle>
+                                                <circle class="donut-segment-coop" cx="100" cy="100" r="70" fill="none" stroke="#9E9E9E" stroke-width="22" stroke-dasharray="0 440" stroke-dashoffset="0" data-segment="datat"></circle>
                                                 <circle cx="100" cy="100" r="52" fill="white"></circle>
                                             </svg>
                                             <div class="donut-center-coop">
@@ -1430,16 +1432,24 @@
                                     </div>
                                     <div class="donut-legend-coop">
                                         <div class="legend-item-coop" data-segment="hoatdong">
-                                            <span class="legend-dot-coop" style="background: #22c55e;"></span>
-                                            <span class="legend-text-coop">Hoạt động (0)</span>
+                                            <span class="legend-dot-coop" style="background: #4CAF50;"></span>
+                                            <span class="legend-text-coop">Đang hoạt động</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
-                                        <div class="legend-item-coop" data-segment="cho">
-                                            <span class="legend-dot-coop" style="background: #ffc107;"></span>
-                                            <span class="legend-text-coop">Chờ (0)</span>
+                                        <div class="legend-item-coop" data-segment="dangketnoi">
+                                            <span class="legend-dot-coop" style="background: #FFC107;"></span>
+                                            <span class="legend-text-coop">Đang kết nối</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
                                         <div class="legend-item-coop" data-segment="loi">
-                                            <span class="legend-dot-coop" style="background: #dc3545;"></span>
-                                            <span class="legend-text-coop">Lỗi (0)</span>
+                                            <span class="legend-dot-coop" style="background: #F44336;"></span>
+                                            <span class="legend-text-coop">Lỗi</span>
+                                            <span class="legend-count-coop">(0)</span>
+                                        </div>
+                                        <div class="legend-item-coop" data-segment="datat">
+                                            <span class="legend-dot-coop" style="background: #9E9E9E;"></span>
+                                            <span class="legend-text-coop">Đã tắt</span>
+                                            <span class="legend-count-coop">(0)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -2442,7 +2452,7 @@
                     const sortedDevices = sortDevicesByStatus(devices);
 
                     deviceContainer.innerHTML = sortedDevices.map(device => {
-                        const statusText = DeviceStatus.getText(device.status);
+                        const statusText = DeviceStatus.getText(device.status, device.is_active);
                         return `
                         <div class="device-card status-${device.status || 'offline'}"
                              data-device-id="${device.id}"

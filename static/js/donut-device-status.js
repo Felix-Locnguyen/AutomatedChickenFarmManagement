@@ -5,7 +5,7 @@
  * Used in: index.html, coop-list.html, device-list.html
  * 
  * API: GET /api/devices/status-stats
- * Response: { online: number, connecting: number, offline: number }
+ * Response: { active: number, connecting: number, error: number, off: number }
  */
 
 (function() {
@@ -13,16 +13,18 @@
 
     // Status mapping: API status -> chart segment
     const STATUS_MAPPING = {
-        'online': 'hoatdong',
-        'connecting': 'cho',
-        'offline': 'loi'
+        'active': 'hoatdong',
+        'connecting': 'dangketnoi',
+        'error': 'loi',
+        'off': 'datat'
     };
 
     // Chart colors (consistent across all pages)
     const CHART_COLORS = {
-        'hoatdong': '#22c55e',  // Xanh - Hoạt động
-        'cho': '#ffc107',        // Vàng - Chờ kết nối
-        'loi': '#dc3545'        // Đỏ - Lỗi/Mất kết nối
+        'hoatdong': '#4CAF50',   // Xanh lá - Đang hoạt động
+        'dangketnoi': '#FFC107', // Vàng - Đang kết nối
+        'loi': '#F44336',        // Đỏ - Lỗi
+        'datat': '#9E9E9E'       // Xám - Đã tắt
     };
 
     // Store interval IDs for cleanup
@@ -30,21 +32,22 @@
 
     /**
      * Convert API data to chart format
-     * @param {object} apiData - { online, connecting, offline }
-     * @returns {object} - { hoatdong, cho, loi }
+     * @param {object} apiData - { active, connecting, error, off }
+     * @returns {object} - { hoatdong, dangketnoi, loi, datat }
      */
     function convertToChartData(apiData) {
         return {
-            'hoatdong': apiData.online || 0,
-            'cho': apiData.connecting || 0,
-            'loi': apiData.offline || 0
+            'hoatdong': apiData.active || 0,
+            'dangketnoi': apiData.connecting || 0,
+            'loi': apiData.error || 0,
+            'datat': apiData.off || 0
         };
     }
 
     /**
      * Render donut chart with data
      * @param {string} elementId - ID of the donut chart container
-     * @param {object} data - { hoatdong, cho, loi }
+     * @param {object} data - { hoatdong, dangketnoi, loi, datat }
      */
     function renderDonutChart(elementId, data) {
         const container = document.getElementById(elementId);
@@ -54,7 +57,7 @@
         }
 
         const segments = container.querySelectorAll('.donut-segment-coop');
-        const total = (data.hoatdong || 0) + (data.cho || 0) + (data.loi || 0);
+        const total = (data.hoatdong || 0) + (data.dangketnoi || 0) + (data.loi || 0) + (data.datat || 0);
         
         if (total === 0) {
             segments.forEach(segment => {
@@ -62,13 +65,14 @@
             });
             const totalEl = container.querySelector('.donut-total-coop');
             if (totalEl) totalEl.textContent = '0';
-            updateLegend(elementId, { hoatdong: 0, cho: 0, loi: 0 });
+            updateLegend(elementId, { hoatdong: 0, dangketnoi: 0, loi: 0, datat: 0 });
             return;
         }
 
         const circumference = 2 * Math.PI * 70;
         let offset = 0;
-        const segmentOrder = ['hoatdong', 'cho', 'loi'];
+        // Order: active (xanh), connecting (vàng), error (đỏ), off (xám)
+        const segmentOrder = ['hoatdong', 'dangketnoi', 'loi', 'datat'];
 
         segments.forEach(segment => {
             const segmentType = segment.getAttribute('data-segment');
@@ -79,9 +83,10 @@
             const dashArray = percentage * circumference;
 
             let segmentName = '';
-            if (segmentType === 'hoatdong') segmentName = 'Hoạt động';
-            else if (segmentType === 'cho') segmentName = 'Chờ';
+            if (segmentType === 'hoatdong') segmentName = 'Đang hoạt động';
+            else if (segmentType === 'dangketnoi') segmentName = 'Đang kết nối';
             else if (segmentType === 'loi') segmentName = 'Lỗi';
+            else if (segmentType === 'datat') segmentName = 'Đã tắt';
 
             segment.style.strokeDasharray = `${dashArray} ${circumference}`;
             segment.style.strokeDashoffset = -offset;
@@ -112,13 +117,19 @@
             const segmentType = item.getAttribute('data-segment');
             const count = data[segmentType] || 0;
             const textEl = item.querySelector('.legend-text-coop');
+            const countEl = item.querySelector('.legend-count-coop');
             
             if (textEl) {
-                let label = '';
-                if (segmentType === 'hoatdong') label = `Hoạt động (${count})`;
-                else if (segmentType === 'cho') label = `Chờ (${count})`;
-                else if (segmentType === 'loi') label = `Lỗi (${count})`;
-                textEl.textContent = label;
+                const descriptions = {
+                    'hoatdong': 'Đang hoạt động',
+                    'dangketnoi': 'Đang kết nối',
+                    'loi': 'Lỗi',
+                    'datat': 'Đã tắt'
+                };
+                textEl.textContent = descriptions[segmentType] || segmentType;
+            }
+            if (countEl) {
+                countEl.textContent = `(${count})`;
             }
         });
     }
