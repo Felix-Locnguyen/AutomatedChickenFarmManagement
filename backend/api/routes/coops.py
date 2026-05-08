@@ -118,11 +118,11 @@ def get_public_coop_devices(coop_id):
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
-    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id).all()
+    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id, deleted=False).all()
     devices = []
     for cd in coop_devices:
         device = db.session.get(Device, cd.device_id)
-        if device:
+        if device and not device.deleted:
             devices.append(device.to_dict())
     
     return jsonify(devices), 200
@@ -151,8 +151,8 @@ def remove_device_from_coop(coop_id, device_id):
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
-    # Kiểm tra xem thiết bị có trong chuồng không
-    coop_device = CoopDevice.query.filter_by(coop_id=coop_id, device_id=device_id).first()
+    # Kiểm tra xem thiết bị có trong chuồng không (chưa bị xóa mềm)
+    coop_device = CoopDevice.query.filter_by(coop_id=coop_id, device_id=device_id, deleted=False).first()
     if not coop_device:
         return jsonify({'error': 'Device not in this coop'}), 404
     
@@ -525,12 +525,12 @@ def get_coop_devices(coop_id):
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
-    # Lấy tất cả các link thiết bị-chuồng
-    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id).all()
+    # Lấy tất cả các link thiết bị-chuồng (chưa bị xóa mềm)
+    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id, deleted=False).all()
     devices = []
     for cd in coop_devices:
         device = db.session.get(Device, cd.device_id)
-        if device:
+        if device and not device.deleted:
             devices.append(device.to_dict())
     
     return jsonify(devices), 200

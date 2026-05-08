@@ -1195,9 +1195,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #22c55e; }
-        .device-recent-card.waiting { border-left-color: #ffc107; }
-        .device-recent-card.offline { border-left-color: #dc3545; }
+        .device-recent-card.online { border-left-color: #4CAF50; }
+        .device-recent-card.waiting { border-left-color: #FFC107; }
+        .device-recent-card.offline { border-left-color: #F44336; }
+        .device-recent-card.off { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -1528,13 +1529,8 @@
         }
 
         // Helper to get status class
-        function getStatusClass(status) {
-            const classMap = {
-                'online': 'active',
-                'connecting': 'waiting',
-                'offline': 'error'
-            };
-            return classMap[status] || 'error';
+        function getStatusClass(status, isActive) {
+            return DeviceStatus.getClass(status, isActive);
         }
 
         // Helper to get status text for UI
@@ -1566,34 +1562,28 @@
                 return;
             }
 
-            container.innerHTML = devices.map(device => `
-                <div class="device-card status-${getStatusClass(device.status)}" data-device-id="${device.id}" data-device-name="${device.name || 'Thiết bị ' + device.id}">
+            container.innerHTML = devices.map(device => {
+                const statusClass = getStatusClass(device.status, device.is_active);
+                const statusText = getStatusText(device.status, device.is_active);
+                return `
+                <div class="device-card status-${statusClass}" data-device-id="${device.id}" data-device-name="${device.name || 'Thiết bị ' + device.id}">
                     <div class="device-card-row device-card-header">
-                        <span class="status-dot ${getStatusClass(device.status)}"></span>
+                        <span class="status-dot ${statusClass}"></span>
                         <span class="device-name">${device.name || 'Thiết bị ' + device.id}</span>
                     </div>
                     <div class="device-card-row device-card-info">
                         <span><i class="fas fa-battery-full"></i> ${device.battery || 100}%</span>
-                        <span><i class="fas fa-${getDeviceIcon(device.type)}"></i> ${getStatusText(device.status, device.is_active)}</span>
+                        <span><i class="fas fa-${getDeviceIcon(device.type)}"></i> ${statusText}</span>
                     </div>
                     <div class="device-card-row device-card-actions">
-                        ${(() => {
-                            const isOnline = device.status === 'online';
-                            const btnText = isOnline 
-                                ? (device.is_active ? 'Tắt' : 'Bật') 
-                                : (device.status === 'connecting' ? 'Đang kết nối...' : 'Lỗi');
-                            const btnClass = isOnline 
-                                ? (device.is_active ? 'status-btn status-on' : 'status-btn status-off') 
-                                : 'status-btn status-disabled';
-                            return `<button class="btn btn-sm ${btnClass} device-toggle-btn" 
-                                        data-device-id="${device.id}" 
-                                        data-device-status="${device.status}"
-                                        data-device-name="${device.name || 'Thiết bị ' + device.id}"
-                                        ${!isOnline ? 'disabled' : ''}
-                                        onclick="toggleDevice(${device.id})">
-                                        ${btnText}
-                                    </button>`;
-                        })()}
+                        ${device.is_active === false || device.status === 'online' ? `
+                        <button class="btn btn-sm ${device.is_active ? 'status-btn status-on' : 'status-btn status-off'} device-toggle-btn" 
+                                data-device-id="${device.id}" 
+                                data-device-status="${device.status}"
+                                data-device-name="${device.name || 'Thiết bị ' + device.id}"
+                                onclick="toggleDevice(${device.id})">
+                                ${device.is_active ? 'Tắt' : 'Bật'}
+                        </button>` : ''}
                         <button class="btn btn-sm btn-outline-danger btn-delete-device" 
                                 data-device-id="${device.id}" 
                                 data-device-name="${device.name || 'Thiết bị ' + device.id}"
@@ -1602,7 +1592,8 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Update donut chart

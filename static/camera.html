@@ -411,9 +411,10 @@
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #22c55e; }
-        .device-recent-card.waiting { border-left-color: #ffc107; }
-        .device-recent-card.offline { border-left-color: #dc3545; }
+        .device-recent-card.online { border-left-color: #4CAF50; }
+        .device-recent-card.waiting { border-left-color: #FFC107; }
+        .device-recent-card.offline { border-left-color: #F44336; }
+        .device-recent-card.off { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -442,14 +443,18 @@
             height: 8px;
             border-radius: 50%;
         }
-        .status-dot.online { background: #22c55e; }
-        .status-dot.waiting { background: #ffc107; }
-        .status-dot.offline { background: #dc3545; }
+        .status-dot.online { background: #4CAF50; }
+        .status-dot.waiting { background: #FFC107; }
+        .status-dot.offline { background: #F44336; }
+        .status-dot.off { background: #9E9E9E; }
         .status-text {
             font-size: 12px;
             font-weight: 500;
         }
-        .status-text.online { color: #22c55e; }
+        .status-text.online { color: #4CAF50; }
+        .status-text.waiting { color: #FFC107; }
+        .status-text.offline { color: #F44336; }
+        .status-text.off { color: #9E9E9E; }
         .status-text.waiting { color: #ffc107; }
         .status-text.offline { color: #dc3545; }
     </style>

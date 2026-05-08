@@ -436,7 +436,7 @@
          * @returns {array}
          */
         getAll: async function() {
-            return await window.apiFetch('/devices');
+            return await window.apiFetch('/devices/public/all');
         },
 
         /**
@@ -445,7 +445,7 @@
          * @returns {object}
          */
         getOne: async function(id) {
-            return await window.apiFetch(`/devices/${id}`);
+            return await window.apiFetch(`/devices/public/${id}`);
         },
 
         /**

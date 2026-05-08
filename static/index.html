@@ -225,15 +225,16 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: transform 0.2s;
             min-height: 60px;
-            border-left: 4px solid #22c55e;
+            border-left: 4px solid #4CAF50;
         }
         .device-recent-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .device-recent-card.online { border-left-color: #22c55e; }
-        .device-recent-card.waiting { border-left-color: #ffc107; }
-        .device-recent-card.offline { border-left-color: #dc3545; }
+        .device-recent-card.online { border-left-color: #4CAF50; }
+        .device-recent-card.waiting { border-left-color: #FFC107; }
+        .device-recent-card.offline { border-left-color: #F44336; }
+        .device-recent-card.off { border-left-color: #9E9E9E; }
         .device-recent-header {
             display: flex;
             justify-content: space-between;
@@ -269,9 +270,10 @@
             font-size: 12px;
             font-weight: 500;
         }
-        .status-text.online { color: #22c55e; }
-        .status-text.waiting { color: #ffc107; }
-        .status-text.offline { color: #dc3545; }
+        .status-text.online { color: #4CAF50; }
+        .status-text.waiting { color: #FFC107; }
+        .status-text.offline { color: #F44336; }
+        .status-text.off { color: #9E9E9E; }
         /* FAB Bottom Navigation */
         .fab-nav {
             display: none;
@@ -940,6 +942,7 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script src="js/donut-device-status.js"></script>
+    <script src="js/status-helpers.js"></script>
     
     <script>
         // Dashboard - Real-time Data with WebSocket + Fallback
@@ -1159,19 +1162,10 @@
 
                 requestAnimationFrame(() => {
                     const devicesHtml = devices.slice(0, 5).map(device => {
-                        // Mapping status - giống device-list.html
                         const status = device.status || device.device_status || 'offline';
-                        let statusClass, statusText;
-                        if (status === 'online' || status === 'connected') {
-                            statusClass = 'online';
-                            statusText = 'Hoạt động';
-                        } else if (status === 'connecting' || status === 'pending') {
-                            statusClass = 'waiting';
-                            statusText = 'Đang chờ';
-                        } else {
-                            statusClass = 'offline';
-                            statusText = DeviceStatus.getText(status);
-                        }
+                        const isActive = device.is_active;
+                        const statusClass = DeviceStatus.getClass(status, isActive);
+                        const statusText = DeviceStatus.getText(status, isActive);
 
                         return `
                             <div class="device-recent-card ${statusClass}">

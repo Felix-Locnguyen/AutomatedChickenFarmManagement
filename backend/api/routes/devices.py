@@ -318,7 +318,19 @@ def get_devices():
         200: Array of device objects
         401: Unauthorized
     """
-    devices = Device.query.all()
+    devices = Device.query.filter_by(deleted=False).all()
+    return jsonify([device.to_dict() for device in devices]), 200
+
+
+@devices_bp.route('/public/all', methods=['GET'])
+def get_all_devices_public():
+    """
+    Lấy danh sách tất cả thiết bị (Không cần auth).
+    
+    Returns:
+        200: Array of device objects
+    """
+    devices = Device.query.filter_by(deleted=False).all()
     return jsonify([device.to_dict() for device in devices]), 200
 
 
@@ -446,7 +458,18 @@ def get_device(device_id):
         404: Không tìm thấy thiết bị
     """
     device = db.session.get(Device, device_id)
-    if not device:
+    if not device or device.deleted:
+        return jsonify({'error': 'Device not found'}), 404
+    return jsonify(device.to_dict()), 200
+
+
+@devices_bp.route('/public/<int:device_id>', methods=['GET'])
+def get_device_public(device_id):
+    """
+    Lấy thông tin một thiết bị cụ thể (Không cần auth).
+    """
+    device = db.session.get(Device, device_id)
+    if not device or device.deleted:
         return jsonify({'error': 'Device not found'}), 404
     return jsonify(device.to_dict()), 200
 

@@ -2316,6 +2316,7 @@
     <!-- API Integration -->
     <script src="js/api.js"></script>
     <script src="js/donut-device-status.js"></script>
+    <script src="js/status-helpers.js"></script>
     <script>
     // Device List - Danh sách thiết bị
     (function() {
@@ -2531,11 +2532,11 @@
                         <div class="device-recent-card ${device.status || 'offline'}">
                             <div class="device-recent-header">
                                 <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
-                                <span class="device-recent-coop">${DeviceStatus.getText(device.status)}</span>
+                                <span class="device-recent-coop">${DeviceStatus.getText(device.status, device.is_active)}</span>
                             </div>
                             <div class="device-recent-status">
-                                <span class="status-dot ${DeviceStatus.getClass(device.status)}"></span>
-                                <span class="status-text ${DeviceStatus.getClass(device.status)}">${DeviceStatus.getText(device.status)}</span>
+                                <span class="status-dot ${DeviceStatus.getClass(device.status, device.is_active)}"></span>
+                                <span class="status-text ${DeviceStatus.getClass(device.status, device.is_active)}">${DeviceStatus.getText(device.status, device.is_active)}</span>
                             </div>
                         </div>
                     `).join('');

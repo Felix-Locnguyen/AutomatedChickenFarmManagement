@@ -48,15 +48,15 @@ def get_cameras():
             ...
         ]
     """
-    # Lọc chỉ lấy các thiết bị là camera
-    devices = Device.query.filter_by(type='camera').all()
+    # Lọc chỉ lấy các thiết bị là camera (chưa bị xóa mềm)
+    devices = Device.query.filter_by(type='camera', deleted=False).all()
     cameras = []
     
     for device in devices:
-        # Lấy danh sách chuồng của camera
-        coop_devices = CoopDevice.query.filter_by(device_id=device.id).all()
+        # Lấy danh sách chuồng của camera (chưa bị xóa mềm)
+        coop_devices = CoopDevice.query.filter_by(device_id=device.id, deleted=False).all()
         coop_ids = [cd.coop_id for cd in coop_devices]
-        coops = Coop.query.filter(Coop.id.in_(coop_ids)).all() if coop_ids else []
+        coops = Coop.query.filter(Coop.id.in_(coop_ids), Coop.deleted == False).all() if coop_ids else []
         
         cameras.append({
             'id': device.id,
@@ -96,10 +96,10 @@ def get_camera(device_id):
     if not device:
         return jsonify({'error': 'Camera not found'}), 404
     
-    # Lấy danh sách chuồng
-    coop_devices = CoopDevice.query.filter_by(device_id=device_id).all()
+    # Lấy danh sách chuồng (chưa bị xóa mềm)
+    coop_devices = CoopDevice.query.filter_by(device_id=device_id, deleted=False).all()
     coop_ids = [cd.coop_id for cd in coop_devices]
-    coops = Coop.query.filter(Coop.id.in_(coop_ids)).all() if coop_ids else []
+    coops = Coop.query.filter(Coop.id.in_(coop_ids), Coop.deleted == False).all() if coop_ids else []
     
     return jsonify({
         'id': device.id,
@@ -134,14 +134,15 @@ def get_camera_by_coop(coop_id):
     if not coop:
         return jsonify({'error': 'Coop not found'}), 404
     
-    # Lấy danh sách thiết bị trong chuồng
-    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id).all()
+    # Lấy danh sách thiết bị trong chuồng (chưa bị xóa mềm)
+    coop_devices = CoopDevice.query.filter_by(coop_id=coop_id, deleted=False).all()
     device_ids = [cd.device_id for cd in coop_devices]
     
-    # Lọc chỉ lấy camera
+    # Lọc chỉ lấy camera (chưa bị xóa mềm)
     cameras = Device.query.filter(
         Device.id.in_(device_ids),
-        Device.type == 'camera'
+        Device.type == 'camera',
+        Device.deleted == False
     ).all()
     
     return jsonify([{
