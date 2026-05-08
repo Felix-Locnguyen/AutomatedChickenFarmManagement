@@ -1693,7 +1693,7 @@
                         statusText = 'Đang chờ';
                     } else {
                         statusClass = 'offline';
-                        statusText = 'Ngắt kết nối';
+                        statusText = DeviceStatus.getText(status);
                     }
 
                     return '<div class="device-recent-card ' + statusClass + '">' +

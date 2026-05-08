@@ -69,30 +69,64 @@
         .video-wrapper {
             position: relative;
             width: 100%;
-            padding-top: 56.25%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding-top: 56.25%; /* 16:9 ratio */
+            background: #000;
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        .video-placeholder {
+        .single-video-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-viewport {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-viewport .video-placeholder {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: rgba(255,255,255,0.7);
+            color: rgba(255,255,255,0.6);
             gap: 15px;
+            transition: all 0.5s ease;
         }
 
-        .video-placeholder i {
+        .video-viewport .video-placeholder i {
             font-size: 60px;
             opacity: 0.5;
+        }
+
+        .video-viewport .camera-label {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 800;
+            z-index: 5;
+            border-left: 4px solid var(--primary);
+            letter-spacing: 1px;
+            backdrop-filter: blur(4px);
         }
 
         .video-overlay {
@@ -106,6 +140,7 @@
             flex-direction: column;
             justify-content: space-between;
             padding: 15px;
+            z-index: 10;
         }
 
         .video-overlay-top {
@@ -155,62 +190,91 @@
         .video-overlay-bottom {
             display: flex;
             justify-content: center;
+            align-items: center;
             pointer-events: auto;
+            gap: 15px;
         }
 
         .btn-fullscreen {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: none;
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 16px;
-            background: rgba(255,255,255,0.9);
-            color: #333;
+            font-size: 20px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            backdrop-filter: blur(5px);
         }
 
         .btn-fullscreen:hover {
-            transform: scale(1.1);
-            background: white;
-            box-shadow: 0 4px 15px rgba(255,255,255,0.3);
+            transform: scale(1.05);
+            background: rgba(255,255,255,0.2);
+            border-color: white;
         }
 
-        .btn-camera {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.3);
+        .btn-camera-box {
+            min-width: 100px;
+            height: 54px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.15);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            background: rgba(0,0,0,0.5);
+            color: rgba(255,255,255,0.8);
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 13px;
+            padding: 0 15px;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-camera-box .cam-name {
+            font-size: 11px;
             font-weight: 800;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            margin: 0 12px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .btn-camera.active {
-            background: var(--primary);
-            border-color: white;
-            box-shadow: 0 0 15px rgba(78, 115, 223, 0.5);
-            transform: scale(1.1);
+        .btn-camera-box .cam-status {
+            font-size: 9px;
+            opacity: 0.7;
+            margin-top: 2px;
         }
 
-        .btn-camera:hover {
-            background: rgba(0,0,0,0.8);
-            border-color: rgba(255,255,255,0.8);
+        .btn-camera-box.active {
+            border-color: var(--primary);
+            background: rgba(78, 115, 223, 0.2);
+            color: white;
+            box-shadow: 0 0 15px rgba(78, 115, 223, 0.3);
         }
 
-        .btn-camera.hidden {
-            display: none;
+        .btn-camera-box:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .btn-camera-box.error {
+            border-color: var(--danger);
+            color: #ff8a80;
+        }
+
+        @media (max-width: 576px) {
+            .dual-video-container {
+                flex-direction: column;
+            }
+            .video-wrapper {
+                padding-top: 120%; /* Taller for mobile to stack */
+            }
+            .btn-camera-box {
+                min-width: 80px;
+                padding: 0 10px;
+            }
         }
 
         .info-section {
@@ -579,9 +643,14 @@
 
                         <div class="video-section">
                             <div class="video-wrapper" id="videoWrapper">
-                                <div class="video-placeholder">
-                                    <i class="fas fa-video"></i>
-                                    <span>Đang tải camera...</span>
+                                <div class="single-video-container">
+                                    <div class="video-viewport" id="mainViewport">
+                                        <div class="camera-label" id="mainCameraLabel">CAMERA 1</div>
+                                        <div class="video-placeholder">
+                                            <i class="fas fa-video"></i>
+                                            <span id="mainViewportStatus">Đang tải Camera 1...</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="video-overlay">
                                     <div class="video-overlay-top">
@@ -594,15 +663,19 @@
                                         </div>
                                     </div>
                                     <div class="video-overlay-bottom">
-                                        <button class="btn-camera active" id="btnCam1" onclick="switchCamera(0)" title="Xem Camera 1">
-                                            Cam 1
-                                        </button>
+                                        <div class="btn-camera-box active" id="btnCam1" onclick="switchMainCamera(0)">
+                                            <span class="cam-name">Camera 1</span>
+                                            <span class="cam-status" id="statusCam1">Trực tiếp</span>
+                                        </div>
+                                        
                                         <button class="btn-fullscreen" onclick="toggleFullscreen()" title="Phóng to toàn màn hình">
                                             <i class="fas fa-expand"></i>
                                         </button>
-                                        <button class="btn-camera" id="btnCam2" onclick="switchCamera(1)" title="Xem Camera 2" style="display: none;">
-                                            Cam 2
-                                        </button>
+                                        
+                                        <div class="btn-camera-box" id="btnCam2" onclick="switchMainCamera(1)">
+                                            <span class="cam-name">Camera 2</span>
+                                            <span class="cam-status" id="statusCam2">Chờ kết nối</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -770,33 +843,37 @@
         }
         window.toggleFullscreen = toggleFullscreen;
 
-        function switchCamera(index) {
+        function switchMainCamera(index) {
             if (index === 1 && availableCameras.length < 2) {
-                showToast('Camera không tồn tại', 'warning');
+                showToast('Camera 2 không khả dụng', 'warning');
                 return;
             }
             
             currentCameraIndex = index;
             
-            // Update UI
+            // Update UI boxes active state
             document.getElementById('btnCam1').classList.toggle('active', index === 0);
             document.getElementById('btnCam2').classList.toggle('active', index === 1);
             
-            // Update placeholder text
-            const cameraName = availableCameras[index] ? availableCameras[index].name : `Camera ${index + 1}`;
-            const placeholderText = document.querySelector('.video-placeholder span');
-            if (placeholderText) {
-                placeholderText.textContent = `Đang kết nối ${cameraName}...`;
+            // Update the main viewport label and status
+            const camLabel = document.getElementById('mainCameraLabel');
+            const camStatus = document.getElementById('mainViewportStatus');
+            
+            camLabel.textContent = `CAMERA ${index + 1}`;
+            
+            if (availableCameras[index]) {
+                const cam = availableCameras[index];
+                camStatus.textContent = cam.status === 'online' ? `Trực tiếp: ${cam.name}` : `Đang kết nối ${cam.name}...`;
                 
-                // Simulate loading effect
-                placeholderText.parentElement.style.opacity = '0.5';
-                setTimeout(() => {
-                    placeholderText.textContent = `Trực tiếp: ${cameraName}`;
-                    placeholderText.parentElement.style.opacity = '1';
-                }, 1000);
+                // Add a quick flash effect to indicate switching
+                const viewport = document.getElementById('mainViewport');
+                viewport.style.opacity = '0.5';
+                setTimeout(() => viewport.style.opacity = '1', 200);
+            } else {
+                camStatus.textContent = `Không có Camera ${index + 1}`;
             }
         }
-        window.switchCamera = switchCamera;
+        window.switchMainCamera = switchMainCamera;
 
         function getStatusBadgeClass(status) {
             if (status === 'active' || status === 'normal') return 'success';
@@ -865,6 +942,7 @@
                 if (partialUpdate) {
                     updateEnvironment(data.environment);
                     updateDevices(data.devices);
+                    updateCameraStatus(data.devices);
                 } else {
                     renderCoopDetail(data);
                 }
@@ -876,6 +954,42 @@
                         window.location.href = 'camera.html';
                     }, 2000);
                 }
+            }
+        }
+
+        function updateCameraStatus(devices) {
+            const cameras = (devices || []).filter(d => d.type === 'camera');
+            availableCameras = cameras; // Store global reference
+            
+            // Cam 1 status box
+            const status1 = document.getElementById('statusCam1');
+            const box1 = document.getElementById('btnCam1');
+            if (cameras[0]) {
+                const isOnline = cameras[0].status === 'online';
+                status1.textContent = isOnline ? 'Trực tiếp' : (cameras[0].status === 'connecting' ? 'Kết nối...' : 'Mất tín hiệu');
+                box1.classList.toggle('error', !isOnline && cameras[0].status !== 'connecting');
+            }
+
+            // Cam 2 status box
+            const status2 = document.getElementById('statusCam2');
+            const box2 = document.getElementById('btnCam2');
+            if (cameras[1]) {
+                const isOnline = cameras[1].status === 'online';
+                status2.textContent = isOnline ? 'Trực tiếp' : (cameras[1].status === 'connecting' ? 'Kết nối...' : 'Mất tín hiệu');
+                box2.classList.toggle('error', !isOnline && cameras[1].status !== 'connecting');
+                box2.style.opacity = '1';
+                box2.style.pointerEvents = 'auto';
+            } else {
+                status2.textContent = 'Không khả dụng';
+                box2.style.opacity = '0.5';
+                box2.style.pointerEvents = 'none';
+            }
+
+            // Update main viewport text if it matches current selection
+            const camStatus = document.getElementById('mainViewportStatus');
+            if (cameras[currentCameraIndex]) {
+                const cam = cameras[currentCameraIndex];
+                camStatus.textContent = cam.status === 'online' ? `Trực tiếp: ${cam.name}` : `Đang kết nối ${cam.name}...`;
             }
         }
 
@@ -892,25 +1006,11 @@
 
             // Handle cameras
             availableCameras = (data.devices || []).filter(d => d.type === 'camera');
-            const btnCam2 = document.getElementById('btnCam2');
             
-            if (availableCameras.length >= 2) {
-                btnCam2.style.display = 'flex';
-                
-                // Task 33: Notify if more than 2 cameras
-                if (availableCameras.length > 2) {
-                    showToast('Phiên bản hiện tải chỉ có thể tích hợp được 2 camera xin lỗi vì sự bất tiện này', 'warning');
-                }
-            } else {
-                btnCam2.style.display = 'none';
-            }
-            
-            // Set initial placeholder text
-            const placeholderText = document.querySelector('.video-placeholder span');
-            if (placeholderText && availableCameras.length > 0) {
-                placeholderText.textContent = `Trực tiếp: ${availableCameras[currentCameraIndex] ? availableCameras[currentCameraIndex].name : availableCameras[0].name}`;
-            }
+            // Initial call to set active camera (default 0)
+            switchMainCamera(currentCameraIndex);
 
+            updateCameraStatus(data.devices);
             updateEnvironment(data.environment);
             updateDevices(data.devices);
 

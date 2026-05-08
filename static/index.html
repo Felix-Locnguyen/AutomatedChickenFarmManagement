@@ -1146,7 +1146,7 @@
                             statusText = 'Đang chờ';
                         } else {
                             statusClass = 'offline';
-                            statusText = 'Ngắt kết nối';
+                            statusText = DeviceStatus.getText(status);
                         }
 
                         return `
@@ -1214,7 +1214,7 @@
                     });
 
                     window.wsManager.subscribe(window.WS_EVENTS.WS_DISCONNECTED, () => {
-                        showToast('Mất kết nối, đang thử lại...', 'warning');
+                        showToast('Lỗi kết nối, đang thử lại...', 'warning');
                     });
 
                 } else {

@@ -244,16 +244,30 @@ def seed_devices(coops):
 
         # 4. Camera (chỉ cho chuồng có has_camera=1)
         if coop.has_camera:
-            camera_device = Device(
-                name=f'Camera giám sát {coop.name[-1]}',
+            # Camera 1
+            camera_1 = Device(
+                name=f'Camera 1 - {coop.name}',
                 type='camera',
                 mac_address=f'CC:AA:BB:DD:EE:{str(device_index).zfill(2)}',
                 status=random.choice(statuses),
                 is_active=True,
                 battery=100
             )
-            db.session.add(camera_device)
-            coop_devices_map[coop.id].append(camera_device)
+            db.session.add(camera_1)
+            coop_devices_map[coop.id].append(camera_1)
+            device_index += 1
+
+            # Camera 2
+            camera_2 = Device(
+                name=f'Camera 2 - {coop.name}',
+                type='camera',
+                mac_address=f'CC:AA:BB:DD:EE:{str(device_index).zfill(2)}',
+                status=random.choice(statuses),
+                is_active=True,
+                battery=100
+            )
+            db.session.add(camera_2)
+            coop_devices_map[coop.id].append(camera_2)
             device_index += 1
         
         count = len(coop_devices_map[coop.id])

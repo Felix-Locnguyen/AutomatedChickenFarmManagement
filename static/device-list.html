@@ -2442,7 +2442,7 @@
                     const sortedDevices = sortDevicesByStatus(devices);
 
                     deviceContainer.innerHTML = sortedDevices.map(device => {
-                        const statusText = device.status === 'online' ? 'Đã kết nối' : device.status === 'connecting' ? 'Đang kết nối' : 'Mất kết nối';
+                        const statusText = DeviceStatus.getText(device.status);
                         return `
                         <div class="device-card status-${device.status || 'offline'}"
                              data-device-id="${device.id}"
@@ -2521,11 +2521,11 @@
                         <div class="device-recent-card ${device.status || 'offline'}">
                             <div class="device-recent-header">
                                 <span class="device-recent-name">${device.name || 'Thiết bị ' + device.id}</span>
-                                <span class="device-recent-coop">${device.status === 'online' ? 'Đã kết nối' : device.status === 'offline' ? 'Offline' : 'Chờ'}</span>
+                                <span class="device-recent-coop">${DeviceStatus.getText(device.status)}</span>
                             </div>
                             <div class="device-recent-status">
-                                <span class="status-dot ${device.status || 'offline'}"></span>
-                                <span class="status-text ${device.status || 'offline'}">${device.status === 'online' ? 'Hoạt động' : device.status === 'offline' ? 'Ngắt kết nối' : 'Đang chờ'}</span>
+                                <span class="status-dot ${DeviceStatus.getClass(device.status)}"></span>
+                                <span class="status-text ${DeviceStatus.getClass(device.status)}">${DeviceStatus.getText(device.status)}</span>
                             </div>
                         </div>
                     `).join('');
