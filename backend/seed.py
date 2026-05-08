@@ -181,52 +181,37 @@ def seed_coops():
 
 def seed_devices(coops):
     """
-    Tạo 15 thiết bị IoT (3 thiết bị/ chuồng) + camera cho chuồng có camera.
+    Tạo thiết bị IoT cho mỗi chuồng.
     
     Mỗi chuồng được gán:
     - 01 Cảm biến nhiệt độ (type: temperature)
     - 01 Cảm biến độ ẩm (type: humidity)
     - 01 Thiết bị điều khiển (type: fan hoặc light)
     - 01 Camera (type: camera) - chỉ cho chuồng có has_camera=1
-    
-    Trạng thái thiết bị (status) được phân bổ ngẫu nhiên:
-    - online: Đang kết nối
-    - offline: Không kết nối
-    - connecting: Đang kết nối
-    
-    Loại thiết bị (type):
-    - temperature: Cảm biến nhiệt độ
-    - humidity: Cảm biến độ ẩm
-    - fan: Quạt thông gió
-    - light: Đèn chiếu sáng
-    - camera: Camera giám sát
     """
     print("  Đang tạo thiết bị IoT...")
     
-    # Các loại trạng thái kết nối
     statuses = ['online', 'offline', 'connecting']
-    
-    # Các loại thiết bị điều khiển
     control_types = ['fan', 'light']
     
-    devices = []
-    camera_devices = []  # Lưu camera để gán sau
-    device_index = 1  # Số thứ tự thiết bị (để tạo tên duy nhất)
+    # Dictionary lưu danh sách thiết bị theo coop_id
+    coop_devices_map = {}
+    device_index = 1
     
     for coop in coops:
-        # Tạo 3 thiết bị cho mỗi chuồng
+        coop_devices_map[coop.id] = []
         
         # 1. Cảm biến nhiệt độ
         temp_device = Device(
             name=f'Cảm biến nhiệt {coop.name[-1]}',
             type='temperature',
             mac_address=f'AA:BB:CC:DD:EE:{str(device_index).zfill(2)}',
-            status=random.choice(statuses),  # Trạng thái ngẫu nhiên
+            status=random.choice(statuses),
             is_active=True,
-            battery=random.randint(60, 100)  # Pin: 60-100%
+            battery=random.randint(60, 100)
         )
         db.session.add(temp_device)
-        devices.append(temp_device)
+        coop_devices_map[coop.id].append(temp_device)
         device_index += 1
         
         # 2. Cảm biến độ ẩm
@@ -239,10 +224,10 @@ def seed_devices(coops):
             battery=random.randint(60, 100)
         )
         db.session.add(humid_device)
-        devices.append(humid_device)
+        coop_devices_map[coop.id].append(humid_device)
         device_index += 1
         
-        # 3. Thiết bị điều khiển (quạt hoặc đèn)
+        # 3. Thiết bị điều khiển
         control_type = random.choice(control_types)
         control_name = 'Quạt thông gió' if control_type == 'fan' else 'Đèn LED'
         control_device = Device(
@@ -254,47 +239,55 @@ def seed_devices(coops):
             battery=random.randint(60, 100)
         )
         db.session.add(control_device)
-        devices.append(control_device)
+        coop_devices_map[coop.id].append(control_device)
         device_index += 1
+
+        # 4. Camera (chỉ cho chuồng có has_camera=1)
+        if coop.has_camera:
+            camera_device = Device(
+                name=f'Camera giám sát {coop.name[-1]}',
+                type='camera',
+                mac_address=f'CC:AA:BB:DD:EE:{str(device_index).zfill(2)}',
+                status=random.choice(statuses),
+                is_active=True,
+                battery=100
+            )
+            db.session.add(camera_device)
+            coop_devices_map[coop.id].append(camera_device)
+            device_index += 1
         
-        print(f"    [OK] {coop.name}: 3 thiết bị đã tạo")
+        count = len(coop_devices_map[coop.id])
+        print(f"    [OK] {coop.name}: {count} thiết bị đã tạo")
     
     db.session.commit()
-    return devices
+    return coop_devices_map
 
 
 # =============================================================================
 # GÁN THIẾT BỊ VÀO CHUỒNG (Bảng trung gian CoopDevice)
 # =============================================================================
 
-def seed_coop_devices(coops, devices):
+def seed_coop_devices(coops, coop_devices_map):
     """
     Gán thiết bị vào các chuồng thông qua bảng trung gian CoopDevice.
-    
-    Bảng CoopDevice thiết lập quan hệ Many-to-Many giữa Coop và Device.
-    Mỗi bản ghi cho biết thiết bị nào đang hoạt động trong chuồng nào.
     """
     print("  Đang gán thiết bị vào chuồng...")
     
-    device_idx = 0  # Chỉ số thiết bị trong danh sách devices
-    
     for coop in coops:
-        # Mỗi chuồng có 3 thiết bị (theo thứ tự: temp, humid, control)
-        for i in range(3):
+        devices = coop_devices_map.get(coop.id, [])
+        for device in devices:
             # Kiểm tra nếu đã tồn tại thì bỏ qua
             existing = CoopDevice.query.filter_by(
                 coop_id=coop.id,
-                device_id=devices[device_idx].id
+                device_id=device.id
             ).first()
             
             if not existing:
                 coop_device = CoopDevice(
                     coop_id=coop.id,
-                    device_id=devices[device_idx].id
+                    device_id=device.id
                 )
                 db.session.add(coop_device)
-            
-            device_idx += 1
     
     db.session.commit()
     print("    [OK] Đã gán thiết bị vào chuồng")
@@ -403,6 +396,46 @@ def seed_feed_schedules(coops):
         print(f"    [OK] {coop.name}: 3 lịch cho ăn (06:00, 12:00, 18:00)")
     
     db.session.commit()
+
+
+# =============================================================================
+# SEED THIẾT BỊ CHƯA KẾT NỐI
+# =============================================================================
+
+def seed_unconnected_devices():
+    """
+    Tạo một số thiết bị mẫu chưa kết nối để demo tính năng quét thiết bị.
+    """
+    print("  Đang tạo thiết bị chưa kết nối...")
+    
+    from models import UnconnectedDevice
+    
+    # Xóa dữ liệu cũ
+    UnconnectedDevice.query.delete()
+    
+    devices = [
+        {'name': 'Cảm biến nhiệt độ mới', 'type': 'temperature', 'mac_address': 'FF:EE:DD:CC:BB:01'},
+        {'name': 'Cảm biến độ ẩm mới', 'type': 'humidity', 'mac_address': 'FF:EE:DD:CC:BB:02'},
+        {'name': 'Quạt công nghiệp', 'type': 'fan', 'mac_address': 'FF:EE:DD:CC:BB:03'},
+        {'name': 'Đèn sưởi thông minh', 'type': 'light', 'mac_address': 'FF:EE:DD:CC:BB:04'},
+        {'name': 'Máy cho ăn tự động v2', 'type': 'feeder', 'mac_address': 'FF:EE:DD:CC:BB:05'},
+        {'name': 'Camera AI 4K', 'type': 'camera', 'mac_address': 'FF:EE:DD:CC:BB:06'},
+        {'name': 'Camera hồng ngoại', 'type': 'camera', 'mac_address': 'FF:EE:DD:CC:BB:07'},
+    ]
+    
+    for d in devices:
+        unconnected = UnconnectedDevice(
+            name=d['name'],
+            type=d['type'],
+            mac_address=d['mac_address'],
+            status='online',
+            is_active=False,
+            battery=100
+        )
+        db.session.add(unconnected)
+    
+    db.session.commit()
+    print(f"    [OK] Đã tạo {len(devices)} thiết bị chưa kết nối")
 
 
 # =============================================================================
@@ -548,6 +581,10 @@ def run_seed():
         # Bước 7: Seed FeedSchedules
         print("\n[7] Seed FeedSchedules...")
         seed_feed_schedules(coops)
+
+        # Bước 7.1: Seed Unconnected Devices
+        print("\n[7.1] Seed Unconnected Devices...")
+        seed_unconnected_devices()
         
         # Bước 8: Seed Alerts
         print("\n[8] Seed Alerts...")

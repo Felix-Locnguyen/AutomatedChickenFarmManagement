@@ -50,8 +50,8 @@ def get_dashboard():
             "timestamp": "2025-01-01T00:00:00"
         }
     """
-    coops = Coop.query.all()
-    devices = Device.query.all()
+    coops = Coop.query.filter_by(deleted=False).all()
+    devices = Device.query.filter_by(deleted=False).all()
     
     # Thống kê cơ bản
     total_coops = len(coops)
@@ -67,14 +67,14 @@ def get_dashboard():
     
     for coop in coops:
         # Lấy dữ liệu môi trường mới nhất của chuồng
-        env = Environment.query.filter_by(coop_id=coop.id).order_by(Environment.recorded_at.desc()).first()
+        env = Environment.query.filter_by(coop_id=coop.id, deleted=False).order_by(Environment.recorded_at.desc()).first()
         
         if env:
             avg_temperature += env.temperature or 0
             avg_humidity += env.humidity or 0
         
         # Đếm số thiết bị trong chuồng
-        coop_devices = CoopDevice.query.filter_by(coop_id=coop.id).count()
+        coop_devices = CoopDevice.query.filter_by(coop_id=coop.id, deleted=False).count()
         
         # Thêm vào danh sách thống kê
         coop_stats.append({
@@ -89,9 +89,18 @@ def get_dashboard():
         })
     
     # Tính trung bình
-    if total_coops > 0:
-        avg_temperature /= total_coops
-        avg_humidity /= total_coops
+    if len(coops) > 0:
+        # Chỉ tính trung bình trên các chuồng có dữ liệu môi trường để chính xác hơn
+        coops_with_env = [c for c in coop_stats if c['temperature'] is not None]
+        if len(coops_with_env) > 0:
+            avg_temp = sum(c['temperature'] for c in coops_with_env) / len(coops_with_env)
+            avg_humid = sum(c['humidity'] for c in coops_with_env) / len(coops_with_env)
+        else:
+            avg_temp = 0
+            avg_humid = 0
+    else:
+        avg_temp = 0
+        avg_humid = 0
     
     return jsonify({
         'total_coops': total_coops,
@@ -99,8 +108,8 @@ def get_dashboard():
         'online_devices': online_devices,
         'offline_devices': offline_devices,
         'connecting_devices': connecting_devices,
-        'avg_temperature': round(avg_temperature, 1),
-        'avg_humidity': round(avg_humidity, 1),
+        'avg_temperature': round(avg_temp, 1),
+        'avg_humidity': round(avg_humid, 1),
         'coops': coop_stats,
         'timestamp': datetime.now().isoformat()
     }), 200
@@ -130,20 +139,20 @@ def get_stats():
             "coop_status": {"active": 3, "cleaning": 1, "empty": 1}
         }
     """
-    chicken_count = db.session.query(func.sum(Coop.current_count)).scalar() or 0
-    total_capacity = db.session.query(func.sum(Coop.capacity)).scalar() or 0
-    online_devices = Device.query.filter(Device.status == 'online').count()
-    unresolved_alerts = Alert.query.filter(Alert.is_resolved == False).count()
+    chicken_count = db.session.query(func.sum(Coop.current_count)).filter(Coop.deleted == False).scalar() or 0
+    total_capacity = db.session.query(func.sum(Coop.capacity)).filter(Coop.deleted == False).scalar() or 0
+    online_devices = Device.query.filter(Device.status == 'online', Device.deleted == False).count()
+    unresolved_alerts = Alert.query.filter(Alert.is_resolved == False, Alert.deleted == False).count()
     
     coop_status = {
-        'active': Coop.query.filter(Coop.status == 'active').count(),
-        'cleaning': Coop.query.filter(Coop.status == 'cleaning').count(),
-        'empty': Coop.query.filter(Coop.status == 'empty').count()
+        'active': Coop.query.filter(Coop.status == 'active', Coop.deleted == False).count(),
+        'cleaning': Coop.query.filter(Coop.status == 'cleaning', Coop.deleted == False).count(),
+        'empty': Coop.query.filter(Coop.status == 'empty', Coop.deleted == False).count()
     }
     
     return jsonify({
-        'total_coops': Coop.query.count(),
-        'total_devices': Device.query.count(),
+        'total_coops': Coop.query.filter_by(deleted=False).count(),
+        'total_devices': Device.query.filter_by(deleted=False).count(),
         'total_chickens': chicken_count,
         'total_capacity': total_capacity,
         'online_devices': online_devices,
@@ -172,6 +181,7 @@ def get_alerts():
     limit = request.args.get('limit', 10, type=int)
     alerts = Alert.query.filter(
         Alert.is_resolved == False,
+        Alert.deleted == False,
         Alert.level.in_(['critical', 'warning'])
     ).order_by(Alert.created_at.desc()).limit(limit).all()
     
@@ -311,12 +321,14 @@ def get_recent_activities():
     activities = []
     
     # Lấy 5 bản ghi môi trường mới nhất
-    recent_environments = Environment.query.order_by(Environment.recorded_at.desc()).limit(5).all()
+    recent_environments = Environment.query.filter_by(deleted=False).order_by(Environment.recorded_at.desc()).limit(5).all()
     for env in recent_environments:
-        coop = Coop.query.get(env.coop_id)
+        coop = Coop.query.filter_by(id=env.coop_id, deleted=False).first()
+        if not coop: continue
+        
         activities.append({
             'type': 'environment',
-            'coop': coop.name if coop else 'Unknown',
+            'coop': coop.name,
             'temperature': env.temperature,
             'humidity': env.humidity,
             'timestamp': env.recorded_at.isoformat() if env.recorded_at else None

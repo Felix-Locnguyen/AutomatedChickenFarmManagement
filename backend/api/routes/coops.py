@@ -20,6 +20,12 @@ import os
 # Thêm đường dẫn parent vào sys.path để có thể import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from models import db, Coop, CoopDevice, Device, Environment
+from websocket import (
+    broadcast_device_update, 
+    broadcast_coop_update, 
+    broadcast_dashboard_update,
+    broadcast_coop_deleted
+)
 
 # Tạo Blueprint cho routes liên quan đến chuồng
 # URL: /api/coops
@@ -167,6 +173,10 @@ def remove_device_from_coop(coop_id, device_id):
     # Xóa thiết bị
     db.session.delete(device)
     db.session.commit()
+    
+    # Task 34: Broadcast update
+    broadcast_coop_update(coop_id)
+    broadcast_dashboard_update()
     
     return jsonify({'message': 'Device removed from coop'}), 200
 
@@ -480,6 +490,10 @@ def delete_coop(coop_id):
             cd.deleted = True
 
         db.session.commit()
+
+        # Task 34: Broadcast update
+        broadcast_coop_deleted(coop_id)
+        broadcast_dashboard_update()
 
         return jsonify({
             'message': 'Coop deleted successfully',

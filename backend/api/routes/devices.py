@@ -30,6 +30,11 @@ import os
 # Thêm đường dẫn parent vào sys.path để có thể import models
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from models import db, Device, CoopDevice, UnconnectedDevice
+from websocket import (
+    broadcast_device_update, 
+    broadcast_coop_update, 
+    broadcast_dashboard_update
+)
 
 # Tạo Blueprint cho routes liên quan đến thiết bị
 # URL: /api/devices
@@ -162,6 +167,10 @@ def toggle_public_device(device_id):
     device.is_active = not device.is_active
     db.session.commit()
     
+    # Task 34: Broadcast update
+    broadcast_device_update(device_id)
+    broadcast_dashboard_update()
+    
     return jsonify({
         'message': 'Device toggled',
         'is_active': device.is_active,
@@ -226,6 +235,11 @@ def add_device_to_coop():
     db.session.delete(unconnected)
     db.session.commit()
     
+    # Task 34: Broadcast update
+    broadcast_coop_update(coop_id)
+    broadcast_device_update(device.id)
+    broadcast_dashboard_update()
+    
     return jsonify({
         'message': 'Device added to coop',
         'device': device.to_dict()
@@ -285,6 +299,11 @@ def remove_device_from_coop(device_id):
     # Xóa thiết bị
     db.session.delete(device)
     db.session.commit()
+    
+    # Task 34: Broadcast update
+    for coop_id in coop_ids:
+        broadcast_coop_update(coop_id)
+    broadcast_dashboard_update()
     
     return jsonify({'message': 'Device removed from coop and added to unconnected list'}), 200
 
@@ -483,11 +502,21 @@ def delete_device(device_id):
     if not device:
         return jsonify({'error': 'Device not found'}), 404
     
+    # Lấy danh sách chuồng trước khi xóa
+    coop_devices = CoopDevice.query.filter_by(device_id=device_id).all()
+    coop_ids = [cd.coop_id for cd in coop_devices]
+    
     # Xóa các liên kết với chuồng trước
     CoopDevice.query.filter_by(device_id=device_id).delete()
     # Xóa thiết bị
     db.session.delete(device)
     db.session.commit()
+    
+    # Task 34: Broadcast update
+    for coop_id in coop_ids:
+        broadcast_coop_update(coop_id)
+    broadcast_device_update(device_id)
+    broadcast_dashboard_update()
     
     return jsonify({'message': 'Device deleted'}), 200
 
@@ -519,6 +548,10 @@ def toggle_device(device_id):
     device.is_active = not device.is_active
     
     db.session.commit()
+    
+    # Task 34: Broadcast update
+    broadcast_device_update(device_id)
+    broadcast_dashboard_update()
     
     return jsonify({
         'message': 'Device toggled',
@@ -573,6 +606,11 @@ def assign_device_to_coop(device_id):
     db.session.add(coop_device)
     db.session.commit()
     
+    # Task 34: Broadcast update
+    broadcast_coop_update(coop_id)
+    broadcast_device_update(device_id)
+    broadcast_dashboard_update()
+    
     return jsonify({'message': 'Device assigned to coop', 'coop_device': {
         'coop_id': coop_id,
         'device_id': device_id,
@@ -616,6 +654,10 @@ def update_device_name(device_id):
     device.status = 'online'
     
     db.session.commit()
+    
+    # Task 34: Broadcast update
+    broadcast_device_update(device_id)
+    broadcast_dashboard_update()
     
     return jsonify({
         'message': 'Device name updated',
@@ -679,6 +721,7 @@ def get_recent_devices():
             'id': device.id,
             'device_name': device.name,
             'status': device.status,
+            'type': device.type,
             'coop_name': coop_name
         })
 

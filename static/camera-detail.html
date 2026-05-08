@@ -179,6 +179,40 @@
             box-shadow: 0 4px 15px rgba(255,255,255,0.3);
         }
 
+        .btn-camera {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: 800;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            margin: 0 12px;
+            text-transform: uppercase;
+        }
+
+        .btn-camera.active {
+            background: var(--primary);
+            border-color: white;
+            box-shadow: 0 0 15px rgba(78, 115, 223, 0.5);
+            transform: scale(1.1);
+        }
+
+        .btn-camera:hover {
+            background: rgba(0,0,0,0.8);
+            border-color: rgba(255,255,255,0.8);
+        }
+
+        .btn-camera.hidden {
+            display: none;
+        }
+
         .info-section {
             width: 100%;
         }
@@ -560,8 +594,14 @@
                                         </div>
                                     </div>
                                     <div class="video-overlay-bottom">
+                                        <button class="btn-camera active" id="btnCam1" onclick="switchCamera(0)" title="Xem Camera 1">
+                                            Cam 1
+                                        </button>
                                         <button class="btn-fullscreen" onclick="toggleFullscreen()" title="Phóng to toàn màn hình">
                                             <i class="fas fa-expand"></i>
+                                        </button>
+                                        <button class="btn-camera" id="btnCam2" onclick="switchCamera(1)" title="Xem Camera 2" style="display: none;">
+                                            Cam 2
                                         </button>
                                     </div>
                                 </div>
@@ -711,6 +751,9 @@
 
         const loadingOverlay = document.getElementById('loadingOverlay');
         const dataContent = document.getElementById('dataContent');
+        
+        let availableCameras = [];
+        let currentCameraIndex = 0;
 
         function updateTimestamp() {
             const now = new Date();
@@ -726,6 +769,34 @@
             fs.classList.toggle('show');
         }
         window.toggleFullscreen = toggleFullscreen;
+
+        function switchCamera(index) {
+            if (index === 1 && availableCameras.length < 2) {
+                showToast('Camera không tồn tại', 'warning');
+                return;
+            }
+            
+            currentCameraIndex = index;
+            
+            // Update UI
+            document.getElementById('btnCam1').classList.toggle('active', index === 0);
+            document.getElementById('btnCam2').classList.toggle('active', index === 1);
+            
+            // Update placeholder text
+            const cameraName = availableCameras[index] ? availableCameras[index].name : `Camera ${index + 1}`;
+            const placeholderText = document.querySelector('.video-placeholder span');
+            if (placeholderText) {
+                placeholderText.textContent = `Đang kết nối ${cameraName}...`;
+                
+                // Simulate loading effect
+                placeholderText.parentElement.style.opacity = '0.5';
+                setTimeout(() => {
+                    placeholderText.textContent = `Trực tiếp: ${cameraName}`;
+                    placeholderText.parentElement.style.opacity = '1';
+                }, 1000);
+            }
+        }
+        window.switchCamera = switchCamera;
 
         function getStatusBadgeClass(status) {
             if (status === 'active' || status === 'normal') return 'success';
@@ -818,6 +889,27 @@
             const statusEl = document.getElementById('coopStatus');
             statusEl.className = 'badge badge-' + getStatusBadgeClass(coop.status);
             statusEl.textContent = getStatusText(coop.status);
+
+            // Handle cameras
+            availableCameras = (data.devices || []).filter(d => d.type === 'camera');
+            const btnCam2 = document.getElementById('btnCam2');
+            
+            if (availableCameras.length >= 2) {
+                btnCam2.style.display = 'flex';
+                
+                // Task 33: Notify if more than 2 cameras
+                if (availableCameras.length > 2) {
+                    showToast('Phiên bản hiện tải chỉ có thể tích hợp được 2 camera xin lỗi vì sự bất tiện này', 'warning');
+                }
+            } else {
+                btnCam2.style.display = 'none';
+            }
+            
+            // Set initial placeholder text
+            const placeholderText = document.querySelector('.video-placeholder span');
+            if (placeholderText && availableCameras.length > 0) {
+                placeholderText.textContent = `Trực tiếp: ${availableCameras[currentCameraIndex] ? availableCameras[currentCameraIndex].name : availableCameras[0].name}`;
+            }
 
             updateEnvironment(data.environment);
             updateDevices(data.devices);

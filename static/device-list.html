@@ -2415,6 +2415,20 @@
             });
         }
 
+        // Lấy icon theo loại thiết bị
+        function getDeviceIcon(type) {
+            const icons = {
+                'temperature': 'fa-thermometer-half',
+                'humidity': 'fa-tint',
+                'fan': 'fa-fan',
+                'light': 'fa-lightbulb',
+                'feeder': 'fa-drumstick-bite',
+                'camera': 'fa-video',
+                'sensor': 'fa-wifi'
+            };
+            return icons[type] || 'fa-wifi';
+        }
+
         async function loadDevices() {
             try {
                 const devices = await devicesAPI.getAll();
@@ -2440,7 +2454,7 @@
                             </div>
                             <div class="device-card-row device-card-info">
                                 <span><i class="fas fa-battery-full"></i> ${device.battery || 0}%</span>
-                                <span><i class="fas fa-wifi"></i> ${statusText}</span>
+                                <span><i class="fas ${getDeviceIcon(device.type)}"></i> ${statusText}</span>
                             </div>
                             <div class="device-card-row device-card-actions">
                                 ${device.status === 'online' ? `
