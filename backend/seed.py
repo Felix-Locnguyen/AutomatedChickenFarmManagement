@@ -419,13 +419,15 @@ def seed_feed_schedules(coops):
 def seed_unconnected_devices():
     """
     Tạo một số thiết bị mẫu chưa kết nối để demo tính năng quét thiết bị.
+    Tạo cả Device records và UnconnectedDevice records để test flow mới.
     """
     print("  Đang tạo thiết bị chưa kết nối...")
     
-    from models import UnconnectedDevice
+    from models import Device, UnconnectedDevice
     
     # Xóa dữ liệu cũ
     UnconnectedDevice.query.delete()
+    Device.query.filter(Device.status == 'pending').delete()
     
     devices = [
         {'name': 'Cảm biến nhiệt độ mới', 'type': 'temperature', 'mac_address': 'FF:EE:DD:CC:BB:01'},
@@ -438,18 +440,32 @@ def seed_unconnected_devices():
     ]
     
     for d in devices:
+        # Tạo Device record trước (để có device_id)
+        device = Device(
+            name=d['name'],
+            type=d['type'],
+            mac_address=d['mac_address'],
+            status='pending',  # Status 'pending' để eligible cho add-to-coop
+            is_active=False,
+            battery=100
+        )
+        db.session.add(device)
+        db.session.flush()  # Lấy device.id
+    
+        # Tạo UnconnectedDevice với device_id trỏ tới Device
         unconnected = UnconnectedDevice(
             name=d['name'],
             type=d['type'],
             mac_address=d['mac_address'],
-            status='online',
+            status='pending',
             is_active=False,
-            battery=100
+            battery=100,
+            device_id=device.id  # Liên kết với Device
         )
         db.session.add(unconnected)
     
     db.session.commit()
-    print(f"    [OK] Đã tạo {len(devices)} thiết bị chưa kết nối")
+    print(f"    [OK] Đã tạo {len(devices)} thiết bị chưa kết nối (với Device records)")
 
 
 # =============================================================================

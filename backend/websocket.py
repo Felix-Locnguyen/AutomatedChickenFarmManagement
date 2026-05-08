@@ -100,9 +100,10 @@ def handle_connect():
             
             # Trạng thái thiết bị
             device_status_counts = {
-                'online': len([d for d in devices if d.status == 'online']),
-                'offline': len([d for d in devices if d.status == 'offline']),
-                'waiting': len([d for d in devices if d.status == 'connecting'])
+                'active': len([d for d in devices if d.is_active and d.status == 'online']),
+                'error': len([d for d in devices if d.is_active and d.status == 'offline']),
+                'connecting': len([d for d in devices if d.is_active and d.status == 'connecting']),
+                'waiting': len([d for d in devices if not d.is_active])
             }
             
             # Gửi dữ liệu cho client vừa kết nối

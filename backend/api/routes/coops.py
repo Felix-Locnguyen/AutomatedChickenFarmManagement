@@ -131,7 +131,7 @@ def get_public_coop_devices(coop_id):
 @coops_bp.route('/public/<int:coop_id>/devices/<int:device_id>', methods=['DELETE'])
 def remove_device_from_coop(coop_id, device_id):
     """
-    Gỡ thiết bị khỏi chuồng (Không cần auth - cho demo).
+    Gỡ thiết bị khỏi chuồng và thêm vào danh sách unconnected (Giữ nguyên Device).
     
     Args:
         coop_id (int): ID của chuồng
@@ -156,25 +156,29 @@ def remove_device_from_coop(coop_id, device_id):
     if not coop_device:
         return jsonify({'error': 'Device not in this coop'}), 404
     
-    # Thêm vào unconnected list
+    # Cập nhật trạng thái thiết bị (không xóa)
+    device.status = 'offline'
+    device.is_active = False
+    
+    # Thêm vào unconnected list VỚI device_id trỏ tới Device
     unconnected = UnconnectedDevice(
         name=device.name,
         type=device.type,
         mac_address=device.mac_address,
-        status=device.status,
-        is_active=device.is_active,
-        battery=device.battery
+        status='offline',
+        is_active=False,
+        battery=device.battery,
+        device_id=device.id  # Liên kết với Device
     )
     db.session.add(unconnected)
     
     # Gỡ liên kết với chuồng
     db.session.delete(coop_device)
     
-    # Xóa thiết bị
-    db.session.delete(device)
+    # Commit
     db.session.commit()
     
-    # Task 34: Broadcast update
+    # Broadcast update
     broadcast_coop_update(coop_id)
     broadcast_dashboard_update()
     

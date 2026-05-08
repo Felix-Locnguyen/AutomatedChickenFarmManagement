@@ -57,8 +57,9 @@ def get_dashboard():
     total_coops = len(coops)
     total_devices = len(devices)
     online_devices = len([d for d in devices if d.status == 'online' and d.is_active == True])
-    offline_devices = len([d for d in devices if d.status == 'offline'])
-    connecting_devices = len([d for d in devices if d.status == 'connecting'])
+    offline_devices = len([d for d in devices if d.status == 'offline' and d.is_active == True])
+    connecting_devices = len([d for d in devices if d.status == 'connecting' and d.is_active == True])
+    waiting_devices = len([d for d in devices if d.is_active == False])
     
     # Tính trung bình nhiệt độ và độ ẩm
     avg_temperature = 0
@@ -108,6 +109,7 @@ def get_dashboard():
         'online_devices': online_devices,
         'offline_devices': offline_devices,
         'connecting_devices': connecting_devices,
+        'waiting_devices': waiting_devices,
         'avg_temperature': round(avg_temp, 1),
         'avg_humidity': round(avg_humid, 1),
         'coops': coop_stats,

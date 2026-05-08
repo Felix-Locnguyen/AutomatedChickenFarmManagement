@@ -57,6 +57,43 @@ def get_unconnected_devices():
     return jsonify([device.to_dict() for device in devices]), 200
 
 
+@devices_bp.route('/public/unconnected/available', methods=['GET'])
+def get_available_unconnected_devices():
+    """
+    Lấy danh sách thiết bị có thể thêm vào chuồng (từ bảng unconnected_devices).
+    
+    Chỉ trả về thiết bị:
+    - Có device_id (đã được tạo trong bảng Device)
+    - Không bị xóa (deleted = 0)
+    - Có status KHÔNG trong ('online', 'connecting', 'offline')
+    - Chưa được gắn vào chuồng nào (không có trong coop_devices)
+    
+    Returns:
+        200: Array of device objects {id, name, type, mac_address}
+    """
+    # Query: Join unconnected_devices với devices, lọc theo điều kiện
+    results = db.session.query(Device).join(
+        UnconnectedDevice, UnconnectedDevice.device_id == Device.id
+    ).filter(
+        Device.deleted == False,
+        Device.status.notin_(['online', 'connecting', 'offline'])
+    ).all()
+    
+    # Lọc bỏ các device đã có trong coop_devices
+    attached_device_ids = [cd.device_id for cd in 
+                           db.session.query(CoopDevice.device_id).filter_by(deleted=False).all()]
+    
+    available = [d for d in results if d.id not in attached_device_ids]
+    
+    return jsonify([{
+        'id': d.id,
+        'name': d.name,
+        'type': d.type,
+        'mac_address': d.mac_address,
+        'status': d.status
+    } for d in available]), 200
+
+
 @devices_bp.route('/public/unconnected', methods=['POST'])
 def add_unconnected_device():
     """
@@ -244,6 +281,83 @@ def add_device_to_coop():
         'message': 'Device added to coop',
         'device': device.to_dict()
     }), 201
+
+
+@devices_bp.route('/public/attach-to-coop', methods=['POST'])
+def attach_device_to_coop():
+    """
+    Thêm thiết bị có sẵn (từ unconnected_devices) vào chuồng (3-step transaction).
+    
+    Bước 1: INSERT INTO coop_devices (coop_id, device_id)
+    Bước 2: DELETE FROM unconnected_devices WHERE device_id = :device_id
+    Bước 3: UPDATE devices SET status = 'connecting', is_active = 1 WHERE id = :device_id
+    
+    Args:
+        Request Body (JSON):
+            - device_id (int): ID thiết bị trong bảng Device (từ unconnected)
+            - coop_id (int): ID chuồng
+            
+    Returns:
+        200: Device object đã thêm vào coop
+        400: Thiếu thông tin
+        404: Không tìm thấy thiết bị/chuồng
+    """
+    data = request.get_json()
+    device_id = data.get('device_id')
+    coop_id = data.get('coop_id')
+    
+    if not device_id or not coop_id:
+        return jsonify({'error': 'device_id and coop_id required'}), 400
+    
+    # Kiểm tra chuồng tồn tại
+    from models import Coop
+    coop = db.session.get(Coop, coop_id)
+    if not coop:
+        return jsonify({'error': 'Coop not found'}), 404
+    
+    # Kiểm tra thiết bị tồn tại
+    device = db.session.get(Device, device_id)
+    if not device:
+        return jsonify({'error': 'Device not found'}), 404
+    
+    # Kiểm tra thiết bị đã trong coop chưa
+    existing_link = CoopDevice.query.filter_by(
+        coop_id=coop_id, device_id=device_id, deleted=False
+    ).first()
+    if existing_link:
+        return jsonify({'error': 'Device already in this coop'}), 400
+    
+    try:
+        # Bước 1: Thêm vào coop_devices
+        coop_device = CoopDevice(coop_id=coop_id, device_id=device_id)
+        db.session.add(coop_device)
+        
+        # Bước 2: Xóa khỏi unconnected_devices (nếu có)
+        UnconnectedDevice.query.filter_by(device_id=device_id).delete()
+        
+        # Bước 3: Cập nhật trạng thái Device
+        device.status = 'connecting'
+        device.is_active = True
+        
+        # Đồng bộ has_camera nếu là thiết bị camera
+        if device.type == 'camera':
+            coop.has_camera = 1
+        
+        db.session.commit()
+        
+        # Broadcast updates
+        broadcast_coop_update(coop_id)
+        broadcast_device_update(device_id)
+        broadcast_dashboard_update()
+        
+        return jsonify({
+            'message': 'Device attached to coop',
+            'device': device.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
 @devices_bp.route('/public/remove-from-coop/<int:device_id>', methods=['DELETE'])
@@ -691,34 +805,22 @@ def update_device_name(device_id):
 @devices_bp.route('/status-stats', methods=['GET'])
 def get_device_status_stats():
     """
-    Lấy thống kê thiết bị theo trạng thái.
+    Lấy thống kê thiết bị theo trạng thái (4 trạng thái).
     
     Returns:
         200: {
-            "off": <số thiết bị đã tắt (is_active = 0)>,
             "active": <số thiết bị đang hoạt động (is_active = 1 AND status = 'online')>,
-            "connecting": <số thiết bị đang kết nối>,
-            "error": <số thiết bị lỗi (is_active = 1 AND status = 'offline')>
+            "error": <số thiết bị lỗi (is_active = 1 AND status = 'offline')>,
+            "connecting": <số thiết bị đang kết nối (is_active = 1 AND status = 'connecting')>,
+            "waiting": <số thiết bị đang chờ kết nối (is_active = 0)>
         }
     """
-    devices = Device.query.filter_by(deleted=False).all()
-    
     stats = {
-        'off': 0,
-        'active': 0,
-        'connecting': 0,
-        'error': 0
+        'active': Device.query.filter(Device.is_active == True, Device.status == 'online', Device.deleted == False).count(),
+        'error': Device.query.filter(Device.is_active == True, Device.status == 'offline', Device.deleted == False).count(),
+        'connecting': Device.query.filter(Device.is_active == True, Device.status == 'connecting', Device.deleted == False).count(),
+        'waiting': Device.query.filter(Device.is_active == False, Device.deleted == False).count()
     }
-    
-    for device in devices:
-        if device.is_active == False:
-            stats['off'] += 1
-        elif device.status in ['online', 'connected']:
-            stats['active'] += 1
-        elif device.status in ['connecting', 'pending']:
-            stats['connecting'] += 1
-        else:
-            stats['error'] += 1
 
     return jsonify(stats), 200
 

@@ -217,7 +217,8 @@ class Device(db.Model):
     DEVICE_STATUS = [
         'online',
         'offline',
-        'connecting'
+        'connecting',
+        'pending'
     ]
     
     id = db.Column(db.Integer, primary_key=True)
@@ -280,9 +281,7 @@ class CoopDevice(db.Model):
         return {
             'id': self.id,
             'coop_id': self.coop_id,
-            'time': self.time.isoformat() if self.time else None,
-            'amount': self.amount,
-            'enabled': self.enabled,
+            'device_id': self.device_id,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
     
