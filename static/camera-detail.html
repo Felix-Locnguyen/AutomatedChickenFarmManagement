@@ -547,6 +547,85 @@
             100% { background-position: -200% 0; }
         }
 
+        .recordings-section {
+            margin-top: 10px;
+        }
+        .recordings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .recordings-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .refresh-recordings-btn {
+            padding: 2px 8px;
+            font-size: 11px;
+        }
+        .recordings-list {
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .recordings-list::-webkit-scrollbar { width: 4px; }
+        .recordings-list::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 2px; }
+        .recording-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        .recording-item:hover {
+            background: #e9ecef;
+            border-color: #4e73df;
+        }
+        .recording-item.active {
+            background: #e8f0fe;
+            border-color: #4e73df;
+        }
+        .recording-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .recording-icon.video_url { background: #d4edda; color: #155724; }
+        .recording-icon.file_path { background: #cce5ff; color: #004085; }
+        .recording-icon.text { background: #fff3cd; color: #856404; }
+        .recording-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .recording-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2c3e50;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .recording-meta {
+            font-size: 11px;
+            color: #6c757d;
+            display: flex;
+            gap: 8px;
+            margin-top: 2px;
+        }
+
         .device-online {
             background: #d4edda;
             color: #155724;
@@ -667,7 +746,8 @@
                                 <div class="single-video-container">
                                     <div class="video-viewport" id="mainViewport">
                                         <div class="camera-label" id="mainCameraLabel">CAMERA 1</div>
-                                        <div class="video-placeholder">
+                                        <video id="videoPlayer" class="video-player" controls playsinline style="display:none; width:100%; height:100%; object-fit:contain; background:#000;" onerror="handleVideoError(event)"></video>
+                                        <div class="video-placeholder" id="videoPlaceholder">
                                             <i class="fas fa-video"></i>
                                             <span id="mainViewportStatus">Đang tải Camera 1...</span>
                                         </div>
@@ -764,6 +844,19 @@
                                             <span class="coop-device-tag active"><i class="fas fa-lightbulb"></i> Đèn LED</span>
                                         </div>
                                     </div>
+
+                                    <div class="recordings-section" id="recordingsSection" style="display:none;">
+                                        <hr>
+                                        <div class="recordings-header">
+                                            <span class="recordings-title"><i class="fas fa-video"></i> Video Recordings</span>
+                                            <button class="btn btn-sm btn-outline-primary refresh-recordings-btn" onclick="loadRecordings()" title="Làm mới">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </div>
+                                        <div class="recordings-list" id="recordingsList">
+                                            <div class="text-muted text-center py-2">Đang tải...</div>
+                                        </div>
+                                    </div>
                                 </div>
                                 </div>
                             </div>
@@ -787,7 +880,8 @@
         <button class="fullscreen-close" onclick="toggleFullscreen()">
             <i class="fas fa-times"></i>
         </button>
-        <div class="video-placeholder" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
+        <video id="fullscreenPlayer" class="fullscreen-player" controls style="width:100%; height:100%; object-fit:contain; background:#000; display:none;" onerror="console.error('Fullscreen video error:', this.error);"></video>
+        <div class="video-placeholder" id="fullscreenPlaceholder" style="display:flex; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);">
             <i class="fas fa-video" style="font-size: 80px; opacity: 0.5;"></i>
             <span style="color: rgba(255,255,255,0.7);">Chế độ toàn màn hình</span>
         </div>
@@ -862,6 +956,36 @@
 
         function toggleFullscreen() {
             const fs = document.getElementById('fullscreenVideo');
+            const player = document.getElementById('videoPlayer');
+            const fsPlayer = document.getElementById('fullscreenPlayer');
+            const fsPlaceholder = document.getElementById('fullscreenPlaceholder');
+            const isOpening = !fs.classList.contains('show');
+
+            if (isOpening) {
+                fsPlayer.src = player.src;
+                fsPlayer.currentTime = player.currentTime;
+                if (player.style.display !== 'none' && player.src) {
+                    fsPlayer.style.display = 'block';
+                    fsPlaceholder.style.display = 'none';
+                    fsPlayer.play().catch(function() {});
+                } else {
+                    fsPlayer.style.display = 'none';
+                    fsPlaceholder.style.display = 'flex';
+                }
+            } else {
+                if (fsPlayer.src) {
+                    player.src = fsPlayer.src;
+                    player.currentTime = fsPlayer.currentTime;
+                    if (fsPlayer.style.display !== 'none') {
+                        player.style.display = 'block';
+                        document.getElementById('videoPlaceholder').style.display = 'none';
+                        player.play().catch(function() {});
+                    }
+                }
+                fsPlayer.pause();
+                fsPlayer.removeAttribute('src');
+            }
+
             fs.classList.toggle('show');
         }
         window.toggleFullscreen = toggleFullscreen;
@@ -1073,6 +1197,203 @@
                 </span>`;
             }).join('');
         }
+
+        window.handleVideoError = function(event) {
+            const player = event.target;
+            const mediaError = player.error;
+            let msg = 'Lỗi không xác định';
+            if (mediaError) {
+                switch (mediaError.code) {
+                    case MediaError.MEDIA_ERR_ABORTED: msg = 'Phát lại bị huỷ'; break;
+                    case MediaError.MEDIA_ERR_NETWORK: msg = 'Lỗi mạng khi tải video'; break;
+                    case MediaError.MEDIA_ERR_DECODE: msg = 'Lỗi giải mã video (codec không hỗ trợ)'; break;
+                    case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: msg = 'Định dạng video không được hỗ trợ'; break;
+                }
+            }
+            console.error('Video playback error:', msg, mediaError);
+            const status = document.getElementById('mainViewportStatus');
+            status.innerHTML = '<i class="fas fa-exclamation-triangle" style="font-size:40px;display:block;margin-bottom:10px;color:#dc3545;"></i> ' + msg;
+            player.style.display = 'none';
+            document.getElementById('videoPlaceholder').style.display = 'flex';
+            showToast(msg, 'error');
+        };
+
+        window.loadRecordings = async function() {
+            if (!availableCameras || availableCameras.length === 0) return;
+            const camId = availableCameras[currentCameraIndex]?.id;
+            if (!camId) return;
+
+            const section = document.getElementById('recordingsSection');
+            const list = document.getElementById('recordingsList');
+            section.style.display = 'block';
+            list.innerHTML = '<div class="text-muted text-center py-2"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>';
+
+            try {
+                const resp = await fetch(`/api/camera/${camId}/recordings?limit=20`, {
+                    headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+                });
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+                const recs = data.recordings || [];
+
+                if (recs.length === 0) {
+                    list.innerHTML = '<div class="text-muted text-center py-2">Chưa có recording nào</div>';
+                    return;
+                }
+
+                list.innerHTML = recs.map(r => {
+                    const iconMap = { video_url: 'fa-link', file_path: 'fa-file-video', text: 'fa-file-alt' };
+                    const icon = iconMap[r.source_type] || 'fa-video';
+                    const duration = r.duration ? Math.round(r.duration) + 's' : '';
+                    const size = r.file_size ? formatFileSize(r.file_size) : '';
+                    const time = r.recorded_at ? new Date(r.recorded_at).toLocaleString('vi-VN') : '';
+                    return `<div class="recording-item" onclick="playRecording(${r.id},'${r.source_type}','${r.source_value.replace(/'/g, "\\'")}')">
+                        <div class="recording-icon ${r.source_type}"><i class="fas ${icon}"></i></div>
+                        <div class="recording-info">
+                            <div class="recording-name">${r.name || 'Không tên'}</div>
+                            <div class="recording-meta">
+                                <span>${time}</span>
+                                ${duration ? '<span>' + duration + '</span>' : ''}
+                                ${size ? '<span>' + size + '</span>' : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (err) {
+                console.error('Load recordings error:', err);
+                list.innerHTML = '<div class="text-danger text-center py-2">Lỗi tải recordings</div>';
+            }
+        };
+
+        window.playRecording = function(id, sourceType, sourceValue) {
+            const player = document.getElementById('videoPlayer');
+            const placeholder = document.getElementById('videoPlaceholder');
+            const status = document.getElementById('mainViewportStatus');
+            const fs = document.getElementById('fullscreenVideo');
+            const fsPlayer = document.getElementById('fullscreenPlayer');
+            const fsPlaceholder = document.getElementById('fullscreenPlaceholder');
+
+            // Highlight active recording
+            document.querySelectorAll('.recording-item').forEach(el => el.classList.remove('active'));
+            const items = document.querySelectorAll('.recording-item');
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].getAttribute('onclick') && items[i].getAttribute('onclick').includes('playRecording(' + id + ',')) {
+                    items[i].classList.add('active');
+                    break;
+                }
+            }
+
+            if (sourceType === 'text') {
+                player.style.display = 'none';
+                placeholder.style.display = 'flex';
+                status.innerHTML = '<i class="fas fa-file-alt" style="font-size:40px;display:block;margin-bottom:10px;"></i> ' + sourceValue;
+                if (fs.classList.contains('show')) {
+                    fsPlayer.style.display = 'none';
+                    fsPlaceholder.style.display = 'flex';
+                }
+                return;
+            }
+
+            // Build playable URL
+            let videoUrl = sourceValue;
+            if (sourceType === 'file_path') {
+                videoUrl = '/api/camera/serve-video?path=' + encodeURIComponent(sourceValue);
+            }
+
+            player.style.display = 'block';
+            placeholder.style.display = 'none';
+            player.src = videoUrl;
+            player.load();
+            player.play().catch(function(e) {
+                console.warn('Auto-play blocked:', e);
+            });
+
+            // Sync fullscreen
+            if (fs.classList.contains('show')) {
+                fsPlayer.style.display = 'block';
+                fsPlaceholder.style.display = 'none';
+                fsPlayer.src = videoUrl;
+                fsPlayer.load();
+                fsPlayer.play().catch(function() {});
+            }
+        };
+
+        window.formatFileSize = function(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        };
+
+        // Đọc video_path.txt và phát video trực tiếp trên viewport
+        async function playVideoFromFile() {
+            try {
+                const resp = await fetch('/api/camera/video-path', {
+                    headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+                });
+                const data = await resp.json();
+                const path = data && data.video_path;
+                if (!path) return;
+
+                // Lấy tên file để hiển thị
+                const fileName = path.split('\\').pop().split('/').pop() || 'Video';
+
+                const player = document.getElementById('videoPlayer');
+                const placeholder = document.getElementById('videoPlaceholder');
+                const status = document.getElementById('mainViewportStatus');
+
+                const videoUrl = '/api/camera/serve-video?path=' + encodeURIComponent(path);
+                player.style.display = 'block';
+                placeholder.style.display = 'none';
+                player.src = videoUrl;
+                player.load();
+                player.play().catch(function(e) {
+                    console.warn('Auto-play from file blocked:', e);
+                });
+
+                status.textContent = 'Phát: ' + fileName;
+                console.log('Playing video from file:', path);
+            } catch (err) {
+                console.warn('playVideoFromFile error:', err);
+            }
+        }
+
+        // Auto-load video từ file text vào camera đầu tiên (tạo recording để lưu lịch sử)
+        async function autoLoadFromFile() {
+            try {
+                const resp = await fetch('/api/camera/auto-load', {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + getAuthToken() }
+                });
+                const result = await resp.json();
+                if (resp.ok) {
+                    console.log('Auto-loaded recording:', result.id);
+                    return result;
+                } else if (resp.status === 400) {
+                    console.log('Auto-load skip:', result.error);
+                } else {
+                    console.warn('Auto-load error:', result.error);
+                }
+            } catch (err) {
+                console.warn('Auto-load request failed:', err);
+            }
+            return null;
+        }
+
+        // Load recordings + auto-play từ file
+        const origRender = renderCoopDetail;
+        renderCoopDetail = async function(data) {
+            origRender(data);
+            // Ưu tiên 1: phát video trực tiếp từ file text
+            await playVideoFromFile();
+            // Ưu tiên 2: tạo recording để lưu lịch sử
+            await autoLoadFromFile();
+            // Tải danh sách recordings
+            setTimeout(loadRecordings, 500);
+        };
+
+        // Auto-reload recordings every 30s
+        setInterval(loadRecordings, 30000);
 
         updateTimestamp();
         setInterval(updateTimestamp, 1000);

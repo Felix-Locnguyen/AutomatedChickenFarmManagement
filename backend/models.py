@@ -489,3 +489,43 @@ class UnconnectedDevice(db.Model):
 
     def __repr__(self):
         return f'<UnconnectedDevice {self.name}>'
+
+
+class VideoRecording(db.Model):
+    __tablename__ = 'video_recordings'
+
+    SOURCE_TYPES = ['text', 'video_url', 'file_path']
+
+    id = db.Column(db.Integer, primary_key=True)
+    device_id = db.Column(db.Integer, db.ForeignKey('devices.id'), nullable=False)
+    coop_id = db.Column(db.Integer, db.ForeignKey('coops.id'), nullable=False)
+    name = db.Column(db.String(200), nullable=False)
+    source_type = db.Column(db.String(20), nullable=False)
+    source_value = db.Column(db.Text, nullable=False)
+    thumbnail_url = db.Column(db.String(500))
+    duration = db.Column(db.Float)
+    file_size = db.Column(db.Integer)
+    recorded_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    deleted = db.Column(db.Boolean, default=False)
+
+    device = db.relationship('Device', backref='video_recordings', lazy='joined')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'device_id': self.device_id,
+            'coop_id': self.coop_id,
+            'name': self.name,
+            'source_type': self.source_type,
+            'source_value': self.source_value,
+            'thumbnail_url': self.thumbnail_url,
+            'duration': self.duration,
+            'file_size': self.file_size,
+            'recorded_at': self.recorded_at.isoformat() if self.recorded_at else None,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
+
+    def __repr__(self):
+        return f'<VideoRecording {self.name} ({self.source_type})>'

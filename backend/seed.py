@@ -25,7 +25,7 @@ from flask import Flask
 from config import config
 
 # Import database models và db instance
-from models import db, User, Coop, Device, CoopDevice, Environment, FeedSchedule, Alert
+from models import db, User, Coop, Device, CoopDevice, Environment, FeedSchedule, Alert, VideoRecording
 
 
 # =============================================================================
@@ -367,6 +367,77 @@ def seed_environments(coops):
 
 
 # =============================================================================
+# SEED DỮ LIỆU VIDEO RECORDINGS CHO CAMERA
+# =============================================================================
+
+def seed_video_recordings(coops, coop_devices_map):
+    """
+    Tạo dữ liệu video recordings fake cho mỗi camera.
+
+    Mỗi camera (device type='camera') được tạo 3-5 recordings với
+    các loại nguồn khác nhau:
+    - text: Nội dung mô tả video dạng text
+    - video_url: Link URL video streaming
+    - file_path: Đường dẫn file video cục bộ
+    """
+    print("  Đang tạo video recordings cho camera...")
+
+    now = datetime.utcnow()
+    recording_templates = [
+        {'name': 'Giám sát buổi sáng', 'source_type': 'video_url',
+         'source_value': 'https://storage.example.com/videos/morning_{cam_id}.mp4',
+         'duration': 300, 'file_size': 45000000},
+        {'name': 'Ghi nhận hoạt động đàn gà', 'source_type': 'text',
+         'source_value': 'Đàn gà đang hoạt động bình thường. Nhiệt độ ổn định 25°C. Quan sát thấy khoảng 95% gà đang ăn/uống.',
+         'duration': 600, 'file_size': 0},
+        {'name': 'Record chiều tối', 'source_type': 'file_path',
+         'source_value': 'D:\\Camera_Data\\coop_{coop_id}\\cam_{cam_id}\\20260515_180000.mp4',
+         'duration': 900, 'file_size': 135000000},
+        {'name': 'Cảnh báo bất thường', 'source_type': 'text',
+         'source_value': '[CẢNH BÁO] Phát hiện gà tụ tập bất thường tại góc chuồng. Nhiệt độ khu vực này cao hơn 2°C so với trung bình.',
+         'duration': 120, 'file_size': 0},
+        {'name': 'Kiểm tra đèn sưởi', 'source_type': 'video_url',
+         'source_value': 'https://storage.example.com/videos/heater_check_{cam_id}.mp4',
+         'duration': 450, 'file_size': 68000000},
+    ]
+
+    count = 0
+    for coop in coops:
+        devices = coop_devices_map.get(coop.id, [])
+        cameras = [d for d in devices if d.type == 'camera']
+
+        for cam in cameras:
+            num_recordings = random.randint(3, 5)
+            for i in range(num_recordings):
+                tmpl = random.choice(recording_templates)
+                hours_ago = random.uniform(0, 72)
+                recorded_at = now - timedelta(hours=hours_ago)
+
+                source_value = tmpl['source_value'].format(
+                    cam_id=cam.id, coop_id=coop.id
+                )
+
+                rec = VideoRecording(
+                    device_id=cam.id,
+                    coop_id=coop.id,
+                    name=tmpl['name'],
+                    source_type=tmpl['source_type'],
+                    source_value=source_value,
+                    thumbnail_url=f'/thumbnails/cameras/{cam.id}/thumb_{i+1}.jpg',
+                    duration=tmpl['duration'],
+                    file_size=tmpl['file_size'],
+                    recorded_at=recorded_at,
+                )
+                db.session.add(rec)
+                count += 1
+
+            print(f"    [OK] {cam.name}: {num_recordings} recordings")
+
+    db.session.commit()
+    print(f"    [OK] Tổng số: {count} video recordings")
+
+
+# =============================================================================
 # SEED LỊCH CHO ĂN
 # =============================================================================
 
@@ -537,6 +608,9 @@ def reset_database():
     print("\n[1] Đang xóa dữ liệu cũ...")
     
     # Xóa theo thứ tự để tránh vi phạm ràng buộc khóa ngoài
+    print("    Xóa VideoRecording...")
+    VideoRecording.query.delete()
+
     print("    Xóa Alert...")
     Alert.query.delete()
     
@@ -612,6 +686,10 @@ def run_seed():
         print("\n[7] Seed FeedSchedules...")
         seed_feed_schedules(coops)
 
+        # Bước 7: Seed Video Recordings
+        print("\n[6.1] Seed Video Recordings...")
+        seed_video_recordings(coops, devices)
+
         # Bước 7.1: Seed Unconnected Devices
         print("\n[7.1] Seed Unconnected Devices...")
         seed_unconnected_devices()
@@ -630,6 +708,7 @@ def run_seed():
         print(f"  CoopDevices:  {CoopDevice.query.count()}")
         print(f"  Environments: {Environment.query.count()}")
         print(f"  FeedSchedules: {FeedSchedule.query.count()}")
+        print(f"  VideoRecordings: {VideoRecording.query.count()}")
         print(f"  Alerts:       {Alert.query.count()}")
         print("=" * 60)
         

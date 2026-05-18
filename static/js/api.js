@@ -538,6 +538,39 @@
          */
         getByCoop: async function(coopId) {
             return await window.apiFetch(`/camera/coop/${coopId}`);
+        },
+
+        /**
+         * Đọc đường dẫn video từ file text
+         * @returns {object} { video_path }
+         */
+        getVideoPath: async function() {
+            return await window.apiFetch('/camera/video-path');
+        },
+
+        /**
+         * Ghi đường dẫn video vào file text
+         * @param {string} videoPath - Đường dẫn video
+         * @returns {object}
+         */
+        setVideoPath: async function(videoPath) {
+            return await window.apiFetch('/camera/video-path', {
+                method: 'PUT',
+                body: JSON.stringify({ video_path: videoPath })
+            });
+        },
+
+        /**
+         * Tạo recording từ đường dẫn trong file text
+         * @param {number} deviceId - ID camera
+         * @param {object} data - { name, duration, file_size }
+         * @returns {object}
+         */
+        createRecordingFromFile: async function(deviceId, data = {}) {
+            return await window.apiFetch(`/camera/${deviceId}/recordings/from-file`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
         }
     };
 
